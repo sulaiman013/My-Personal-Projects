@@ -1,0 +1,191 @@
+---
+title: "EDA and bivariate analysis of TSCS Corruptions Data"
+output:
+  github_document: default
+---
+<style>
+body {
+text-align: justify}
+</style>
+## 1: Inspect the TSCS Corruption Dataset  
+  
+### 1.A: R Code  
+  
+```{r message=FALSE, warning=FALSE}
+#loading the package tidyverse
+library(tidyverse) 
+
+#importing the dataset
+data1 <- read.csv("D:\\Projects\\EDA and Bivariate analysis of TSCS corruption data\\SchwindtBayer_Tavits_Data2016.csv") 
+
+#finding the number of rows and observations in the dataset
+nrow(data1)
+
+#finding the number of columns and variables in the dataset
+ncol(data1) 
+
+#inspecting first few rows/columns of data
+head(data1) 
+
+#inspecting minimum year
+min(data1$year) 
+
+#inspecting maximum year
+max(data1$year) 
+
+#inspecting range of years
+range(data1$year) 
+
+#inspecting the number of countries covered in the dataset using dplyr, piping operator etc.
+data1 %>%
+  select(country) %>%
+  n_distinct() 
+
+```
+
+### 1.B: Interpretation of the Findings  
+  
+The dataset has 2002 rows/observations and 66 columns/variables. The dataset is ranging from year 1990 to 2010. And, a total of 115 countries covered in the dataset.  
+
+## 2: Summarize an Indicator of Corruption  
+  
+### 2.A: R Code  
+  
+```{r message=FALSE, warning=FALSE}
+#this is the World Bank Governance Indicator 
+head(data1$wb_corr) 
+
+#calculating mean, median, minimum, maximum, and standard deviation of the corruption indicator
+data1 %>%
+  select(wb_corr) %>%
+  summarise(Average = mean(wb_corr, na.rm = TRUE),
+            Median = median(wb_corr, na.rm = TRUE),
+            Minimum = min(wb_corr, na.rm = TRUE),
+            Maximum = max(wb_corr, na.rm = TRUE),
+            `Standard Deviation` = sd(wb_corr, na.rm = TRUE))
+
+#plotting a histogram of the corruption indicator including a red colored line that showing the average of that variable.
+hist(data1$wb_corr);abline(v = mean(data1$wb_corr, na.rm = TRUE), col= "red", lwd = 2) 
+```
+
+### 2.B: Interpretation of the Results  
+  
+The corruption indicator variable contains many missing values, so we have to analyze/calculate summary statistics excluding those missing values. The mean of variable is 0.198, median is -0.128, ranging from -1.458 to 2.590 and the standard deviation is 1.02. The histogram indicating to a right skewed distribution of the data.  
+  
+## 3: Corruption Across Regions  
+  
+### 3.A: R Code  
+  
+```{r fig.height=9, fig.width=9, message=FALSE, warning=FALSE}
+#identifying the region variable
+head(data1$region) 
+
+#using the dplyr package and piping operator, selecting the variable region and the using mutate and recode to recode the region variable numeric to character.
+data1 <- data1 %>% 
+  mutate(region_ch = recode(region, '1' = "Sub-Saharan Africa",
+                                 '2' = "South Asia",
+                                 '3' = "East Asia",
+                                 '4' = "South East Asia",
+                                 '5' = "Pacific Islands/Oceania",
+                                 '6' = "Middle East/North Africa",
+                                 '7' = "Latin America",
+                                 '8' = "Caribbean and non-Iberic America",
+                                 '9' = "Eastern Europe/Soviet Union",
+                                 '10' = "Western Europe"))
+
+#calculating the average of world bank governance indicator for every region
+data1 %>% 
+  group_by(region_ch) %>%
+  summarize(mean(wb_corr, na.rm = TRUE))
+
+#installing the package ggplot2 and the loading it. Plotting boxplots comparing the regional distributions of the corruption indicator. 
+#install.packages("ggplot2")
+ggplot(data1) +
+ aes(x = "", y = wb_corr) +
+ geom_boxplot(fill = "#0c4c8a") +
+ labs(y = "World Bank Governance Indicators", title = "Boxplot", subtitle = "Comparing regional distributions of corruption") +
+ theme_classic() +
+ facet_wrap(vars(region_ch))
+```
+  
+### 3.B: Interpretation of the Results  
+  
+There are 10 regions in this dataset. In these 10 regions, 5 regions (1,2,4,7, and 9) are more corrupted than other 5 regions(3,5,6,8, and 10). The boxplot showing the distribution of corruption indicator for each region, it also showing outliers and shape of the distribution.  
+  
+## 4. Corruption Over Time  
+  
+### 4.A: R Code  
+  
+```{r message=FALSE, warning=FALSE}
+#calculating yearly average of world bank governance indicator for region 2 and 3.
+data2 <- data1 %>%
+  group_by(year, region) %>%
+  filter(region == 2 | region == 3) %>%
+  summarise(avg_yearly = mean(wb_corr, na.rm = TRUE))
+data2
+
+#plotting yearly average of world bank governance indicator for region 2 and 3 over time (1990 to 2010). 
+ggplot(data2) +
+ aes(x = year, y = avg_yearly) +
+ geom_line(size = 1.36, colour = "#0c4c8a") +
+ labs(x = "Years", y = "World Bank Governance Indicator", title = "Lines", subtitle = "Showing yearly average World Bank Governance Indicator corruption for region 2 and 3 over time") +
+ theme_classic() +
+ facet_wrap(vars(region))
+```
+
+### 4.B: Interpretation of the Results  
+  
+For region 2, the corruption increased from 2002 to 2005 and then it drastically decreased until 2007. And then again the corruption increased slowly.  
+For region 3, the corruption decreased from 2002 to 2003 and then it slowly increased until 2008. And then again the corruption decreased radically.  
+  
+## 5: Women's Political Empowerment and Corruption  
+  
+### 5.A: R Code  
+  
+```{r message=FALSE, warning=FALSE}
+#plotting a scatter-plot that will show the relationship between the variables.
+ggplot(data1) +
+ aes(y = wb_corr, x = pctwomen) +
+ geom_point(size = 1.4, colour = "#26828e") +
+ labs(y = "World Bank Governance Indicator", x = "% of Women's legislative representation", title = "Scatterplot", subtitle = "Showing relationship between Women's legislative representation and World bank governance indicator corruption") +
+ theme_classic()
+
+#plotting a scatter-plot that will show the relationship between the variables comparing different democratic countries.
+ggplot(data1) +
+ aes(y = wb_corr, x = pctwomen , colour = polity2) +
+ geom_point(size = 1.5) +
+ scale_color_viridis_c(option = "viridis") +
+ labs(y = "World bank governance indicator", x = "% of Women's legislative representation", title = "Scatterplot", subtitle = "Showing relationship between pctwomen and wb_corr comparing different democratic countries", color = "LESS vs MORE Democratic") +
+ theme_classic()
+```
+  
+### 5.B: Interpretation of the Results  
+  
+The first plot showing, as the percentage of women's legislative representation increases the corruption indicator also increases meaning the corruption itself is decreasing.   
+The second plot showing, percentage of women's legislative representation is more in democratic countries than less democratic countries. Also, more democratic countries tends to have less corruption because we can see higher value of corruption indicator which actually means lesser corruption.
+  
+## 6: Bivariate Data Visualization of Corruption  
+  
+### 6.A: R Code  
+  
+```{r message=FALSE, warning=FALSE}
+#plotting a scatter-plot that will show the relationship between the variables.
+ggplot(data1) +
+ aes(y = wb_corr, x = gdpc) +
+ geom_point(size = 1.4, colour = "#26828e") +
+ labs(y = "World Bank Governance Indicator", x = "GDP per capita", title = "Scatterplot", subtitle = "Showing relationship between GDP per capita and World bank governance indicator corruption") +
+ theme_classic()
+
+#plotting a scatter-plot that will show the relationship between the variables comparing different democratic countries.
+ggplot(data1) +
+ aes(y = wb_corr, x = gdpc, colour = polity2) +
+ geom_point(size = 1.5) +
+ scale_color_viridis_c(option = "viridis") +
+ labs(y = "World bank governance indicator", x = "GDP per capita", title = "Scatterplot", subtitle = "Showing relationship between gdpc and wb_corr comparing different democratic countries", color = "LESS vs MORE Democratic") +
+ theme_classic()
+```
+  
+### 6.B: Interpretation of the Results  
+  
+The first plot showing, as the GDP per capita increases the corruption indicator also increases meaning the corruption itself is decreasing.   
+The second plot showing, the amount of GDP per capita is more in democratic countries than less democratic countries. Also, more democratic countries tends to have less corruption because we can see higher value of corruption indicator which actually means lesser corruption.  
