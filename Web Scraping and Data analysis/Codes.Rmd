@@ -1,0 +1,272 @@
+---
+title: "Web Scraping and Data Analysis"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Loading necessary libraries  
+  
+```{r message=FALSE, warning=FALSE}
+library(stringr)
+library(R.utils)
+library(rvest)
+library(dplyr)
+library(xml2)
+library(tm)
+library(ggplot2)
+```
+  
+  
+## Web scraping the billboard hot 100 page  
+  
+```{r message=FALSE, warning=FALSE}
+an_url="https://www.billboard.com/charts/hot-100"
+an = read_html(an_url)
+an
+str( an )
+
+
+hot100.rank = an %>% 
+  html_nodes('.chart-element__rank__number') %>% 
+  html_text()
+
+hot100.artist = an %>% 
+  html_nodes('.text--truncate.color--secondary') %>% 
+  html_text()
+
+hot100.title = an %>% 
+  html_nodes('.color--primary') %>% 
+  html_text()
+hot100.title =hot100.title[-c(1,2)]
+
+
+df <- data.frame(hot100.rank, hot100.artist, hot100.title)
+```
+  
+  
+## Observing number of tracks of each artist  
+  
+```{r message=FALSE, warning=FALSE}
+table(df$hot100.artist)
+```
+  
+  
+## Creating a function that will return all the songs sang by a specific artist  
+  
+```{r message=FALSE, warning=FALSE}
+artist.func = function(write){
+  
+  if(write == "List"){
+    result= df$hot100.artist
+    return(result)
+  } 
+  if(nchar(write, type="chars")){
+    df_song = df[ df$hot100.artist==write, ]
+    result = df_song$hot100.title
+    }
+  else{
+    result = "Invalid Input"
+  }
+  return(result)
+}
+
+write = "The Weeknd"
+
+artist.func(write)
+```
+  
+  
+## Web scraping another page, cleaning and making a data frame  
+  
+```{r message=FALSE, warning=FALSE}
+an_url2="https://www.chewy.com/b/dry-food-294"
+an2 = read_html(an_url2)
+an2
+
+brand_name = an2 %>% 
+  html_nodes('h2 strong') %>% 
+  html_text()
+brand_name = trimws(brand_name, which = c("both"), whitespace = "[ :\t\r\n]")
+brand_name
+
+prod_name = an2 %>% 
+  html_nodes('.content h2') %>% 
+  html_text()
+prod_name
+prod_name = trimws(prod_name, which = c("both"), whitespace = "[:\t\r\n]")
+prod_name
+prod_name = removeWords(prod_name, brand_name)
+prod_name
+prod_name = trimws(prod_name, which = c("both"), whitespace = "[ :\t\r\n]")
+prod_name
+
+price.auto = an2 %>% 
+  html_nodes('.autoship strong') %>%
+  html_text()
+
+price.auto
+
+price.auto = trimws(price.auto, which = c("both"), whitespace = "[ \t\r\n]")
+price.auto
+
+
+price.orig = an2 %>% 
+  html_nodes('.price strong') %>% 
+  html_text()
+price.orig = trimws(price.orig, which = c("both"), whitespace = "[ \t\r\n]")
+price.orig
+
+num_review = an2 %>% 
+  html_nodes('.item-rating span') %>% 
+  html_text()
+num_review = trimws(num_review, which = c("both"), whitespace = "[ \t\r\n]")
+num_review
+
+
+df2 <- cbind(brand_name, prod_name, price.auto, price.orig, num_review)
+df2 <- data.frame(df2)
+```
+  
+  
+## Average number of reviews of each brand  
+  
+```{r message=FALSE, warning=FALSE}
+df2$num_review <- as.numeric(df2$num_review)
+avg_rev_brand <-  aggregate((num_review) ~ brand_name , data= df2, FUN = mean)
+avg_rev_brand
+```
+  
+  
+## Subsetting the data frame only having the brand "Taste of the wild"  
+  
+```{r message=FALSE, warning=FALSE}
+df2_tasteofthewild = df2[df2$brand_name == "Taste of the Wild",]
+```
+  
+  
+## Visualization  
+  
+```{r message=FALSE, warning=FALSE}
+df2$price.auto <- gsub("[$]", "", df2$price.auto)
+df2$price.orig <- gsub("[$]", "", df2$price.orig)
+
+df2$price.auto <- as.numeric(df2$price.auto)
+df2$price.orig <- as.numeric(df2$price.orig)
+
+
+ggplot(df2) +
+ aes(x = price.orig, y = price.auto, colour = brand_name) +
+ geom_point(shape = "circle", 
+ size = 2.8) +
+ scale_color_hue(direction = 1) +
+ theme_gray()
+```
+  
+  
+## Creating a variable that shows price differences  
+  
+```{r message=FALSE, warning=FALSE}
+df2$price.diff <- df2$price.orig - df2$price.auto
+df2$price.diff[is.na(df2$price.diff)] <- 0
+```
+  
+  
+## Sorting the newly created data frame  
+  
+```{r message=FALSE, warning=FALSE}
+df2 <- arrange(df2,brand_name, prod_name)
+```
+  
+  
+## Creating a function where I'll input the number of pages to scrape and the output will be the cleaned scraped pages in a data frame  
+  
+```{r message=FALSE, warning=FALSE}
+chewy.info = function(url){
+  an2 = read_html(url)
+  
+  brand_name = an2 %>% 
+    html_nodes('h2 strong') %>% 
+    html_text()
+  brand_name
+  
+ prod_name = an2 %>% 
+  html_nodes('.content h2') %>% 
+  html_text()
+ 
+  prod_name
+  prod_name = trimws(prod_name, which = c("both"), whitespace = "[:\t\r\n]")
+  prod_name
+  prod_name = removeWords(prod_name, brand_name)
+  prod_name
+  prod_name = trimws(prod_name, which = c("both"), whitespace = "[ :\t\r\n]")
+  prod_name
+  
+  price.auto = an2 %>% 
+    html_nodes('.autoship strong') %>% 
+    html_text()
+  price.auto = trimws(price.auto, which = c("both"), whitespace = "[ \t\r\n]")
+  price.auto
+  
+  
+  price.orig = an2 %>% 
+    html_nodes('.price strong') %>% 
+    html_text()
+  price.orig = trimws(price.orig, which = c("both"), whitespace = "[ \t\r\n]")
+  price.orig
+  
+  num_review = an2 %>% 
+    html_nodes('.item-rating span') %>% 
+    html_text()
+  num_review = trimws(num_review, which = c("both"), whitespace = "[ \t\r\n]")
+  num_review
+  
+  
+  chewy.df <- cbind(brand_name, prod_name, price.auto, price.orig, num_review)
+  chewy.df <- data.frame(chewy.df)
+  return(chewy.df)
+}
+
+chewy.info.final = function(page_num){
+  if(page_num>5 | page_num<1){
+    result="Invalid input." 
+  } else{
+    #url = "https://www.chewy.com/b/dry-food-294"
+    result = df2[,-6]
+    if(page_num<=5 & page_num>1){
+      for(i in 2:page_num){
+        url = paste("https://www.chewy.com/b/dry-food_c294_p" , i , sep="")
+        result.temp = chewy.info(url)
+        result = rbind(result, result.temp)
+      }
+    }
+  }
+  return(result)
+}
+
+page_num=3
+chewy.result = chewy.info.final(page_num)
+chewy.result
+```
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
