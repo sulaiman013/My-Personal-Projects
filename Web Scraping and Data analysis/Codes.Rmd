@@ -248,7 +248,7 @@ chewy.info.final = function(page_num){
 
 page_num=3
 chewy.result = chewy.info.final(page_num)
-chewy.result
+head(chewy.result)
 ```
   
 
