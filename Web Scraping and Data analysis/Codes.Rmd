@@ -10,13 +10,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Loading necessary libraries  
   
 ```{r message=FALSE, warning=FALSE}
+library(tidyverse)
 library(stringr)
 library(R.utils)
 library(rvest)
-library(dplyr)
 library(xml2)
 library(tm)
-library(ggplot2)
 ```
   
   
@@ -25,9 +24,6 @@ library(ggplot2)
 ```{r message=FALSE, warning=FALSE}
 an_url="https://www.billboard.com/charts/hot-100"
 an = read_html(an_url)
-an
-str( an )
-
 
 hot100.rank = an %>% 
   html_nodes('.chart-element__rank__number') %>% 
@@ -50,7 +46,8 @@ df <- data.frame(hot100.rank, hot100.artist, hot100.title)
 ## Observing number of tracks of each artist  
   
 ```{r message=FALSE, warning=FALSE}
-table(df$hot100.artist)
+no_of_tracks <- table(df$hot100.artist)
+head(no_of_tracks)
 ```
   
   
@@ -84,7 +81,6 @@ artist.func(write)
 ```{r message=FALSE, warning=FALSE}
 an_url2="https://www.chewy.com/b/dry-food-294"
 an2 = read_html(an_url2)
-an2
 
 brand_name = an2 %>% 
   html_nodes('h2 strong') %>% 
@@ -103,9 +99,19 @@ prod_name
 prod_name = trimws(prod_name, which = c("both"), whitespace = "[ :\t\r\n]")
 prod_name
 
-price.auto = an2 %>% 
-  html_nodes('.autoship strong') %>%
-  html_text()
+price.auto = an2 %>%
+  html_nodes('.product-info') %>%
+  map_chr(~{
+    autoprice <- .x %>% 
+      html_nodes('.autoship strong') %>% 
+      html_text2()
+    
+    if(length(autoprice) == 0){
+      autoprice <- NA
+    }
+    
+    return(autoprice)
+ }) 
 
 price.auto
 
@@ -119,15 +125,24 @@ price.orig = an2 %>%
 price.orig = trimws(price.orig, which = c("both"), whitespace = "[ \t\r\n]")
 price.orig
 
-num_review = an2 %>% 
-  html_nodes('.item-rating span') %>% 
-  html_text()
-num_review = trimws(num_review, which = c("both"), whitespace = "[ \t\r\n]")
+num_review = an2 %>%
+  html_nodes('.product-info') %>%
+  map_chr(~{
+    rating <- .x %>% 
+      html_nodes('.item-rating span') %>% 
+      html_text2()
+    
+    if(length(rating) == 0){
+      rating <- NA
+    }
+    
+    return(rating)
+ }) 
+
 num_review
 
-
-df2 <- cbind(brand_name, prod_name, price.auto, price.orig, num_review)
-df2 <- data.frame(df2)
+df2 <- data.frame(brand_name, prod_name, price.auto, price.orig, num_review)
+head(df2)
 ```
   
   
@@ -144,6 +159,7 @@ avg_rev_brand
   
 ```{r message=FALSE, warning=FALSE}
 df2_tasteofthewild = df2[df2$brand_name == "Taste of the Wild",]
+df2_tasteofthewild
 ```
   
   
@@ -162,7 +178,7 @@ ggplot(df2) +
  geom_point(shape = "circle", 
  size = 2.8) +
  scale_color_hue(direction = 1) +
- theme_gray()
+ theme_classic()
 ```
   
   
@@ -188,54 +204,70 @@ chewy.info = function(url){
   an2 = read_html(url)
   
   brand_name = an2 %>% 
-    html_nodes('h2 strong') %>% 
-    html_text()
-  brand_name
-  
- prod_name = an2 %>% 
+  html_nodes('h2 strong') %>% 
+  html_text()
+brand_name = trimws(brand_name, which = c("both"), whitespace = "[ :\t\r\n]")
+
+prod_name = an2 %>% 
   html_nodes('.content h2') %>% 
   html_text()
- 
-  prod_name
-  prod_name = trimws(prod_name, which = c("both"), whitespace = "[:\t\r\n]")
-  prod_name
-  prod_name = removeWords(prod_name, brand_name)
-  prod_name
-  prod_name = trimws(prod_name, which = c("both"), whitespace = "[ :\t\r\n]")
-  prod_name
+
+prod_name = trimws(prod_name, which = c("both"), whitespace = "[:\t\r\n]")
+prod_name = removeWords(prod_name, brand_name)
+prod_name = trimws(prod_name, which = c("both"), whitespace = "[ :\t\r\n]")
+
+
+price.auto = an2 %>%
+  html_nodes('.product-info') %>%
+  map_chr(~{
+    autoprice <- .x %>% 
+      html_nodes('.autoship strong') %>% 
+      html_text2()
+    
+    if(length(autoprice) == 0){
+      autoprice <- NA
+    }
+    
+    return(autoprice)
+ }) 
+
+price.auto = trimws(price.auto, which = c("both"), whitespace = "[ \t\r\n]")
+
+
+
+price.orig = an2 %>% 
+  html_nodes('.price strong') %>% 
+  html_text()
+price.orig = trimws(price.orig, which = c("both"), whitespace = "[ \t\r\n]")
+
+
+num_review = an2 %>%
+  html_nodes('.product-info') %>%
+  map_chr(~{
+    rating <- .x %>% 
+      html_nodes('.item-rating span') %>% 
+      html_text2()
+    
+    if(length(rating) == 0){
+      rating <- NA
+    }
+    
+    return(rating)
+ }) 
+
   
-  price.auto = an2 %>% 
-    html_nodes('.autoship strong') %>% 
-    html_text()
-  price.auto = trimws(price.auto, which = c("both"), whitespace = "[ \t\r\n]")
-  price.auto
   
-  
-  price.orig = an2 %>% 
-    html_nodes('.price strong') %>% 
-    html_text()
-  price.orig = trimws(price.orig, which = c("both"), whitespace = "[ \t\r\n]")
-  price.orig
-  
-  num_review = an2 %>% 
-    html_nodes('.item-rating span') %>% 
-    html_text()
-  num_review = trimws(num_review, which = c("both"), whitespace = "[ \t\r\n]")
-  num_review
-  
-  
-  chewy.df <- cbind(brand_name, prod_name, price.auto, price.orig, num_review)
-  chewy.df <- data.frame(chewy.df)
+  chewy.df <- data.frame(brand_name, prod_name, price.auto, price.orig, num_review)
   return(chewy.df)
 }
 
 chewy.info.final = function(page_num){
-  if(page_num>5 | page_num<1){
+  if(page_num>8 | page_num<1){
     result="Invalid input." 
   } else{
     #url = "https://www.chewy.com/b/dry-food-294"
     result = df2[,-6]
-    if(page_num<=5 & page_num>1){
+    if(page_num<=8 & page_num>1){
       for(i in 2:page_num){
         url = paste("https://www.chewy.com/b/dry-food_c294_p" , i , sep="")
         result.temp = chewy.info(url)
@@ -246,7 +278,7 @@ chewy.info.final = function(page_num){
   return(result)
 }
 
-page_num=3
+page_num=6
 chewy.result = chewy.info.final(page_num)
 head(chewy.result)
 ```
