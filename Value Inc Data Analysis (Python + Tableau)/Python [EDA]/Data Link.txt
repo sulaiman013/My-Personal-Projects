@@ -1,0 +1,5 @@
+Raw Data: https://drive.google.com/file/d/1XQ7aA7HEkq1pzQHZVn4abDNGMR9SY-33/view?usp=sharing
+
+After Performing the EDA using the python notebook it should look like the cleaned data.
+
+Cleaned Data: https://drive.google.com/file/d/107cb-Uhla1jhJKZrpEtqWqBf9vy7mFyo/view?usp=sharing
