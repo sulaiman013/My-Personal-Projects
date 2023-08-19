@@ -125,6 +125,132 @@ ORDER BY FIRST_PURCHASE_MONTH;
 | 2011-11-01           | 425	     | 55        | 0         | 0         | 0         | 0         | 0         | 0         | 0         | 0         | 0          | 0          | 0          |
 | 2011-12-01           | 45        | 0         | 0         | 0         | 0         | 0         | 0         | 0         | 0         | 0         | 0          | 0          | 0          |
 
+## Order Level Cohort Analysis Table Explanation
+
+- **FIRST_PURCHASE_MONTH:** This column indicates the month in which a cohort of customers made their first purchase.
+
+- **'Month_0', 'Month_1', 'Month_2', ..., 'Month_12':** These columns represent the subsequent months following the customers' first purchase. For instance, 'Month_0' corresponds to the same month as the first purchase, 'Month_1' corresponds to the first month after the first purchase, 'Month_2' corresponds to the second month after the first purchase, and so forth.
+
+- **Values in the Table:** The numbers in each cell of the table reflect the count of invoices (transactions) carried out by the customers within the specific cohort during the corresponding month. For instance, if there is a value of 1,701 in the first row under 'Month_0', it means that the cohort of customers who made their initial purchase in December 2010 conducted 1,701 invoices (transactions) within the same month.
+
+The cohort analysis serves as a powerful tool for comprehending customer behavior over time. When observing the table, several observations can be made:
+
+- **Cohort December 2010 ('Month_0'):** This cohort exhibited a substantial number of invoices (1,701) during their first month, which then gradually declined over the subsequent months.
+
+- **Cohort January 2011 ('Month_0'):** This cohort initiated with 545 invoices in the first month, followed by a downward trend in the subsequent months.
+
+- **Cohort February 2011 ('Month_0'):** In the initial month, this cohort recorded 473 invoices, displaying a pattern similar to that of the January cohort.
+
+... and so forth for the other cohorts.
+
+By thoroughly analyzing this cohort table, valuable insights into customer behavior can be uncovered. These insights encompass identifying patterns of repeat purchases, discerning shifts in retention rates over time, and recognizing which cohorts are more likely to generate higher transaction volumes. This collection of information can offer significant insights into business performance and aid in informed decision-making for devising effective customer engagement and marketing strategies.
+
+## Cohort Analysis/Customer Retention Analysis on Customer Level
+
+The following cohort analysis delves into customer-level retention analysis. In this analysis, we determine the count of distinct customers within each cohort, categorized by their first purchase month and subsequent months.
+
+This type of cohort analysis offers insights into how well businesses are retaining their customer base over time, shedding light on customer loyalty and engagement patterns. By observing the changes in customer counts across different cohorts and months, businesses can better understand the effectiveness of their customer retention strategies and tailor their approaches accordingly.
+
+By conducting this analysis, you can gain valuable insights into customer behavior, track changes in retention rates, and identify trends in customer loyalty. This information can guide decision-making processes related to customer engagement, marketing campaigns, and overall business strategies.
+
+```sql
+-- Cohort Analysis/Customer Retention Analysis on Customer Level
+
+-- Step 1: Create a Common Table Expression (CTE) named CTE1 to prepare data
+WITH CTE1 AS (
+    SELECT 
+        InvoiceNo, CUSTOMERID, 
+        to_date(INVOICEDATE, 'DD/MM/YY HH24:MI') AS INVOICEDATE, 
+        ROUND(QUANTITY * UNITPRICE, 2) AS REVENUE
+    FROM RETAIL
+    WHERE CUSTOMERID IS NOT NULL
+),
+
+-- Step 2: Create CTE2 to calculate purchase and first purchase months
+CTE2 AS (
+    SELECT InvoiceNo, CUSTOMERID, INVOICEDATE, 
+        DATE_TRUNC('MONTH', INVOICEDATE) AS PURCHASE_MONTH,
+        DATE_TRUNC('MONTH', MIN(INVOICEDATE) OVER (PARTITION BY CUSTOMERID ORDER BY INVOICEDATE)) AS FIRST_PURCHASE_MONTH,
+        REVENUE
+    FROM CTE1
+),
+
+-- Step 3: Create CTE3 to determine cohort months
+CTE3 AS (
+    SELECT CUSTOMERID, FIRST_PURCHASE_MONTH,
+        CONCAT('Month_', datediff('MONTH', FIRST_PURCHASE_MONTH, PURCHASE_MONTH)) AS COHORT_MONTH
+    FROM CTE2
+)
+
+-- Final Query: Count distinct customers in each cohort for subsequent months
+SELECT FIRST_PURCHASE_MONTH as Cohort,
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_0', CUSTOMERID, NULL))) as "Month_0",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_1', CUSTOMERID, NULL))) as "Month_1",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_2', CUSTOMERID, NULL))) as "Month_2",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_3', CUSTOMERID, NULL))) as "Month_3",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_4', CUSTOMERID, NULL))) as "Month_4",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_5', CUSTOMERID, NULL))) as "Month_5",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_6', CUSTOMERID, NULL))) as "Month_6",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_7', CUSTOMERID, NULL))) as "Month_7",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_8', CUSTOMERID, NULL))) as "Month_8",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_9', CUSTOMERID, NULL))) as "Month_9",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_10', CUSTOMERID, NULL))) as "Month_10",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_11', CUSTOMERID, NULL))) as "Month_11",
+    COUNT(DISTINCT(IFF(COHORT_MONTH='Month_12', CUSTOMERID, NULL))) as "Month_12"
+FROM CTE3
+GROUP BY FIRST_PURCHASE_MONTH
+ORDER BY FIRST_PURCHASE_MONTH;
+```
+### Result of the query
+| COHORT     | Month_0 | Month_1 | Month_2 | Month_3 | Month_4 | Month_5 | Month_6 | Month_7 | Month_8 | Month_9 | Month_10 | Month_11 | Month_12 |
+|------------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|----------|----------|----------|
+| 2010-12-01 | 945     | 358     | 313     | 367     | 340     | 375     | 360     | 336     | 333     | 371     | 354      | 473      | 260      |
+| 2011-01-01 | 419     | 100     | 118     | 101     | 138     | 126     | 109     | 108     | 129     | 145     | 152      | 63       | 0        |
+| 2011-02-01 | 380     | 93      | 73      | 106     | 102     | 91      | 96      | 108     | 97      | 119     | 35       | 0        | 0        |
+| 2011-03-01 | 437     | 84      | 111     | 96      | 102     | 77      | 114     | 105     | 126     | 37      | 0        | 0        | 0        |
+| 2011-04-01 | 299     | 68      | 65      | 63      | 62      | 72      | 69      | 78      | 25      | 0       | 0        | 0        | 0        |
+| 2011-05-01 | 278     | 66      | 48      | 48      | 60      | 68      | 74      | 27      | 0       | 0       | 0        | 0        | 0        |
+| 2011-06-01 | 234     | 49      | 44      | 64      | 58      | 79      | 24      | 0       | 0       | 0       | 0        | 0        | 0        |
+| 2011-07-01 | 191     | 40      | 39      | 43      | 51      | 22      | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
+| 2011-08-01 | 169     | 42      | 42      | 43      | 23      | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
+| 2011-09-01 | 298     | 89      | 98      | 35      | 0       | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
+| 2011-10-01 | 350     | 93      | 46      | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
+| 2011-11-01 | 321     | 43      | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
+| 2011-12-01 | 41      | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
+
+## Cohort Analysis/Customer Retention Analysis on Customer Level
+
+The following table presents the results of a cohort analysis focusing on customer-level retention. This analysis calculates the count of distinct customers within each cohort based on their first purchase month and subsequent months.
+
+### Interpretation of the Table
+
+- **Cohort:** This column displays the cohort's first purchase month, indicating the period when customers made their initial purchases.
+
+- **Month_0, Month_1, ..., Month_12:** These columns represent the subsequent months after the customers' first purchase. For instance, "Month_0" signifies the same month as the first purchase, "Month_1" refers to the first month following the first purchase, and so on.
+
+- **Values in the Table:** The numbers in each cell represent the count of distinct customers who made purchases during the corresponding cohort month and subsequent months. For example, the value 945 under "Month_0" in the row corresponding to the cohort of December 2010 means that there were 945 distinct customers who made their first purchase during that month.
+
+### Observations
+
+- **Cohort of December 2010 (Month_0):** This cohort started with 945 customers in its first month, and the number decreased in subsequent months. For instance, the count in "Month_1" dropped to 358, and it continued to decrease over time.
+
+- **Cohort of January 2011 (Month_0):** In this cohort, 419 customers made their first purchase in January 2011. The count decreased as the months progressed, showing a typical retention pattern.
+
+- **Cohort of February 2011 (Month_0):** With 380 customers making their first purchase, this cohort experienced a similar retention trend as the previous cohorts.
+
+- **... and so on for other cohorts.**
+
+### Insights
+
+By analyzing this cohort table, businesses can gain insights into customer retention patterns. For instance:
+
+- Understanding the percentage of customers who remain active in subsequent months after their first purchase.
+- Identifying cohorts that exhibit high or low retention rates.
+- Adjusting marketing strategies and engagement initiatives based on cohort behavior.
+
+This analysis provides valuable information for optimizing customer engagement, retention strategies, and marketing efforts, ultimately contributing to business growth and customer satisfaction.
+
+
 
 
 
