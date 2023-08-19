@@ -303,21 +303,21 @@ ORDER BY Cohort;
 ```
 
 ### Result of the query
-| COHORT     | Month_0 | Month_1 | Month_2 | Month_3 | Month_4 | Month_5 | Month_6 | Month_7 | Month_8 | Month_9 | Month_10 | Month_11 | Month_12 |
-|------------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|----------|----------|----------|
-| 2010-12-01 | 945     | 358     | 313     | 367     | 340     | 375     | 360     | 336     | 333     | 371     | 354      | 473      | 260      |
-| 2011-01-01 | 419     | 100     | 118     | 101     | 138     | 126     | 109     | 108     | 129     | 145     | 152      | 63       | 0        |
-| 2011-02-01 | 380     | 93      | 73      | 106     | 102     | 91      | 96      | 108     | 97      | 119     | 35       | 0        | 0        |
-| 2011-03-01 | 437     | 84      | 111     | 96      | 102     | 77      | 114     | 105     | 126     | 37      | 0        | 0        | 0        |
-| 2011-04-01 | 299     | 68      | 65      | 63      | 62      | 72      | 69      | 78      | 25      | 0       | 0        | 0        | 0        |
-| 2011-05-01 | 278     | 66      | 48      | 48      | 60      | 68      | 74      | 27      | 0       | 0       | 0        | 0        | 0        |
-| 2011-06-01 | 234     | 49      | 44      | 64      | 58      | 79      | 24      | 0       | 0       | 0       | 0        | 0        | 0        |
-| 2011-07-01 | 191     | 40      | 39      | 43      | 51      | 22      | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
-| 2011-08-01 | 169     | 42      | 42      | 43      | 23      | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
-| 2011-09-01 | 298     | 89      | 98      | 35      | 0       | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
-| 2011-10-01 | 350     | 93      | 46      | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
-| 2011-11-01 | 321     | 43      | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
-| 2011-12-01 | 41      | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0       | 0        | 0        | 0        |
+| COHORT     | 'Month_0' | 'Month_1' | 'Month_2' | 'Month_3' | 'Month_4' | 'Month_5' | 'Month_6' | 'Month_7' | 'Month_8' | 'Month_9' | 'Month_10' | 'Month_11' | 'Month_12' |
+|------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|------------|------------|------------|
+| 2010-12-01 | 66,676    | 25,436    | 25,398    | 32,723    | 24,483    | 33,929    | 34,524    | 24,225    | 22,651    | 40,927    | 55,317     | 53,117     | 18,593     |
+| 2011-01-01 | 18,890    | 4,158     | 5,732     | 4,638     | 8,181     | 5,995     | 5,237     | 5,611     | 5,954     | 7,679     | 11,947     | 3,417      |            |
+| 2011-02-01 | 17,899    | 3,783     | 6,407     | 6,048     | 2,141     | 3,212     | 4,218     | 5,130     | 6,637     | 7,497     | 2,033      |            |            |
+| 2011-03-01 | 14,855    | 3,884     | 6,641     | 4,626     | 3,045     | 3,109     | 6,268     | 7,160     | 9,064     | 2,190     |            |            |            |
+| 2011-04-01 | 9,721     | 3,012     | 2,944     | 2,041     | 2,101     | 1,798     | 2,185     | 3,608     | 460       |           |            |            |            |
+| 2011-05-01 | 12,767    | 2,901     | 2,812     | 2,620     | 2,132     | 2,484     | 3,032     | 890       |           |           |            |            |            |
+| 2011-06-01 | 9,303     | 2,560     | 1,198     | 2,225     | 3,465     | 6,772     | 650       |           |           |           |            |            |            |
+| 2011-07-01 | -632      | 1,142     | 1,160     | 938       | 1,933     | 559       |           |           |           |           |            |            |            |
+| 2011-08-01 | 4,994     | 62        | -783      | -2,036    | -707      |           |           |           |           |           |            |            |            |
+| 2011-09-01 | 12,110    | 1,998     | 3,212     | 1,003     |           |           |           |           |           |           |            |            |            |
+| 2011-10-01 | 9,670     | 3,682     | 2,202     |           |           |           |           |           |           |           |            |            |            |
+| 2011-11-01 | 13,651    | 3,190     |           |           |           |           |           |           |           |           |            |            |            |
+| 2011-12-01 | 10,046    |           |           |           |           |           |           |           |           |           |            |            |            |
 
 ## Cohort Analysis on Number of Revenue
 
@@ -337,7 +337,25 @@ ORDER BY Cohort;
 
 The table illustrates changing revenue patterns for different cohorts over the months after their first purchase, providing insights into customer behavior and revenue generation trends.
 
+## Conclusion
 
+Cohort analysis is a powerful methodology that enables businesses to gain valuable insights into customer behavior, retention rates, revenue trends, and overall business performance. By segmenting customers into cohorts based on their common characteristics or events, such as their first purchase month, businesses can uncover patterns and make informed decisions to optimize customer engagement, marketing strategies, and revenue generation.
+
+In this analysis, we used Snowflake SQL queries to perform cohort analysis on a retail dataset. We focused on three aspects of cohort analysis: order level analysis, customer retention analysis, and revenue analysis.
+
+### Order Level Analysis
+
+We analyzed the number of invoices (transactions) for different customer cohorts in subsequent months after their initial purchase. This analysis provided insights into customer engagement patterns, repeat purchases, and overall transaction behavior over time.
+
+### Customer Retention Analysis
+
+By counting distinct customers in each cohort for subsequent months, we measured customer retention rates. This analysis allowed us to understand how well the business retains its customer base over time and identify trends in customer loyalty and engagement.
+
+### Revenue Analysis
+
+We examined how revenue generated by various cohorts changes over time. This analysis showcased revenue patterns, including initial spending spikes, revenue declines, or consistent growth, which can be used to tailor marketing efforts and enhance customer lifetime value.
+
+In conclusion, cohort analysis serves as a critical tool for businesses to understand and respond effectively to customer behavior and revenue generation trends. By leveraging the insights gained from cohort analysis, businesses can make informed decisions, optimize their strategies, and ultimately achieve sustainable growth and success.
 
 
 
