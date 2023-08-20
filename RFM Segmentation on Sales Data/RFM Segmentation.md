@@ -193,6 +193,19 @@ group by YEAR_ID
 order by 2 desc;
 ```
 ### Results:
+| YEAR_ID | REVENUE      |
+|---------|--------------|
+| 2004    | 4,412,321.07 |
+| 2003    | 3,359,238.69 |
+| 2005    | 1,791,486.71 |
+
+Okay, let us look at the data and see how our sales have improved over time. In order to spot any trends or changes that might have been hiding in the data, we divided it up by year.
+
+So what do you know? It appears that 2004, which had a total revenue of about $4.4 million, won the prize. This is quite a feat. We also had a pretty good year in 2003, earning about $3.3 million. And even though 2005 may not have reached the previous years' heights, it still managed to earn about $1.8 million.
+
+What does this mean for us, then? We have grown tremendously, especially in 2004. It seemed like that year, our sales took off like rockets! And although 2005 did not quite reach the same heights, it still made up a sizeable portion of our revenue.
+
+These observations can aid in future planning, resource allocation, and perhaps even provide some insight into what made 2004 such a spectacular success. Keep the positive energy going and discover what other pearls of knowledge the data may contain!
 
 ### Revenue by Deal Size
 ``` sql
@@ -203,6 +216,17 @@ group by DEALSIZE
 order by 2 desc;
 ```
 ### Results:
+| DEALSIZE | REVENUE      |
+|----------|--------------|
+| Medium   | 5,815,484.87 |
+| Small    | 2,505,263.91 |
+| Large    | 1,242,297.69 |
+
+Let us talk about deal sizes because they are kind of like the secret to our sales success. Here is what we discovered after looking more closely at how different deal sizes are impacting our revenue:
+
+Deals classified as "medium" generate an impressive $5.8 million, making them the real heavy hitters. They are our revenue engine and the show is main attraction. With a substantial $2.5 million contribution, "small" deals are also no slouches. Even our "Large" deals total a respectable $1.2 million despite not taking center stage.
+
+So what should we conclude? Our "Medium" deals are our revenue generators, but you should not undervalue the influence of "Small" and "Large" deals because each has a different effect.
 
 ### City with Highest Sales in a Specific Country
 ``` sql
@@ -214,6 +238,18 @@ group by city
 order by 2 desc;
 ```
 ### Results:
+| CITY       | REVENUE    |
+|------------|------------|
+| Manchester | 157,807.81 |
+| London     | 124,823.54 |
+| Liverpool  | 118,008.27 |
+| Cowes      | 78,240.84  |
+
+Okay, let us identify the key city that is dominating the sales scene in a particular nation. In this instance, let us use the UK as an example. 🇬🇧 We have combed through the data to identify the city that is making the most money.
+
+And "Manchester" wins the title, drumroll please! Sales in this city have reached an amazing $157,807.81, which is rocking. With a revenue of $124,823.54, London is not far behind, and "Liverpool" is not slowing down either with a revenue of $118,008.27. With a generous donation of $78,240.84, even the city of "Cowes" is participating.
+
+What is the story here, then? Our sales champion in the UK is "Manchester," but it is great to see other cities making their mark as well.
 
 ### Best Selling Product in the United States
 ```sql
