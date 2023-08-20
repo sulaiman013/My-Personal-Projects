@@ -261,8 +261,67 @@ group by  country, YEAR_ID, PRODUCTLINE
 order by 4 desc;
 ```
 ### Results:
+| COUNTRY | YEAR_ID | PRODUCTLINE      | REVENUE    |
+|---------|---------|------------------|------------|
+| USA     | 2004    | Classic Cars     | 560,448.26 |
+| USA     | 2003    | Classic Cars     | 558,544.09 |
+| USA     | 2004    | Vintage Cars     | 301,982.35 |
+| USA     | 2004    | Motorcycles      | 287,243.09 |
+| USA     | 2003    | Vintage Cars     | 266,141.82 |
+| USA     | 2004    | Trucks and Buses | 230,219.17 |
+| USA     | 2005    | Classic Cars     | 225,645.87 |
+| USA     | 2005    | Vintage Cars     | 189,631.73 |
+| USA     | 2003    | Motorcycles      | 178,108.95 |
+| USA     | 2004    | Planes           | 177,431.76 |
+| USA     | 2003    | Trucks and Buses | 125,794.86 |
+| USA     | 2004    | Ships            | 102,595    |
+| USA     | 2003    | Planes           | 90,016.44  |
+| USA     | 2005    | Planes           | 60,984.69  |
+| USA     | 2003    | Ships            | 58,237.59  |
+| USA     | 2005    | Motorcycles      | 55,019.66  |
+| USA     | 2005    | Ships            | 48,855.55  |
+| USA     | 2005    | Trucks and Buses | 41,828.39  |
+| USA     | 2003    | Trains           | 28,304.13  |
+| USA     | 2004    | Trains           | 25,551.06  |
+| USA     | 2005    | Trains           | 15,398.37  |
+
+i) Our biggest earners in 2004 were "Classic Cars," who brought in a staggering $560,448.26. These vintage beauties were in high demand!
+
+ii) Following closely behind, the year 2003 saw "Classic Cars" generate significant revenue of $558,544.09. It is obvious that they have a devoted following.
+
+iii) With $301,982.35, "Vintage Cars" was not far behind, taking center stage in 2004. Like nostalgia was flying off the shelves!
+
+iv) In 2004, "Motorcycles" cranked up their engines and sped in with a chilly $287,243.09. They appear to be a favorite among bike enthusiasts.
+
+The list keeps going, with various product lines making their mark over time. It is incredible to see the range of goods that people adore, whether they are modern "Planes," tough "Trucks and Buses," or even time-honored "Ships."
+
+So what is going on? These insights show us precisely where our products are succeeding and where there is room for improvement. We are using this information to guide our strategies and keep those sales numbers rising, whether it is a throwback to the past with "Classic Cars" or a fascination with "Planes"!
 
 ### Best Month for Sales in a Specific Year
+```sql
+-- Finding the best month for sales in a specific year (e.g., 2003) and calculating revenue and frequency.
+select  MONTH_ID, sum(sales) Revenue, count(ORDERNUMBER) Frequency
+from SALES_SAMPLE_DATA
+where YEAR_ID = 2003
+group by  MONTH_ID
+order by 2 desc;
+```
+### Results:
+| MONTH_ID | REVENUE    | FREQUENCY |
+|----------|------------|-----------|
+| 11       | 985,828.35 | 282       |
+| 10       | 541,033.18 | 150       |
+| 9        | 263,973.36 | 76        |
+| 12       | 261,876.46 | 70        |
+| 8        | 197,809.3  | 58        |
+| 4        | 197,390.35 | 57        |
+| 7        | 187,731.88 | 50        |
+| 6        | 168,082.56 | 46        |
+| 3        | 164,755.9  | 48        |
+| 2        | 140,836.19 | 41        |
+| 5        | 131,599.9  | 41        |
+| 1        | 118,321.26 | 35        |
+
 ```sql
 -- Finding the best month for sales in a specific year (e.g., 2004) and calculating revenue and frequency.
 select  MONTH_ID, sum(sales) Revenue, count(ORDERNUMBER) Frequency
@@ -272,6 +331,46 @@ group by  MONTH_ID
 order by 2 desc;
 ```
 ### Results:
+| MONTH_ID | REVENUE    | FREQUENCY |
+|----------|------------|-----------|
+| 11       | 949,097.21 | 266       |
+| 10       | 552,924.25 | 159       |
+| 8        | 418,168.92 | 119       |
+| 12       | 372,802.66 | 110       |
+| 7        | 327,144.09 | 91        |
+| 2        | 311,419.53 | 86        |
+| 1        | 291,581.95 | 84        |
+| 6        | 286,674.22 | 85        |
+| 9        | 285,756.99 | 81        |
+| 5        | 273,438.39 | 74        |
+| 4        | 174,845.62 | 52        |
+| 3        | 168,467.24 | 48        |
+```sql
+-- Finding the best month for sales in a specific year (e.g., 2005) and calculating revenue and frequency.
+select  MONTH_ID, sum(sales) Revenue, count(ORDERNUMBER) Frequency
+from SALES_SAMPLE_DATA
+where YEAR_ID = 2005
+group by  MONTH_ID
+order by 2 desc;
+```
+### Results:
+| MONTH_ID | REVENUE    | FREQUENCY |
+|----------|------------|-----------|
+| 5        | 457,861.06 | 120       |
+| 3        | 374,262.76 | 106       |
+| 2        | 358,186.18 | 97        |
+| 1        | 339,543.42 | 99        |
+| 4        | 261,633.29 | 56        |
+
+**Best Sales Months in 2003:**
+Our sales data for the year 2003 showed that "November" dominated the market with an astounding $985,828.35 in revenue, supported by an impressive 282 orders. "October" followed closely behind, earning a respectable $541,033.18 and 150 orders. These months undoubtedly paved the way for a year of impressive sales numbers, demonstrating that consumers were eager to shop for the upcoming holiday season.
+
+**Best Sales Months in 2004:**
+When it came to sales in 2004, "November" once more dominated the market, bringing in a sizable $949,097.21 in revenue and 266 orders. "October" followed suit, maintaining its appeal with 159 orders and $552,924.25 in sales. These reliable performers confirmed that autumn remained a season of high sales impact, making it an ideal time for strategic marketing campaigns.
+
+**Best Sales Months in 2005:**
+As 2005 got underway, attention turned to "May," which stood out as the standout month thanks to an impressive $457,861.06 in sales generated by 120 orders. While "March" demonstrated its strength with 106 orders and $374,262.76. These months confirmed that the springtime was the season with the highest levels of customer engagement, which encouraged us to use this knowledge to develop targeted marketing and engagement plans.
+
 
 ### Product Sales in a Specific Month
 ```sql
@@ -283,5 +382,30 @@ group by  MONTH_ID, PRODUCTLINE
 order by 3 desc;
 ```
 ### Results:
+| MONTH_ID | PRODUCTLINE      | REVENUE    | COUNT(ORDERNUMBER) |
+|----------|------------------|------------|--------------------|
+| 11       | Classic Cars     | 336,600.26 | 95                 |
+| 11       | Vintage Cars     | 207,908.15 | 57                 |
+| 11       | Motorcycles      | 140,830.11 | 37                 |
+| 11       | Planes           | 106,161.14 | 32                 |
+| 11       | Trucks and Buses | 81,906.44  | 21                 |
+| 11       | Ships            | 57,227.56  | 19                 |
+| 11       | Trains           | 18,463.55  | 5                  |
 
+**Top Selling Products in November 2004:**
 
+i) A strong 95 orders helped "Classic Cars" win the title with an impressive $336,600.26 in sales. It's clear that classic charm was a big hit.
+
+ii) "Vintage Cars" came in second place with 57 orders and a revenue of $207,908,15. Customers were drawn in by the allure of vintage elegance and kept coming back.
+
+iii) With $140,830.11 and 37 orders, "Motorcycles" cranked up their engines. Clearly, the excitement of traveling on open roads was a draw.
+
+iv) With 32 orders and $106,161.14 in sales, "Planes" was a huge success. It appears that customers were eager to embark on their next journey.
+
+v) "Trucks and Buses" announced their presence with 21 orders and $81,906.44. There were many admirers of these tough cars.
+
+vi) "Ships" arrived on the scene carrying 19 orders and $57.227.56. Nautical charm had its appeal.
+
+vii) The last item on the list, "Trains," had five orders and $18,463.55. It is obvious that some customers were drawn in by a hint of nostalgia.
+
+# TO BE CONTINUED FEELING SLEEPY NOW!
