@@ -159,9 +159,8 @@ The investigation delved into specific questions as part of the supplemental ana
 
 This EDA project served as an example of how SQL queries can offer insightful information about the various aspects of a dataset, resulting in a better comprehension of sales patterns, product performance, and consumer behavior. The outcomes demonstrated areas for strategic decision-making, allowing data-driven methodologies to improve business outcomes.
 
+### Grouping Sales by Product Line
 ```sql
----Exploratory Data Analysis
-
 -- Let's start by examining the first 10 rows of the dataset to get an initial overview.
 -- We're selecting specific columns such as ORDERNUMBER, ORDERLINENUMBER, PRODUCTLINE, SALES, and more.
 SELECT ORDERNUMBER, ORDERLINENUMBER, PRODUCTLINE, SALES, *  
@@ -169,6 +168,8 @@ FROM SALES_SAMPLE_DATA
 ORDER BY 1, 2
 LIMIT 10;
 ```
+### Results:
+
 ``` sql
 -- Grouping sales by product line to understand the distribution of sales across different product categories.
 -- We're calculating the total revenue and the number of orders for each product line.
@@ -177,6 +178,9 @@ from SALES_SAMPLE_DATA
 group by PRODUCTLINE
 order by 3 desc;
 ```
+### Results:
+
+
 ``` sql
 -- Analyzing sales revenue by year to identify trends or changes over time.
 select YEAR_ID, sum(sales) Revenue
@@ -184,6 +188,9 @@ from SALES_SAMPLE_DATA
 group by YEAR_ID
 order by 2 desc;
 ```
+### Results:
+
+
 ``` sql
 -- Investigating sales revenue by deal size to understand the impact of deal sizes on revenue.
 select  DEALSIZE,  sum(sales) Revenue
@@ -191,6 +198,9 @@ from SALES_SAMPLE_DATA
 group by DEALSIZE
 order by 2 desc;
 ```
+### Results:
+
+
 ``` sql
 -- Identifying the city with the highest sales in a specific country (e.g., 'UK').
 select city, sum (sales) Revenue
@@ -199,6 +209,9 @@ where country = 'UK'
 group by city
 order by 2 desc;
 ```
+### Results:
+
+
 ```sql
 -- Determining the best-selling product in the United States.
 select country, YEAR_ID, PRODUCTLINE, sum(sales) Revenue
@@ -207,6 +220,9 @@ where country = 'USA'
 group by  country, YEAR_ID, PRODUCTLINE
 order by 4 desc;
 ```
+### Results:
+
+
 ```sql
 -- Finding the best month for sales in a specific year (e.g., 2004) and calculating revenue and frequency.
 select  MONTH_ID, sum(sales) Revenue, count(ORDERNUMBER) Frequency
@@ -215,6 +231,9 @@ where YEAR_ID = 2004
 group by  MONTH_ID
 order by 2 desc;
 ```
+### Results:
+
+
 ```sql
 -- Identifying the top-selling product line in a specific month (e.g., November 2004).
 select  MONTH_ID, PRODUCTLINE, sum(sales) Revenue, count(ORDERNUMBER)
@@ -223,3 +242,6 @@ where YEAR_ID = 2004 and MONTH_ID = 11
 group by  MONTH_ID, PRODUCTLINE
 order by 3 desc;
 ```
+### Results:
+
+
