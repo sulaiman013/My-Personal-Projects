@@ -151,3 +151,75 @@ select distinct TERRITORY from SALES_SAMPLE_DATA;
 | EMEA      |
 | APAC      |
 | Japan     |
+
+## Exploratory Data Analysis
+Using SQL queries, a thorough analysis of the sales dataset was carried out in this exploratory data analysis (EDA). Beginning with the distribution of sales across various product lines, the analysis highlighted significant information, including order numbers, line numbers, and actual sales values for a chosen subset of data points. Insightful metrics like total revenue and the number of orders connected to each product line were also revealed by aggregating the dataset by product line. The analysis also included a focus on yearly revenue and the distribution of sales among various deal sizes in order to comprehend the sales dynamics over time. 
+
+The investigation delved into specific questions as part of the supplemental analyses.  For instance, the city with the highest sales within a certain nation (such as the UK) was found. The analysis also identified the top-grossing product in the United States and followed its performance over a range of years and product categories. The analysis then focused on identifying the best sales month within a given year, revealing the amount of money made and how frequently orders were placed during that time. Notably, the analysis of sales for November in a particular year revealed that Classic Cars emerged as the top revenue-generating product line.
+
+This EDA project served as an example of how SQL queries can offer insightful information about the various aspects of a dataset, resulting in a better comprehension of sales patterns, product performance, and consumer behavior. The outcomes demonstrated areas for strategic decision-making, allowing data-driven methodologies to improve business outcomes.
+
+```sql
+---Exploratory Data Analysis
+
+-- Let's start by examining the first 10 rows of the dataset to get an initial overview.
+-- We're selecting specific columns such as ORDERNUMBER, ORDERLINENUMBER, PRODUCTLINE, SALES, and more.
+SELECT ORDERNUMBER, ORDERLINENUMBER, PRODUCTLINE, SALES, *  
+FROM SALES_SAMPLE_DATA
+ORDER BY 1, 2
+LIMIT 10;
+```
+``` sql
+-- Grouping sales by product line to understand the distribution of sales across different product categories.
+-- We're calculating the total revenue and the number of orders for each product line.
+select PRODUCTLINE, ROUND(sum(sales),0) AS Revenue, COUNT(DISTINCT ORDERNUMBER) AS NO_OF_ORDERS
+from SALES_SAMPLE_DATA
+group by PRODUCTLINE
+order by 3 desc;
+```
+``` sql
+-- Analyzing sales revenue by year to identify trends or changes over time.
+select YEAR_ID, sum(sales) Revenue
+from SALES_SAMPLE_DATA
+group by YEAR_ID
+order by 2 desc;
+```
+``` sql
+-- Investigating sales revenue by deal size to understand the impact of deal sizes on revenue.
+select  DEALSIZE,  sum(sales) Revenue
+from SALES_SAMPLE_DATA
+group by DEALSIZE
+order by 2 desc;
+```
+``` sql
+-- Identifying the city with the highest sales in a specific country (e.g., 'UK').
+select city, sum (sales) Revenue
+from SALES_SAMPLE_DATA
+where country = 'UK'
+group by city
+order by 2 desc;
+```
+```sql
+-- Determining the best-selling product in the United States.
+select country, YEAR_ID, PRODUCTLINE, sum(sales) Revenue
+from SALES_SAMPLE_DATA
+where country = 'USA'
+group by  country, YEAR_ID, PRODUCTLINE
+order by 4 desc;
+```
+```sql
+-- Finding the best month for sales in a specific year (e.g., 2004) and calculating revenue and frequency.
+select  MONTH_ID, sum(sales) Revenue, count(ORDERNUMBER) Frequency
+from SALES_SAMPLE_DATA
+where YEAR_ID = 2004
+group by  MONTH_ID
+order by 2 desc;
+```
+```sql
+-- Identifying the top-selling product line in a specific month (e.g., November 2004).
+select  MONTH_ID, PRODUCTLINE, sum(sales) Revenue, count(ORDERNUMBER)
+from SALES_SAMPLE_DATA
+where YEAR_ID = 2004 and MONTH_ID = 11
+group by  MONTH_ID, PRODUCTLINE
+order by 3 desc;
+```
