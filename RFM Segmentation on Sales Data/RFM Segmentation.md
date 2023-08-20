@@ -158,17 +158,6 @@ The investigation delved into specific questions as part of the supplemental ana
 
 This EDA project served as an example of how SQL queries can offer insightful information about the various aspects of a dataset, resulting in a better comprehension of sales patterns, product performance, and consumer behavior. The outcomes demonstrated areas for strategic decision-making, allowing data-driven methodologies to improve business outcomes.
 
-
-```sql
--- Let's start by examining the first 10 rows of the dataset to get an initial overview.
--- We're selecting specific columns such as ORDERNUMBER, ORDERLINENUMBER, PRODUCTLINE, SALES, and more.
-SELECT ORDERNUMBER, ORDERLINENUMBER, PRODUCTLINE, SALES, *  
-FROM SALES_SAMPLE_DATA
-ORDER BY 1, 2
-LIMIT 10;
-```
-### Results:
-
 ### Grouping Sales by Product Line
 ``` sql
 -- Grouping sales by product line to understand the distribution of sales across different product categories.
@@ -179,6 +168,21 @@ group by PRODUCTLINE
 order by 3 desc;
 ```
 ### Results:
+| PRODUCTLINE      | REVENUE   | NO_OF_ORDERS |
+|------------------|-----------|--------------|
+| Classic Cars     | 3,797,679 | 190          |
+| Vintage Cars     | 1,778,697 | 163          |
+| Motorcycles      | 1,151,329 | 70           |
+| Trucks and Buses | 1,056,547 | 68           |
+| Ships            | 651,089   | 60           |
+| Planes           | 910,313   | 54           |
+| Trains           | 217,392   | 43           |
+
+So, when we examined the sales information in more detail and grouped it by product line, some intriguing patterns emerged. "Classic Cars" completely crushed it with the most sales and revenue; they are like the super stars of our goods! The "Vintage Cars" and "Motorcycles" are right behind them, competing well with respectable sales and a healthy number of orders.
+
+Now, why is this important? Well, consider this: knowing which products are selling like hotcakes can really assist us in making wise choices. For instance, we can guarantee that we have an adequate supply of those well-liked "Classic Cars" on hand. Additionally, since vintage cars and motorcycles are also doing well, we could devote more marketing effort to promoting them.
+
+Additionally, knowing this information could completely alter how you plan to introduce new products. Therefore, this sales scoop equips us with the knowledge necessary to succeed in the business world, whether it is maintaining the stock on the shelves, creating killer marketing strategies, or conceptualizing exciting new products.
 
 ### Total Revenue by Year
 ``` sql
