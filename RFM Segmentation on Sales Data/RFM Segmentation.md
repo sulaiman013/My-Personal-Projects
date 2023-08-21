@@ -16,8 +16,9 @@ This repository contains SQL queries for Exploratory Data Analysis (EDA) and RFM
   - [Product Sales in a Specific Month](#product-sales-in-a-specific-month)
 - [RFM Segmentation](#rfm-segmentation)
   - [Calculating RFM Scores](#calculating-rfm-scores)
-  - [RFM Segmentation Categories](#rfm-segmentation-categories)
-  - [Customer Segmentation](#customer-segmentation)
+  - [RFM Customer Segmentation](#rfm-customer-segmentation)
+- [Conclusion](#conclusion) 
+  
 
 ## Creating the Database
 
@@ -586,3 +587,138 @@ _RFM_SCORE_CATEGORY:_ Combined RFM score category, formed by concatenating recen
 
 The RFM segmentation is utilized to group customers into segments based on their purchasing behavior. Higher RFM scores generally indicate more valuable customers who have made recent, frequent, and high-value purchases.
 
+### RFM Customer Segmentation
+```sql
+-- Count the number of unique RFM score categories
+select count (distinct rfm_score_category) from rfm_segment; -- 36 unique rfm scores
+
+-- Select customer information and assign customer segments based on RFM scores
+select CUSTOMERNAME , rfm_recency, rfm_frequency, rfm_monetary,
+	case 
+		when rfm_score_category in (111, 112, 121, 122, 123, 132, 211, 212, 114, 141) then 'lost_customers'  -- Customers with low recency and low frequency, lost customers
+		when rfm_score_category in (133, 134, 143, 244, 334, 343, 344, 144) then 'slipping_away' -- High spenders who haven't purchased lately, slipping away
+		when rfm_score_category in (311, 411, 331) then 'new_customers' -- New customers with recent purchases
+		when rfm_score_category in (222, 231, 221,  223, 233, 322) then 'potential_churners' -- Customers showing signs of churn risk
+		when rfm_score_category in (323, 333,321, 341, 422, 332, 432) then 'active_customers' -- Active customers with frequent but lower-value purchases
+		when rfm_score_category in (433, 434, 443, 444) then 'loyal_customers' -- Loyal customers with high recency, frequency, and monetary value
+        else 'Other' -- Other customer segment
+	end as Customer_Segment
+from rfm_segment;
+```
+### Results:
+| CUSTOMERNAME                   | RFM_RECENCY | RFM_FREQUENCY | RFM_MONETARY | CUSTOMER_SEGMENT           |
+|--------------------------------|-------------|---------------|--------------|----------------------------|
+| Boards & Toys Co.              | 3           | 1             | 1            | new customers              |
+| Atelier graphique              | 2           | 3             | 1            | potential churners         |
+| Auto-Moto Classics Inc.        | 2           | 2             | 1            | potential churners         |
+| Microscale Inc.                | 2           | 1             | 1            | lost_customers             |
+| Royale Belge                   | 3           | 4             | 1            | active                     |
+| Double Decker Gift Stores, Ltd | 1           | 1             | 1            | lost_customers             |
+| Cambridge Collectables Co.     | 1           | 2             | 1            | lost_customers             |
+| West Coast Collectables Co.    | 1           | 1             | 1            | lost_customers             |
+| Men 'R' US Retailers, Ltd.     | 1           | 1             | 1            | lost_customers             |
+| CAF Imports                    | 1           | 1             | 1            | lost_customers             |
+| Signal Collectibles Ltd.       | 1           | 1             | 1            | lost_customers             |
+| Mini Auto Werke                | 3           | 2             | 1            | active                     |
+| Iberia Gift Imports, Corp.     | 1           | 1             | 1            | lost_customers             |
+| Online Mini Collectables       | 1           | 1             | 1            | lost_customers             |
+| Gift Ideas Corp.               | 3           | 3             | 1            | new customers              |
+| Clover Collections, Co.        | 1           | 1             | 1            | lost_customers             |
+| Australian Gift Network, Co    | 3           | 2             | 1            | active                     |
+| Australian Collectables, Ltd   | 4           | 3             | 1            | Other                      |
+| Auto Assoc. & Cie.             | 1           | 1             | 1            | lost_customers             |
+| Classic Gift Ideas, Inc        | 1           | 1             | 1            | lost_customers             |
+| Osaka Souveniers Co.           | 1           | 1             | 1            | lost_customers             |
+| Daedalus Designs Imports       | 1           | 1             | 1            | lost_customers             |
+| Alpha Cognac                   | 3           | 2             | 2            | potential churners         |
+| Diecast Collectables           | 1           | 2             | 2            | lost_customers             |
+| Quebec Home Shopping Network   | 4           | 2             | 2            | active                     |
+| Mini Wheels Co.                | 2           | 3             | 2            | Other                      |
+| Marseille Mini Autos           | 3           | 3             | 2            | active                     |
+| Petit Auto                     | 4           | 3             | 2            | active                     |
+| Canadian Gift Exchange Network | 2           | 1             | 2            | lost_customers             |
+| Classic Legends Inc.           | 2           | 3             | 2            | Other                      |
+| giftsbymail.co.uk              | 2           | 1             | 2            | lost_customers             |
+| Lyon Souveniers                | 3           | 2             | 2            | potential churners         |
+| Norway Gifts By Mail, Co.      | 1           | 2             | 2            | lost_customers             |
+| Super Scale Inc.               | 1           | 2             | 2            | lost_customers             |
+| Mini Caravy                    | 4           | 2             | 2            | active                     |
+| Collectables For Less Inc.     | 3           | 2             | 2            | potential churners         |
+| Signal Gift Stores             | 2           | 3             | 2            | Other                      |
+| Gifts4AllAges.com              | 4           | 3             | 2            | active                     |
+| Tekni Collectables Inc.        | 4           | 2             | 2            | active                     |
+| Motor Mint Distributors Inc.   | 2           | 3             | 2            | Other                      |
+| Mini Classics                  | 2           | 1             | 2            | lost_customers             |
+| Collectable Mini Designs Co.   | 1           | 1             | 2            | lost_customers             |
+| Vitachrome Inc.                | 2           | 3             | 2            | Other                      |
+| Stylish Desk Decors, Co.       | 3           | 3             | 2            | active                     |
+| Auto Canal Petit               | 4           | 2             | 3            | Other                      |
+| Cruz & Sons Co.                | 2           | 3             | 3            | potential churners         |
+| Amica Models & Co.             | 1           | 1             | 3            | Other                      |
+| La Corne D'abondance, Co.      | 2           | 3             | 3            | potential churners         |
+| FunGiftIdeas.com               | 3           | 2             | 3            | active                     |
+| Toms Spezialitten, Ltd         | 2           | 1             | 3            | Other                      |
+| Heintze Collectables           | 2           | 1             | 3            | Other                      |
+| Gift Depot Inc.                | 4           | 3             | 3            | loyal                      |
+| Marta's Replicas Co.           | 1           | 1             | 3            | Other                      |
+| Oulu Toy Supplies, Inc.        | 3           | 2             | 3            | active                     |
+| Toys4GrownUps.com              | 3           | 2             | 3            | active                     |
+| Mini Creations Ltd.            | 3           | 2             | 3            | active                     |
+| Toys of Finland, Co.           | 3           | 2             | 3            | active                     |
+| Herkku Gifts                   | 1           | 3             | 3            | slipping away, cannot lose |
+| Suominen Souveniers            | 3           | 4             | 3            | slipping away, cannot lose |
+| Handji Gifts& Co               | 4           | 4             | 3            | loyal                      |
+| Baane Mini Imports             | 2           | 4             | 3            | Other                      |
+| Vida Sport, Ltd                | 1           | 2             | 3            | lost_customers             |
+| UK Collectables, Ltd.          | 4           | 2             | 3            | Other                      |
+| Tokyo Collectables, Ltd        | 4           | 4             | 3            | loyal                      |
+| Technics Stores Inc.           | 3           | 4             | 3            | slipping away, cannot lose |
+| Diecast Classics Inc.          | 4           | 4             | 4            | loyal                      |
+| Online Diecast Creations Co.   | 2           | 3             | 4            | Other                      |
+| Scandinavian Gift Ideas        | 3           | 2             | 4            | Other                      |
+| Reims Collectables             | 4           | 4             | 4            | loyal                      |
+| Rovelli Gifts                  | 2           | 3             | 4            | Other                      |
+| L'ordine Souveniers            | 4           | 3             | 4            | loyal                      |
+| Saveley & Henriot, Co.         | 1           | 3             | 4            | slipping away, cannot lose |
+| Danish Wholesale Imports       | 4           | 4             | 4            | loyal                      |
+| Salzburg Collectables          | 4           | 4             | 4            | loyal                      |
+| Corporate Gift Ideas Co.       | 3           | 4             | 4            | slipping away, cannot lose |
+| Souveniers And Things Co.      | 4           | 4             | 4            | loyal                      |
+| Anna's Decorations, Ltd        | 3           | 4             | 4            | slipping away, cannot lose |
+| AV Stores, Co.                 | 2           | 3             | 4            | Other                      |
+| The Sharp Gifts Warehouse      | 4           | 4             | 4            | loyal                      |
+| Land of Toys Inc.              | 2           | 4             | 4            | slipping away, cannot lose |
+| Dragon Souveniers, Ltd.        | 3           | 4             | 4            | slipping away, cannot lose |
+| La Rochelle Gifts              | 4           | 4             | 4            | loyal                      |
+| Muscle Machine Inc             | 2           | 4             | 4            | slipping away, cannot lose |
+| Australian Collectors, Co.     | 2           | 4             | 4            | slipping away, cannot lose |
+| Mini Gifts Distributors Ltd.   | 4           | 4             | 4            | loyal                      |
+| Euro Shopping Channel          | 4           | 4             | 4            | loyal                      |
+
+Here's the interpretation for the segments:
+
+**New Customers:** Customers like "Boards & Toys Co." and "Gift Ideas Corp." have recently made their first purchase. These are potential new business opportunities.
+
+**Potential Churners:** Customers like "Atelier graphique," "Auto-Moto Classics Inc.," and "Alpha Cognac" have shown some signs of churn risk due to their relatively low recency or frequency scores.
+
+**Lost Customers:** Customers like "Microscale Inc.," "Double Decker Gift Stores, Ltd," and "Iberia Gift Imports, Corp." have low recency, frequency, and monetary scores, indicating they haven't engaged recently and might be lost.
+
+**Active:** Customers like "Royale Belge," "Australian Gift Network, Co," and "Marseille Mini Autos" have high recency and frequency, suggesting they are actively engaging with the business.
+
+**Slipping Away, Cannot Lose:** Customers like "Herkku Gifts" and "Suominen Souveniers" are high spenders who haven't purchased recently. They are slipping away, and it's crucial to retain them.
+
+**Loyal:** Customers like "Handji Gifts & Co," "Gift Depot Inc.," and "Tokyo Collectables, Ltd" are loyal customers with high recency, frequency, and monetary scores.
+
+**Other:** Customers not falling into the specific segments mentioned above are categorized as "Other."
+
+## Conclusion
+The RFM analysis has yielded valuable insights into customer behavior and preferences, guiding effective business strategies. The segmentation highlights:
+
+**Growth Potential:** "New Customers" present growth opportunities, warranting targeted engagement efforts.
+**Retention Focus:** Addressing "Potential Churners" minimizes attrition risk and encourages loyalty.
+**Re-engagement Strategies:** Targeting "Lost Customers" with incentives can revive interest.
+**Engaged Base:** "Active" customers respond well to loyalty programs and tailored content.
+**High-Value Attention:** Strategies for "Slipping Away, Cannot Lose" group prevent loss of top spenders.
+**Loyalty Recognition:** Rewarding "Loyal" customers deepens brand loyalty.
+
+This analysis drives personalized strategies, optimizing engagement, retention, and revenue. Continuous adaptation based on real-time data is crucial for sustained success.
