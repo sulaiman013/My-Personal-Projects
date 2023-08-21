@@ -561,15 +561,28 @@ SELECT * FROM rfm_segment;
 | Euro Shopping Channel          | 912,294       | 3,522            | 26        | 2005-05-31      | 2005-05-31     | 0       | 4           | 4             | 4            | 12              | 444                |
 
 _CUSTOMERNAME:_ The name of the customer or company.
+
 _MONETARYVALUE:_ Total monetary value spent by the customer on purchases.
+
 _AVGMONETARYVALUE:_ Average monetary value per purchase.
+
 _FREQUENCY:_ Number of distinct orders made by the customer.
+
 _LAST_ORDER_DATE:_ Date of the last order made by the customer.
+
 _MAX_ORDER_DATE:_ Maximum date of orders within the dataset.
+
 _RECENCY:_ The number of days since the last order was made.
+
 _RFM_RECENCY:_ Recency score segment (1 to 4) based on quartiles.
+
 _RFM_FREQUENCY:_ Frequency score segment (1 to 4) based on quartiles.
+
 _RFM_MONETARY:_ Monetary score segment (1 to 4) based on quartiles.
+
 _RFM_TOTAL_SCORE:_ Total RFM score, sum of recency, frequency, and monetary scores.
+
 _RFM_SCORE_CATEGORY:_ Combined RFM score category, formed by concatenating recency, frequency, and monetary scores.
+
 The RFM segmentation is utilized to group customers into segments based on their purchasing behavior. Higher RFM scores generally indicate more valuable customers who have made recent, frequent, and high-value purchases.
+
