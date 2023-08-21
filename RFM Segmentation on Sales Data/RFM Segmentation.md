@@ -408,4 +408,168 @@ vi) "Ships" arrived on the scene carrying 19 orders and $57.227.56. Nautical cha
 
 vii) The last item on the list, "Trains," had five orders and $18,463.55. It is obvious that some customers were drawn in by a hint of nostalgia.
 
-# TO BE CONTINUED FEELING SLEEPY NOW!
+## RFM Segmentation
+RFM segmentation is a powerful technique that helps businesses categorize and understand their customer base using three key metrics: Recency, Frequency, and Monetary Value. Let's apply RFM segmentation to the sales data we are working with in this project.
+
+**Recency (R):** This metric assesses how recently a customer made a purchase. By calculating the time elapsed since the last purchase, we can identify customers who are more engaged (recent buyers) and those who might be slipping away (less recent buyers).
+
+**Frequency (F):** Frequency measures how often a customer makes purchases within a given time frame. This helps distinguish between frequent shoppers and occasional buyers, providing insights into customer loyalty and engagement.
+
+**Monetary Value (M):** Monetary value evaluates the total amount a customer has spent. It distinguishes high-value customers from those who make smaller transactions, allowing us to identify your most valuable clients.
+
+By combining these three metrics, we create distinct segments that provide a comprehensive view of our customer base:
+
+Loyal Customers: High in Frequency, Monetary Value, and made a purchase recently (high Recency).
+Potential Churners: Previously high in Frequency and Monetary Value, but their Recency is decreasing, indicating potential disengagement.
+New Customers: Low in Frequency and Monetary Value, but recent purchasers, suggesting a growing relationship.
+Lost Customers: Low in all three metrics – they haven't purchased recently, and their Frequency and Monetary Value are minimal.
+Active Customers: Moderate in Frequency and Monetary Value, indicating consistent engagement.
+Big Spenders: High in Monetary Value, but their Frequency and Recency might vary.
+Slipping Away: Previously high in Frequency and Monetary Value, but their Recency is decreasing, indicating potential churn.
+Other Segments: Customers that don't fit neatly into the above categories.
+RFM segmentation enables targeted marketing strategies for each group. For instance, we might offer exclusive deals to potential churners or celebrate milestones with loyal customers. With the insights gained from RFM, we can enhance customer experiences, optimize marketing efforts, and drive business growth based on a deeper understanding of your customers' behaviors and preferences.
+
+### Calculating RFM Scores
+```sql
+-- Creating a view for RFM segmentation based on Recency (R), Frequency (F), and Monetary (M) scores
+
+-- Step 1: Calculate RFM metrics for each customer
+CREATE OR REPLACE VIEW rfm_segment AS
+WITH CTE1 AS
+	(
+		-- Calculate MonetaryValue, AvgMonetaryValue, Frequency, last_order_date, and Recency for each customer
+		SELECT 
+			CUSTOMERNAME, 
+			ROUND(sum(sales), 0) AS MonetaryValue,
+			ROUND(avg(sales), 0) AS AvgMonetaryValue,
+			count(DISTINCT ORDERNUMBER) AS Frequency,
+			MAX(TO_DATE(ORDERDATE, 'DD/MM/YY')) AS last_order_date,
+			(SELECT MAX(TO_DATE(ORDERDATE, 'DD/MM/YY')) FROM SALES_SAMPLE_DATA) AS max_order_date,
+			DATEDIFF('DAY', MAX(TO_DATE(ORDERDATE, 'DD/MM/YY')), (SELECT MAX(TO_DATE(ORDERDATE, 'DD/MM/YY')) FROM SALES_SAMPLE_DATA)) AS Recency
+		FROM SALES_SAMPLE_DATA
+		GROUP BY CUSTOMERNAME
+	),
+
+-- Step 2: Calculate RFM scores using NTILE to segment customers into quartiles
+rfm_calc AS
+(
+	SELECT C.*,
+		NTILE(4) OVER (ORDER BY Recency DESC) AS rfm_recency,
+		NTILE(4) OVER (ORDER BY Frequency ASC) AS rfm_frequency,
+		NTILE(4) OVER (ORDER BY MonetaryValue ASC) AS rfm_monetary
+	FROM CTE1 C
+)
+
+-- Step 3: Calculate the total RFM score and create a combined RFM score category
+SELECT 
+	R.*,
+	(rfm_recency + rfm_frequency + rfm_monetary) AS rfm_total_score,
+	CONCAT(CAST(rfm_recency AS VARCHAR), CAST(rfm_frequency AS VARCHAR), CAST(rfm_monetary AS VARCHAR)) AS rfm_score_category
+FROM rfm_calc R;
+
+-- Display the results of RFM segmentation
+SELECT * FROM rfm_segment;
+```
+### Results:
+| CUSTOMERNAME                   | MONETARYVALUE | AVGMONETARYVALUE | FREQUENCY | LAST_ORDER_DATE | MAX_ORDER_DATE | RECENCY | RFM_RECENCY | RFM_FREQUENCY | RFM_MONETARY | RFM_TOTAL_SCORE | RFM_SCORE_CATEGORY |
+|--------------------------------|---------------|------------------|-----------|-----------------|----------------|---------|-------------|---------------|--------------|-----------------|--------------------|
+| Boards & Toys Co.              | 9,129         | 3,043            | 2         | 2005-02-08      | 2005-05-31     | 112     | 3           | 1             | 1            | 5               | 311                |
+| Atelier graphique              | 24,180        | 3,454            | 3         | 2004-11-25      | 2005-05-31     | 187     | 2           | 3             | 1            | 6               | 231                |
+| Auto-Moto Classics Inc.        | 26,479        | 3,310            | 3         | 2004-12-03      | 2005-05-31     | 179     | 2           | 2             | 1            | 5               | 221                |
+| Microscale Inc.                | 33,145        | 3,314            | 2         | 2004-11-03      | 2005-05-31     | 209     | 2           | 1             | 1            | 4               | 211                |
+| Royale Belge                   | 33,440        | 4,180            | 4         | 2005-01-10      | 2005-05-31     | 141     | 3           | 4             | 1            | 8               | 341                |
+| Double Decker Gift Stores, Ltd | 36,019        | 3,002            | 2         | 2004-01-22      | 2005-05-31     | 495     | 1           | 1             | 1            | 3               | 111                |
+| Cambridge Collectables Co.     | 36,164        | 3,288            | 2         | 2004-05-08      | 2005-05-31     | 388     | 1           | 2             | 1            | 4               | 121                |
+| West Coast Collectables Co.    | 46,085        | 3,545            | 2         | 2004-01-29      | 2005-05-31     | 488     | 1           | 1             | 1            | 3               | 111                |
+| Men 'R' US Retailers, Ltd.     | 48,048        | 3,432            | 2         | 2004-01-09      | 2005-05-31     | 508     | 1           | 1             | 1            | 3               | 111                |
+| CAF Imports                    | 49,642        | 3,819            | 2         | 2004-03-19      | 2005-05-31     | 438     | 1           | 1             | 1            | 3               | 111                |
+| Signal Collectibles Ltd.       | 50,219        | 3,348            | 2         | 2004-02-10      | 2005-05-31     | 476     | 1           | 1             | 1            | 3               | 111                |
+| Mini Auto Werke                | 52,264        | 3,484            | 3         | 2005-03-10      | 2005-05-31     | 82      | 3           | 2             | 1            | 6               | 321                |
+| Iberia Gift Imports, Corp.     | 54,724        | 3,648            | 2         | 2004-10-06      | 2005-05-31     | 237     | 1           | 1             | 1            | 3               | 111                |
+| Online Mini Collectables       | 57,198        | 3,813            | 2         | 2004-09-10      | 2005-05-31     | 263     | 1           | 1             | 1            | 3               | 111                |
+| Gift Ideas Corp.               | 57,294        | 3,015            | 3         | 2004-12-04      | 2005-05-31     | 178     | 3           | 3             | 1            | 7               | 331                |
+| Clover Collections, Co.        | 57,756        | 3,610            | 2         | 2004-09-16      | 2005-05-31     | 257     | 1           | 1             | 1            | 3               | 111                |
+| Australian Gift Network, Co    | 59,469        | 3,965            | 3         | 2005-02-02      | 2005-05-31     | 118     | 3           | 2             | 1            | 6               | 321                |
+| Australian Collectables, Ltd   | 64,591        | 2,808            | 3         | 2005-05-09      | 2005-05-31     | 22      | 4           | 3             | 1            | 8               | 431                |
+| Auto Assoc. & Cie.             | 64,834        | 3,602            | 2         | 2004-10-11      | 2005-05-31     | 232     | 1           | 1             | 1            | 3               | 111                |
+| Classic Gift Ideas, Inc        | 67,507        | 3,215            | 2         | 2004-10-14      | 2005-05-31     | 229     | 1           | 1             | 1            | 3               | 111                |
+| Osaka Souveniers Co.           | 67,605        | 3,380            | 2         | 2004-04-13      | 2005-05-31     | 413     | 1           | 1             | 1            | 3               | 111                |
+| Daedalus Designs Imports       | 69,052        | 3,453            | 2         | 2004-02-21      | 2005-05-31     | 465     | 1           | 1             | 1            | 3               | 111                |
+| Alpha Cognac                   | 70,488        | 3,524            | 3         | 2005-03-28      | 2005-05-31     | 64      | 3           | 2             | 2            | 7               | 322                |
+| Diecast Collectables           | 70,860        | 3,937            | 2         | 2004-04-26      | 2005-05-31     | 400     | 1           | 2             | 2            | 5               | 122                |
+| Quebec Home Shopping Network   | 74,205        | 3,373            | 3         | 2005-05-01      | 2005-05-31     | 30      | 4           | 2             | 2            | 8               | 422                |
+| Mini Wheels Co.                | 74,476        | 3,546            | 3         | 2004-11-18      | 2005-05-31     | 194     | 2           | 3             | 2            | 7               | 232                |
+| Marseille Mini Autos           | 74,936        | 2,997            | 3         | 2005-01-06      | 2005-05-31     | 145     | 3           | 3             | 2            | 8               | 332                |
+| Petit Auto                     | 74,973        | 2,999            | 3         | 2005-05-30      | 2005-05-31     | 1       | 4           | 3             | 2            | 9               | 432                |
+| Canadian Gift Exchange Network | 75,239        | 3,420            | 2         | 2004-10-22      | 2005-05-31     | 221     | 2           | 1             | 2            | 5               | 212                |
+| Classic Legends Inc.           | 77,795        | 3,890            | 3         | 2004-11-21      | 2005-05-31     | 191     | 2           | 3             | 2            | 7               | 232                |
+| giftsbymail.co.uk              | 78,241        | 3,009            | 2         | 2004-11-01      | 2005-05-31     | 211     | 2           | 1             | 2            | 5               | 212                |
+| Lyon Souveniers                | 78,570        | 3,929            | 3         | 2005-03-17      | 2005-05-31     | 75      | 3           | 2             | 2            | 7               | 322                |
+| Norway Gifts By Mail, Co.      | 79,224        | 3,301            | 2         | 2004-08-21      | 2005-05-31     | 283     | 1           | 2             | 2            | 5               | 122                |
+| Super Scale Inc.               | 79,472        | 4,675            | 2         | 2004-05-04      | 2005-05-31     | 392     | 1           | 2             | 2            | 5               | 122                |
+| Mini Caravy                    | 80,438        | 4,234            | 3         | 2005-04-14      | 2005-05-31     | 47      | 4           | 2             | 2            | 8               | 422                |
+| Collectables For Less Inc.     | 81,578        | 3,399            | 3         | 2005-01-20      | 2005-05-31     | 131     | 3           | 2             | 2            | 7               | 322                |
+| Signal Gift Stores             | 82,751        | 2,853            | 3         | 2004-11-29      | 2005-05-31     | 183     | 2           | 3             | 2            | 7               | 232                |
+| Gifts4AllAges.com              | 83,210        | 3,200            | 3         | 2005-05-06      | 2005-05-31     | 25      | 4           | 3             | 2            | 9               | 432                |
+| Tekni Collectables Inc.        | 83,228        | 3,963            | 3         | 2005-04-03      | 2005-05-31     | 58      | 4           | 2             | 2            | 8               | 422                |
+| Motor Mint Distributors Inc.   | 83,682        | 3,638            | 3         | 2004-11-17      | 2005-05-31     | 195     | 2           | 3             | 2            | 7               | 232                |
+| Mini Classics                  | 85,556        | 3,291            | 2         | 2004-10-15      | 2005-05-31     | 228     | 2           | 1             | 2            | 5               | 212                |
+| Collectable Mini Designs Co.   | 87,489        | 3,500            | 2         | 2004-02-26      | 2005-05-31     | 460     | 1           | 1             | 2            | 4               | 112                |
+| Vitachrome Inc.                | 88,041        | 3,522            | 3         | 2004-11-05      | 2005-05-31     | 207     | 2           | 3             | 2            | 7               | 232                |
+| Stylish Desk Decors, Co.       | 88,805        | 3,416            | 3         | 2004-12-03      | 2005-05-31     | 179     | 3           | 3             | 2            | 8               | 332                |
+| Auto Canal Petit               | 93,171        | 3,451            | 3         | 2005-04-07      | 2005-05-31     | 54      | 4           | 2             | 3            | 9               | 423                |
+| Cruz & Sons Co.                | 94,016        | 3,616            | 3         | 2004-11-16      | 2005-05-31     | 196     | 2           | 3             | 3            | 8               | 233                |
+| Amica Models & Co.             | 94,117        | 3,620            | 2         | 2004-09-09      | 2005-05-31     | 264     | 1           | 1             | 3            | 5               | 113                |
+| La Corne D'abondance, Co.      | 97,204        | 4,226            | 3         | 2004-11-20      | 2005-05-31     | 192     | 2           | 3             | 3            | 8               | 233                |
+| FunGiftIdeas.com               | 98,924        | 3,805            | 3         | 2005-03-03      | 2005-05-31     | 89      | 3           | 2             | 3            | 8               | 323                |
+| Toms Spezialitten, Ltd         | 100,307       | 3,858            | 2         | 2004-10-16      | 2005-05-31     | 227     | 2           | 1             | 3            | 6               | 213                |
+| Heintze Collectables           | 100,596       | 3,726            | 2         | 2004-10-22      | 2005-05-31     | 221     | 2           | 1             | 3            | 6               | 213                |
+| Gift Depot Inc.                | 101,895       | 4,076            | 3         | 2005-05-05      | 2005-05-31     | 26      | 4           | 3             | 3            | 10              | 433                |
+| Marta's Replicas Co.           | 103,080       | 3,818            | 2         | 2004-10-13      | 2005-05-31     | 230     | 1           | 1             | 3            | 5               | 113                |
+| Oulu Toy Supplies, Inc.        | 104,370       | 3,262            | 3         | 2005-01-31      | 2005-05-31     | 120     | 3           | 2             | 3            | 8               | 323                |
+| Toys4GrownUps.com              | 104,562       | 3,485            | 3         | 2005-01-12      | 2005-05-31     | 139     | 3           | 2             | 3            | 8               | 323                |
+| Mini Creations Ltd.            | 108,951       | 3,113            | 3         | 2005-01-07      | 2005-05-31     | 144     | 3           | 2             | 3            | 8               | 323                |
+| Toys of Finland, Co.           | 111,250       | 3,708            | 3         | 2005-02-09      | 2005-05-31     | 111     | 3           | 2             | 3            | 8               | 323                |
+| Herkku Gifts                   | 111,640       | 3,850            | 3         | 2004-09-03      | 2005-05-31     | 270     | 1           | 3             | 3            | 7               | 133                |
+| Suominen Souveniers            | 113,961       | 3,799            | 3         | 2005-01-06      | 2005-05-31     | 145     | 3           | 4             | 3            | 10              | 343                |
+| Handji Gifts& Co               | 115,499       | 3,208            | 4         | 2005-04-23      | 2005-05-31     | 38      | 4           | 4             | 3            | 11              | 443                |
+| Baane Mini Imports             | 116,599       | 3,644            | 4         | 2004-11-05      | 2005-05-31     | 207     | 2           | 4             | 3            | 9               | 243                |
+| Vida Sport, Ltd                | 117,714       | 3,797            | 2         | 2004-08-30      | 2005-05-31     | 274     | 1           | 2             | 3            | 6               | 123                |
+| UK Collectables, Ltd.          | 118,008       | 4,069            | 3         | 2005-04-08      | 2005-05-31     | 53      | 4           | 2             | 3            | 9               | 423                |
+| Tokyo Collectables, Ltd        | 120,563       | 3,768            | 4         | 2005-04-22      | 2005-05-31     | 39      | 4           | 4             | 3            | 11              | 443                |
+| Technics Stores Inc.           | 120,783       | 3,552            | 4         | 2005-01-05      | 2005-05-31     | 146     | 3           | 4             | 3            | 10              | 343                |
+| Diecast Classics Inc.          | 122,138       | 3,940            | 4         | 2005-05-30      | 2005-05-31     | 1       | 4           | 4             | 4            | 12              | 444                |
+| Online Diecast Creations Co.   | 131,685       | 3,873            | 3         | 2004-11-04      | 2005-05-31     | 208     | 2           | 3             | 4            | 9               | 234                |
+| Scandinavian Gift Ideas        | 134,259       | 3,533            | 3         | 2005-03-03      | 2005-05-31     | 89      | 3           | 2             | 4            | 9               | 324                |
+| Reims Collectables             | 135,043       | 3,294            | 5         | 2005-03-30      | 2005-05-31     | 62      | 4           | 4             | 4            | 12              | 444                |
+| Rovelli Gifts                  | 137,956       | 2,874            | 3         | 2004-11-12      | 2005-05-31     | 200     | 2           | 3             | 4            | 9               | 234                |
+| L'ordine Souveniers            | 142,601       | 3,656            | 3         | 2005-05-10      | 2005-05-31     | 21      | 4           | 3             | 4            | 11              | 434                |
+| Saveley & Henriot, Co.         | 142,874       | 3,485            | 3         | 2004-03-02      | 2005-05-31     | 455     | 1           | 3             | 4            | 8               | 134                |
+| Danish Wholesale Imports       | 145,042       | 4,029            | 5         | 2005-04-15      | 2005-05-31     | 46      | 4           | 4             | 4            | 12              | 444                |
+| Salzburg Collectables          | 149,799       | 3,745            | 4         | 2005-05-17      | 2005-05-31     | 14      | 4           | 4             | 4            | 12              | 444                |
+| Corporate Gift Ideas Co.       | 149,883       | 3,656            | 4         | 2005-02-23      | 2005-05-31     | 97      | 3           | 4             | 4            | 11              | 344                |
+| Souveniers And Things Co.      | 151,571       | 3,295            | 4         | 2005-05-29      | 2005-05-31     | 2       | 4           | 4             | 4            | 12              | 444                |
+| Anna's Decorations, Ltd        | 153,996       | 3,348            | 4         | 2005-03-09      | 2005-05-31     | 83      | 3           | 4             | 4            | 11              | 344                |
+| AV Stores, Co.                 | 157,808       | 3,094            | 3         | 2004-11-17      | 2005-05-31     | 195     | 2           | 3             | 4            | 9               | 234                |
+| The Sharp Gifts Warehouse      | 160,010       | 4,000            | 4         | 2005-04-22      | 2005-05-31     | 39      | 4           | 4             | 4            | 12              | 444                |
+| Land of Toys Inc.              | 164,069       | 3,348            | 4         | 2004-11-15      | 2005-05-31     | 197     | 2           | 4             | 4            | 10              | 244                |
+| Dragon Souveniers, Ltd.        | 172,990       | 4,023            | 5         | 2005-03-02      | 2005-05-31     | 90      | 3           | 4             | 4            | 11              | 344                |
+| La Rochelle Gifts              | 180,125       | 3,399            | 4         | 2005-05-31      | 2005-05-31     | 0       | 4           | 4             | 4            | 12              | 444                |
+| Muscle Machine Inc             | 197,737       | 4,120            | 4         | 2004-12-01      | 2005-05-31     | 181     | 2           | 4             | 4            | 10              | 244                |
+| Australian Collectors, Co.     | 200,995       | 3,654            | 5         | 2004-11-29      | 2005-05-31     | 183     | 2           | 4             | 4            | 10              | 244                |
+| Mini Gifts Distributors Ltd.   | 654,858       | 3,638            | 17        | 2005-05-29      | 2005-05-31     | 2       | 4           | 4             | 4            | 12              | 444                |
+| Euro Shopping Channel          | 912,294       | 3,522            | 26        | 2005-05-31      | 2005-05-31     | 0       | 4           | 4             | 4            | 12              | 444                |
+
+_CUSTOMERNAME:_ The name of the customer or company.
+_MONETARYVALUE:_ Total monetary value spent by the customer on purchases.
+_AVGMONETARYVALUE:_ Average monetary value per purchase.
+_FREQUENCY:_ Number of distinct orders made by the customer.
+_LAST_ORDER_DATE:_ Date of the last order made by the customer.
+_MAX_ORDER_DATE:_ Maximum date of orders within the dataset.
+_RECENCY:_ The number of days since the last order was made.
+_RFM_RECENCY:_ Recency score segment (1 to 4) based on quartiles.
+_RFM_FREQUENCY:_ Frequency score segment (1 to 4) based on quartiles.
+_RFM_MONETARY:_ Monetary score segment (1 to 4) based on quartiles.
+_RFM_TOTAL_SCORE:_ Total RFM score, sum of recency, frequency, and monetary scores.
+_RFM_SCORE_CATEGORY:_ Combined RFM score category, formed by concatenating recency, frequency, and monetary scores.
+The RFM segmentation is utilized to group customers into segments based on their purchasing behavior. Higher RFM scores generally indicate more valuable customers who have made recent, frequent, and high-value purchases.
