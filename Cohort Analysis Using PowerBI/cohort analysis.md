@@ -55,6 +55,7 @@ The following data modeling steps were performed in Power BI:
 Eighteen DAX measures were created for cohort analysis:
 
 1. Active Customers = DISTINCTCOUNT(FactSales[CustomerID])
+
 2. Churned Customers =
     SWITCH(
         TRUE(),
@@ -62,7 +63,9 @@ Eighteen DAX measures were created for cohort analysis:
         BLANK(),
         [New Customers] - [Cohort Performance]
     )
+
 3. Churned Rate = DIVIDE([Churned Customers],[New Customers])
+
 4. Cohort Performance =
 VAR _minDate = MIN(DimDate[Start of Month])
 VAR _maxDate = MAX(DimDate[Start of Month])
@@ -74,6 +77,7 @@ RETURN
         DimCustomers[First Transaction Month] >= _minDate
             && DimCustomers[First Transaction Month] <= _maxDate
     )
+
 5. Lost Customers =
 VAR _customersThisMonth =
     VALUES(FactSales[CustomerID])
@@ -88,7 +92,9 @@ VAR _lostCustomers =
     )
 RETURN
     COUNTROWS(_lostCustomers)
+
 6. New Customers = CALCULATE([Active Customers], FactSales[Months Since First Transaction] = 0)
+
 7. Recovered Customers =
 VAR _customersThisMonth =
     VALUES(FactSales[CustomerID])
@@ -109,6 +115,7 @@ VAR _recoveredCustomers =
     )
 RETURN
     COUNTROWS(_recoveredCustomers)
+
 8. Retained Customers =
 VAR _customersThisMonth =
     VALUES(FactSales[CustomerID])
@@ -123,13 +130,16 @@ VAR _retainedCustomers =
     )
 RETURN
     COUNTROWS(_retainedCustomers)
+
 9. Retention Rate =
     DIVIDE([Cohort Performance],[New Customers])
+
 10. Active Customers LW =
     CALCULATE(
         [Active Customers],
         DATEADD(DimDate[Date], -7, DAY)
     )
+
 11. Weekly Churned Customers =
     SWITCH(
         TRUE(),
@@ -137,7 +147,9 @@ RETURN
         BLANK(),
         [Weekly New Customers] - [Weekly Cohort Performance]
     )
+
 12. Weekly Churned Rate = DIVIDE([Weekly Churned Customers],[Weekly New Customers])
+
 13. Weekly Cohort Performance =
 VAR _minDate = MIN(DimDate[Start of Week])
 VAR _maxDate = MAX(DimDate[Start of Week])
@@ -149,6 +161,7 @@ RETURN
         DimCustomers[First Transaction Week] >= _minDate
             && DimCustomers[First Transaction Week] <= _maxDate
     )
+
 14. Weekly Lost Customers =
 VAR _customersThisWeek =
     VALUES(FactSales[CustomerID])
@@ -163,7 +176,9 @@ VAR _weeklylostCustomers =
     )
 RETURN
     COUNTROWS(_weeklylostCustomers)
+
 15. Weekly New Customers = CALCULATE([Active Customers], FactSales[Weeks Since First Transaction] = 0)
+
 16. Weekly Recovered Customers =
 VAR _customersThisWeek =
     VALUES(FactSales[CustomerID])
@@ -184,6 +199,7 @@ VAR _weeklyrecoveredCustomers =
     )
 RETURN
     COUNTROWS(_weeklyrecoveredCustomers)
+
 17. Weekly Retained Customers =
 VAR _customersThisWeek =
     VALUES(FactSales[CustomerID])
@@ -198,6 +214,7 @@ VAR _weeklyretainedCustomers =
     )
 RETURN
     COUNTROWS(_weeklyretainedCustomers)
+
 18. Weekly Retention Rate =
     DIVIDE([Weekly Cohort Performance],[Weekly New Customers])
 
