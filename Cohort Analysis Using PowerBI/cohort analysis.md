@@ -205,5 +205,10 @@ RETURN
 ## Visualizations
 Finally, the project is ready for creating visualizations based on the calculated DAX measures to analyze and present the cohort analysis results.
 
+## Monthly Cohort Analysis:
 
+![Dashboard 1](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/0ff52650-bae1-4146-970d-7761da1a8c7b)
 
+## Weekly Cohort Analysis:
+
+![Dashboard 2](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/096ef5ba-e4d7-4191-b345-a8f94e736ac3)
