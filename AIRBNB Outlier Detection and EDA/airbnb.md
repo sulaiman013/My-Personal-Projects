@@ -416,11 +416,18 @@ FROM CLEANED                                       -- Use the cleaned dataset
 GROUP BY DAY                                       -- Group the results by day type (weekday or weekend)
 ORDER BY "TOTAL BOOKING PRICE" DESC;                -- Order the results by total booking price in descending order
 ```
+| DAY_TYPE | AVERAGE_PRICE | MINIMUM_BOOKING_PRICE | MAXIMUM_BOOKING_PRICE | TOTAL BOOKING PRICE | NUMBER_OF_BOOKING |
+|----------|---------------|-----------------------|-----------------------|---------------------|-------------------|
+| Weekend  | 219           | 34.8                  | 527.1                 | 4,230,451           | 19,318            |
+| Weekday  | 213           | 37.1                  | 527.3                 | 4,163,749           | 19,505            |
+
 This SQL query focuses on analyzing booking prices based on the type of day (weekday or weekend) in the cleaned dataset. It calculates various statistics for each day type, including the average, minimum, and maximum booking prices, as well as the total booking price and the number of bookings. The results are grouped by day type and ordered in descending order of total booking price.
 
 This analysis provides insights into how booking prices vary between weekdays and weekends, offering a clear overview of the price distribution and potential patterns in the dataset.
 
 ## Causal Relationship with Guest Satisfaction Scores
+Overall Guest Satisfaction Statistics: This query calculates the average, minimum, and maximum guest satisfaction scores in the cleaned dataset, providing insights into the overall satisfaction level.
+
 ```sql
 /* Guest Satisfaction Analysis */
 
@@ -431,7 +438,13 @@ SELECT
     ROUND(MIN(GUEST_SATISFACTION), 1) AS MINIMUM_GUEST_SATISFACTION_SCORE,
     ROUND(MAX(GUEST_SATISFACTION), 1) AS MAXIMUM_GUEST_SATISFACTION_SCORE
 FROM CLEANED; -- Average: 93.0, Min: 20.0, Max: 100.0
+```
+| AVERAGE_GUEST_SATISFACTION_SCORE | MINIMUM_GUEST_SATISFACTION_SCORE | MAXIMUM_GUEST_SATISFACTION_SCORE |
+|----------------------------------|----------------------------------|----------------------------------|
+| 93.1                             | 20                               | 100                              |
 
+Guest Satisfaction by City: This query presents average, minimum, and maximum guest satisfaction scores grouped by city, ordered by average guest satisfaction. It reveals variations in guest satisfaction among different cities.
+```sql
 -- Query 2: Analyze guest satisfaction by city
 -- Calculate average, minimum, and maximum guest satisfaction scores by city, ordered by average guest satisfaction
 SELECT 
@@ -442,7 +455,21 @@ SELECT
 FROM CLEANED
 GROUP BY CITY
 ORDER BY AVERAGE_GUEST_SATISFACTION_SCORE DESC;
+```
+| CITY      | AVERAGE_GUEST_SATISFACTION_SCORE | MINIMUM_GUEST_SATISFACTION_SCORE | MAXIMUM_GUEST_SATISFACTION_SCORE |
+|-----------|----------------------------------|----------------------------------|----------------------------------|
+| Athens    | 95                               | 20                               | 100                              |
+| Budapest  | 94.6                             | 20                               | 100                              |
+| Berlin    | 94.3                             | 20                               | 100                              |
+| Amsterdam | 94                               | 20                               | 100                              |
+| Vienna    | 93.7                             | 20                               | 100                              |
+| Rome      | 93.1                             | 20                               | 100                              |
+| Paris     | 91.8                             | 20                               | 100                              |
+| Barcelona | 91.3                             | 20                               | 100                              |
+| Lisbon    | 91                               | 20                               | 100                              |
 
+Factors Behind Guest Satisfaction: This query explores the factors contributing to the difference in average guest satisfaction scores across cities. It analyzes average cleanliness rating, price, attraction index, and distances to assess potential influencers of guest satisfaction.
+```sql
 -- Query 3: Explore factors behind the difference in average guest satisfaction scores
 -- Analyze various factors' averages for cities with higher guest satisfaction
 SELECT 
@@ -456,29 +483,65 @@ SELECT
 FROM CLEANED
 GROUP BY CITY
 ORDER BY AVERAGE_GUEST_SATISFACTION_SCORE DESC;
+```
+| CITY      | AVERAGE_GUEST_SATISFACTION_SCORE | AVERAGE_CLEANLINESS_RATING | AVERAGE_PRICE | AVERAGE_ATTRACTION_INDEX | AVERAGE_DISTANCE_FROM_CITY_CENTER | AVERAGE_DISTANCE_FROM_METRO |
+|-----------|----------------------------------|----------------------------|---------------|--------------------------|-----------------------------------|-----------------------------|
+| Athens    | 95                               | 9.64                       | 144           | 5.7                      | 6.2                               | 2                           |
+| Budapest  | 94.6                             | 9.48                       | 167           | 12.6                     | 19.3                              | 11.7                        |
+| Berlin    | 94.3                             | 9.46                       | 212           | 16.4                     | 25.3                              | 14.3                        |
+| Amsterdam | 94                               | 9.48                       | 354           | 12.5                     | 11.2                              | 4.4                         |
+| Vienna    | 93.7                             | 9.47                       | 222           | 8.7                      | 13.3                              | 5.2                         |
+| Rome      | 93.1                             | 9.51                       | 197           | 10.3                     | 9.6                               | 4.1                         |
+| Paris     | 91.8                             | 9.23                       | 299           | 17.2                     | 7.7                               | 1.2                         |
+| Barcelona | 91.3                             | 9.3                        | 227           | 16.4                     | 8.4                               | 4                           |
+| Lisbon    | 91                               | 9.36                       | 230           | 7.3                      | 9.6                               | 6.2                         |
 
+Correlation with Attraction Index: This query calculates the correlation between guest satisfaction and attraction index, indicating the strength and direction of their association.
+```sql
 -- Correlation analysis of guest satisfaction
 -- Calculate the correlation between guest satisfaction and attraction index
 SELECT 
     ROUND(CORR(GUEST_SATISFACTION, NORMALSED_ATTACTION_INDEX), 2) AS "CORRELATION BET GUEST SATISFACTION AND ATTRACTION INDEX"
 FROM CLEANED; -- Indicates not much association
+```
+| CORRELATION BET GUEST SATISFACTION AND ATTRACTION INDEX |
+|---------------------------------------------------------|
+| -0.04                                                   |
 
+Correlation with Price and Cleanliness Rating: These queries compute the correlations between guest satisfaction and price, as well as guest satisfaction and cleanliness rating. They reveal the degree of association between guest satisfaction and these factors.
+```sql
 -- Calculate the correlation between guest satisfaction and price, and guest satisfaction and cleanliness rating
 SELECT 
     ROUND(CORR(GUEST_SATISFACTION, PRICE), 2) AS "CORRELATION BET GUEST SATISFACTION AND PRICE",
     ROUND(CORR(GUEST_SATISFACTION, CLEANINGNESS_RATING), 2) AS "CORRELATION BET GUEST SATISFACTION AND CLEANINGNESS RATING"
 FROM CLEANED; -- Price doesn't have a significant association, but cleanliness rating does have a moderate to strong positive association
 ```
-Interpretation:
+| CORRELATION BET GUEST SATISFACTION AND PRICE | CORRELATION BET GUEST SATISFACTION AND CLEANINGNESS RATING |
+|----------------------------------------------|------------------------------------------------------------|
+| 0                                            | 0.69                                                       |
 
-Overall Guest Satisfaction Statistics: This query calculates the average, minimum, and maximum guest satisfaction scores in the cleaned dataset, providing insights into the overall satisfaction level.
+### Summary:
+The provided SQL queries focus on establishing a causal relationship between guest satisfaction scores and various factors within the cleaned Airbnb dataset.
 
-Guest Satisfaction by City: This query presents average, minimum, and maximum guest satisfaction scores grouped by city, ordered by average guest satisfaction. It reveals variations in guest satisfaction among different cities.
+- **Overall Guest Satisfaction Statistics**: The average, minimum, and maximum guest satisfaction scores are calculated, resulting in an average satisfaction of 93.1, with a minimum of 20 and a maximum of 100.
 
-Factors Behind Guest Satisfaction: This query explores the factors contributing to the difference in average guest satisfaction scores across cities. It analyzes average cleanliness rating, price, attraction index, and distances to assess potential influencers of guest satisfaction.
+- **Guest Satisfaction by City**: The average, minimum, and maximum guest satisfaction scores are grouped by city and ordered by average guest satisfaction. This analysis highlights variations in guest satisfaction among cities, with Athens, Budapest, and Berlin having the highest average scores.
 
-Correlation with Attraction Index: This query calculates the correlation between guest satisfaction and attraction index, indicating the strength and direction of their association.
+- **Factors Behind Guest Satisfaction**: The query investigates the elements that affect how average guest satisfaction scores vary across cities. Analysis is done on a number of variables, including price, distance, attraction index, and average cleanliness rating. Higher guest satisfaction scores are found in Athens, Budapest, and Berlin, which also have moderate to high ratings for cleanliness, relatively low prices, and higher attraction indices.
 
-Correlation with Price and Cleanliness Rating: These queries compute the correlations between guest satisfaction and price, as well as guest satisfaction and cleanliness rating. They reveal the degree of association between guest satisfaction and these factors.
+- **Correlation with Attraction Index**: The correlation between guest satisfaction and attraction index is calculated, indicating a weak negative association (correlation coefficient: -0.04). This suggests that guest satisfaction is not substantially influenced by the attraction index.
 
-These queries and interpretations shed light on guest satisfaction patterns, potential influencers, and associations with different factors within the dataset.
+- **Correlation with Price and Cleanliness Rating**: The correlations between guest satisfaction and price, as well as guest satisfaction and cleanliness rating, are determined. The correlation with price is negligible (correlation coefficient: 0), implying that price doesn't significantly impact guest satisfaction. However, the correlation with cleanliness rating is moderately strong and positive (correlation coefficient: 0.69), indicating that guest satisfaction tends to increase with higher cleanliness ratings.
+
+In conclusion, the questions reveal information about the variables affecting guest satisfaction ratings. While factors like attraction index and price have a relatively small impact on customer satisfaction, cleanliness rating stands out as a significant factor. These results assist in highlighting important areas where hosts and Airbnb hosts can concentrate in order to improve guest experiences and general satisfaction.
+
+## Conclusion:
+In conclusion, the "Airbnb Data Analysis and Outlier Detection Project" has shed important light on various aspects of the Airbnb market by offering insightful analyses of the European booking dataset. We gained a thorough understanding of booking patterns, pricing trends, and the distribution of room types across various cities through extensive exploratory data analysis (EDA). We were able to identify potential research areas of interest thanks to this preliminary analysis.
+
+Outlier detection, where we used statistical techniques to find and examine outliers in the dataset's price distribution, was a crucial component of this project. We were able to comprehend the extent of the outlier presence thanks to this process, which also resulted in the creation of a "CLEANED" dataset by eliminating the outliers. For a thorough analysis, the cleaned dataset better captures the underlying trends and patterns in the data.
+
+We investigated factors that affect guest satisfaction scores as we dug deeper into the topic. When compared to other factors like attraction index and price, the correlation analysis showed that cleanliness ratings have a significant impact on guest satisfaction. This finding emphasizes how crucial it is to uphold strict standards for cleanliness in order to improve visitor satisfaction.
+
+This project helps Airbnb hosts and stakeholders make wise decisions to increase guest satisfaction by presenting statistics and correlations. The knowledge gained from this analysis can be used to inform pricing decisions, emphasize the importance of cleanliness, and provide practical advice for enhancing the guest experience.
+
+Overall, this project serves as an example of the value of data analysis in delivering practical knowledge for enhancing business operations and client satisfaction in the dynamic and cutthroat environment of the hospitality sector. This project is a useful tool for analysts and stakeholders in the Airbnb ecosystem because it combines exploratory analysis, outlier detection, and correlation assessments to create a strong foundation for data-driven decision-making.
