@@ -179,3 +179,89 @@ ORDER BY 4 DESC;
 Query 9: Explore weekend and private room relationships
 Continues causal relationship exploration by analyzing bookings, revenue, and average guest satisfaction scores specifically for weekends and private rooms.
 
+## Outlier Detection and Removal
+```sql
+/* Outlier Detection and Data Cleaning */
+
+-- Create or replace a view named "OUTLIER" to identify outliers in the dataset
+-- Calculate the five-number summary and interquartile range (IQR)
+-- Determine lower and upper hinges for outlier detection
+-- Select rows where prices are outliers based on hinges
+CREATE OR REPLACE VIEW OUTLIER AS
+(
+    WITH FIVE_NUMBER_SUMMARY AS
+    -- Calculate the minimum, Q1, median, Q3, and maximum of the "PRICE" field
+    SELECT 
+        MIN(PRICE) AS MIN_ORDER_VALUE,
+        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY PRICE) AS Q1,
+        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY PRICE) AS MEDIAN,
+        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY PRICE) AS Q3,
+        MAX(PRICE) AS MAX_ORDER_VALUE,
+        (PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY PRICE) - PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY PRICE)) AS IQR
+    FROM AIRBNB
+),
+HINGES AS
+    -- Calculate the lower and upper hinges for outlier detection
+    SELECT (Q1 - 1.5 * IQR) AS LOWER_HINGE, (Q3 + 1.5 * IQR) AS UPPER_HINGE
+    FROM FIVE_NUMBER_SUMMARY
+    -- Select rows where prices are outliers based on hinges
+    SELECT 
+        *
+    FROM AIRBNB
+    WHERE PRICE < (SELECT LOWER_HINGE FROM HINGES) OR PRICE > (SELECT UPPER_HINGE FROM HINGES)
+);
+
+-- Count the number of outliers in the "PRICE" field
+SELECT 
+    COUNT (*) AS "NUMBER OF OUTLIERS IN PRICE FIELD" 
+FROM OUTLIER
+WHERE PRICE < (SELECT LOWER_HINGE FROM HINGES) OR PRICE > (SELECT UPPER_HINGE FROM HINGES); -- Total outliers: 2,891
+
+-- Check outlier data statistics (minimum, average, maximum) grouped by room type
+SELECT 
+    ROOM_TYPE AS "ROOM TYPE",
+    COUNT(*) AS "NO. OF Bookings", 
+    ROUND(MIN(PRICE), 1) AS "MINIMUM OUTLIER PRICE VALUE",
+    ROUND(MAX(PRICE), 1) AS "MAXIMUM OUTLIER PRICE VALUE",
+    ROUND(AVG(PRICE), 1) AS "AVERAGE OUTLIER PRICE VALUE"
+FROM OUTLIER
+GROUP BY ROOM_TYPE;
+
+-- Compare outlier data statistics with the main dataset
+-- Check minimum, average, and maximum prices grouped by room type
+SELECT 
+    ROOM_TYPE AS "ROOM TYPE",
+    COUNT(*) AS "NO. OF Bookings", 
+    ROUND(MIN(PRICE), 1) AS "MINIMUM PRICE VALUE",
+    ROUND(MAX(PRICE), 1) AS "MAXIMUM PRICE VALUE",
+    ROUND(AVG(PRICE), 1) AS "AVERAGE PRICE VALUE"
+FROM AIRBNB
+GROUP BY ROOM_TYPE; -- Notice the difference in average outlier price value vs. average price value
+
+-- Create a view named "CLEANED" by removing outliers
+-- Apply similar outlier detection logic to filter out outliers
+CREATE VIEW CLEANED AS
+(
+    WITH FIVE_NUMBER_SUMMARY AS
+    -- Same calculation as before
+    HINGES AS
+        -- Same calculation as before
+    -- Select rows where prices are within the hinges, effectively removing outliers
+    SELECT * FROM AIRBNB
+    WHERE PRICE > (SELECT LOWER_HINGE FROM HINGES) AND PRICE < (SELECT UPPER_HINGE FROM HINGES)
+);
+
+-- Count the number of records in the cleaned dataset
+SELECT COUNT(*) FROM CLEANED;
+
+-- Check statistics of cleaned data (minimum, average, maximum) grouped by room type
+SELECT 
+    ROOM_TYPE AS "ROOM TYPE",
+    COUNT(*) AS "NO. OF Bookings", 
+    ROUND(MIN(PRICE), 1) AS "MINIMUM PRICE VALUE",
+    ROUND(MAX(PRICE), 1) AS "MAXIMUM PRICE VALUE",
+    ROUND(AVG(PRICE), 1) AS "AVERAGE PRICE VALUE"
+FROM CLEANED
+GROUP BY ROOM_TYPE;
+```
+
