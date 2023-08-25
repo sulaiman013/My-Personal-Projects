@@ -102,28 +102,30 @@ SELECT * FROM AIRBNB LIMIT 5;
 In order to complete several important tasks, this script first switches to the new database, "TOURISM," or creates a new one if one already exists. A schema called "EUROPE" is created in the "TOURISM" database, and the context changes to this schema. A table called "AIRBNB" is then created with columns that correspond to dataset variables and are each defined with the appropriate data types. In addition, a file format called "csv_format" is created for CSV files that specifies the field delimiter, permits optional double-quote enclosure, and instructs the skip-header-row option. Finally, a sample of the data from the "AIRBNB" table is shown, providing a preliminary look at the dataset's organization. This script, which is written in Markdown and provides step-by-step explanations, is prepared to be added to your GitHub repository or portfolio website.
 
 ## Exploratory Data Analysis
+Query 1: Count total records in the dataset
+Returns the number of records in the dataset (41,714).
 ```sql
 /* Exploratory Data Analysis (EDA) */
 
 -- Count the number of records in the dataset
 SELECT COUNT(*) AS "NUMBER OF RECORDS" FROM AIRBNB; -- Total records: 41,714
 ```
-Query 1: Count total records in the dataset
-Returns the number of records in the dataset (41,714).
+Query 2: Count unique cities in the dataset
+Calculates the number of unique cities in the dataset (9 cities).
 ```sql
 -- Count the number of unique/distinct cities in the European dataset
 SELECT COUNT(DISTINCT CITY) AS "NUMBER OF UNIQUE CITY"
 FROM AIRBNB; -- Total unique cities: 9
 ```
-Query 2: Count unique cities in the dataset
-Calculates the number of unique cities in the dataset (9 cities).
+Query 3: List distinct city names
+Displays the unique names of cities present in the dataset.
 ```sql
 -- List distinct city names
 SELECT DISTINCT CITY AS "CITY NAMES"
 FROM AIRBNB;
 ```
-Query 3: List distinct city names
-Displays the unique names of cities present in the dataset.
+Query 4: Count bookings per city
+Shows the number of bookings made in each city, ordered by booking counts.
 ```sql
 -- Count the number of bookings in each city
 SELECT CITY, COUNT(CITY) AS "NUMBER OF BOOKINGS"
@@ -131,8 +133,8 @@ FROM AIRBNB
 GROUP BY CITY
 ORDER BY 2 DESC;
 ```
-Query 4: Count bookings per city
-Shows the number of bookings made in each city, ordered by booking counts.
+Query 5: Calculate total booking revenue by city
+Computes the total booking revenue generated for each city, ordered by revenue.
 ```sql
 -- Calculate total booking revenue by city
 SELECT CITY, ROUND(SUM(PRICE), 0) AS "TOTAL BOOKING REVENUE"
@@ -140,8 +142,8 @@ FROM AIRBNB
 GROUP BY CITY
 ORDER BY 2 DESC;
 ```
-Query 5: Calculate total booking revenue by city
-Computes the total booking revenue generated for each city, ordered by revenue.
+Query 6: Combine bookings and revenue by city
+Presents the number of bookings and total revenue for each city, ordered by revenue.
 ```sql
 -- Combine the results of number of bookings and total booking revenue by city
 SELECT CITY, COUNT(CITY) AS "NUMBER OF BOOKINGS", ROUND(SUM(PRICE), 0) AS "TOTAL BOOKING REVENUE"
@@ -149,15 +151,15 @@ FROM AIRBNB
 GROUP BY CITY
 ORDER BY "TOTAL BOOKING REVENUE" DESC;
 ```
-Query 6: Combine bookings and revenue by city
-Presents the number of bookings and total revenue for each city, ordered by revenue.
+Query 7: List distinct room types
+Displays the different types of rooms available in the dataset.
 ```sql
 -- List distinct room types
 SELECT DISTINCT ROOM_TYPE
 FROM AIRBNB;
 ```
-Query 7: List distinct room types
-Displays the different types of rooms available in the dataset.
+Query 8: Analyze city and room type relationships
+Explores potential causal links by comparing bookings, revenue, and average guest satisfaction scores for various city and room type combinations.
 ```sql
 -- Explore potential causal relationships
 -- Analyze bookings, revenue, and average guest satisfaction by city and room type
@@ -166,8 +168,8 @@ FROM AIRBNB
 GROUP BY CITY, ROOM_TYPE
 ORDER BY 4 DESC;
 ```
-Query 8: Analyze city and room type relationships
-Explores potential causal links by comparing bookings, revenue, and average guest satisfaction scores for various city and room type combinations.
+Query 9: Explore weekend and private room relationships
+Continues causal relationship exploration by analyzing bookings, revenue, and average guest satisfaction scores specifically for weekends and private rooms.
 ```sql
 -- Analyze bookings, revenue, and average guest satisfaction for weekends and private rooms
 SELECT CITY, COUNT(CITY) AS "NUMBER OF BOOKINGS", ROUND(SUM(PRICE), 0) AS "TOTAL BOOKING REVENUE", ROUND(AVG(GUEST_SATISFACTION), 1) AS "AVERAGE GUEST SATISFACTION SCORE"
@@ -176,8 +178,7 @@ WHERE DAY ILIKE '%end' AND ROOM_TYPE ILIKE 'pri%' -- Only for weekends and priva
 GROUP BY CITY
 ORDER BY 4 DESC;
 ```
-Query 9: Explore weekend and private room relationships
-Continues causal relationship exploration by analyzing bookings, revenue, and average guest satisfaction scores specifically for weekends and private rooms.
+
 
 ## Outlier Detection and Removal
 ```sql
