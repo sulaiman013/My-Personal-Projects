@@ -124,6 +124,18 @@ Displays the unique names of cities present in the dataset.
 SELECT DISTINCT CITY AS "CITY NAMES"
 FROM AIRBNB;
 ```
+| CITY NAMES |
+|------------|
+| Amsterdam  |
+| Athens     |
+| Barcelona  |
+| Berlin     |
+| Budapest   |
+| Lisbon     |
+| Paris      |
+| Vienna     |
+| Rome       |
+
 Query 4: Count bookings per city
 Shows the number of bookings made in each city, ordered by booking counts.
 ```sql
@@ -133,6 +145,18 @@ FROM AIRBNB
 GROUP BY CITY
 ORDER BY 2 DESC;
 ```
+| CITY      | NUMBER OF BOOKINGS |
+|-----------|--------------------|
+| Rome      | 9,027              |
+| Paris     | 6,688              |
+| Lisbon    | 5,763              |
+| Athens    | 5,280              |
+| Budapest  | 4,022              |
+| Vienna    | 3,537              |
+| Barcelona | 2,833              |
+| Berlin    | 2,484              |
+| Amsterdam | 2,080              |
+
 Query 5: Calculate total booking revenue by city
 Computes the total booking revenue generated for each city, ordered by revenue.
 ```sql
@@ -142,6 +166,18 @@ FROM AIRBNB
 GROUP BY CITY
 ORDER BY 2 DESC;
 ```
+| CITY      | TOTAL BOOKING REVENUE |
+|-----------|-----------------------|
+| Paris     | 2,625,250             |
+| Rome      | 1,854,073             |
+| Lisbon    | 1,372,807             |
+| Amsterdam | 1,192,075             |
+| Vienna    | 854,477               |
+| Barcelona | 832,204               |
+| Athens    | 801,209               |
+| Budapest  | 709,937               |
+| Berlin    | 607,546               |
+
 Query 6: Combine bookings and revenue by city
 Presents the number of bookings and total revenue for each city, ordered by revenue.
 ```sql
@@ -151,6 +187,18 @@ FROM AIRBNB
 GROUP BY CITY
 ORDER BY "TOTAL BOOKING REVENUE" DESC;
 ```
+| CITY      | NUMBER OF BOOKINGS | TOTAL BOOKING REVENUE |
+|-----------|--------------------|-----------------------|
+| Paris     | 6,688              | 2,625,250             |
+| Rome      | 9,027              | 1,854,073             |
+| Lisbon    | 5,763              | 1,372,807             |
+| Amsterdam | 2,080              | 1,192,075             |
+| Vienna    | 3,537              | 854,477               |
+| Barcelona | 2,833              | 832,204               |
+| Athens    | 5,280              | 801,209               |
+| Budapest  | 4,022              | 709,937               |
+| Berlin    | 2,484              | 607,546               |
+
 Query 7: List distinct room types
 Displays the different types of rooms available in the dataset.
 ```sql
@@ -158,6 +206,12 @@ Displays the different types of rooms available in the dataset.
 SELECT DISTINCT ROOM_TYPE
 FROM AIRBNB;
 ```
+| ROOM_TYPE       |
+|-----------------|
+| Private room    |
+| Entire home/apt |
+| Shared room     |
+
 Query 8: Analyze city and room type relationships
 Explores potential causal links by comparing bookings, revenue, and average guest satisfaction scores for various city and room type combinations.
 ```sql
@@ -168,6 +222,36 @@ FROM AIRBNB
 GROUP BY CITY, ROOM_TYPE
 ORDER BY 4 DESC;
 ```
+| CITY      | ROOM_TYPE       | NUMBER OF BOOKINGS | TOTAL BOOKING REVENUE | AVERAGE GUEST SATISFACTION SCORE |
+|-----------|-----------------|--------------------|-----------------------|----------------------------------|
+| Paris     | Entire home/apt | 5,067              | 2,154,021             | 92                               |
+| Rome      | Entire home/apt | 5,561              | 1,339,001             | 93.5                             |
+| Lisbon    | Entire home/apt | 3,878              | 1,095,519             | 91.6                             |
+| Amsterdam | Entire home/apt | 1,126              | 827,271               | 95.4                             |
+| Athens    | Entire home/apt | 4,872              | 755,548               | 95.2                             |
+| Vienna    | Entire home/apt | 2,747              | 704,763               | 93.6                             |
+| Budapest  | Entire home/apt | 3,589              | 662,433               | 94.7                             |
+| Rome      | Private room    | 3,454              | 513,912               | 92.5                             |
+| Barcelona | Private room    | 2,279              | 489,334               | 91.6                             |
+| Paris     | Private room    | 1,527              | 456,907               | 92.3                             |
+| Amsterdam | Private room    | 944                | 361,994               | 93.5                             |
+| Barcelona | Entire home/apt | 542                | 341,382               | 89.2                             |
+| Berlin    | Entire home/apt | 882                | 320,348               | 94                               |
+| Berlin    | Private room    | 1,529              | 276,015               | 94.7                             |
+| Lisbon    | Private room    | 1,811              | 269,662               | 90.2                             |
+| Vienna    | Private room    | 774                | 147,390               | 94.2                             |
+| Budapest  | Private room    | 419                | 45,729                | 93.2                             |
+| Athens    | Private room    | 397                | 44,797                | 93.1                             |
+| Paris     | Shared room     | 94                 | 14,321                | 92.1                             |
+| Berlin    | Shared room     | 73                 | 11,183                | 90.2                             |
+| Lisbon    | Shared room     | 74                 | 7,627                 | 85.1                             |
+| Amsterdam | Shared room     | 10                 | 2,809                 | 92.8                             |
+| Vienna    | Shared room     | 16                 | 2,324                 | 88.1                             |
+| Budapest  | Shared room     | 14                 | 1,776                 | 97.6                             |
+| Barcelona | Shared room     | 12                 | 1,489                 | 89.3                             |
+| Rome      | Shared room     | 12                 | 1,161                 | 87.4                             |
+| Athens    | Shared room     | 11                 | 865                   | 92.1                             |
+
 Query 9: Explore weekend and private room relationships
 Continues causal relationship exploration by analyzing bookings, revenue, and average guest satisfaction scores specifically for weekends and private rooms.
 ```sql
@@ -178,7 +262,17 @@ WHERE DAY ILIKE '%end' AND ROOM_TYPE ILIKE 'pri%' -- Only for weekends and priva
 GROUP BY CITY
 ORDER BY 4 DESC;
 ```
-
+| CITY      | NUMBER OF BOOKINGS | TOTAL BOOKING REVENUE | AVERAGE GUEST SATISFACTION SCORE |
+|-----------|--------------------|-----------------------|----------------------------------|
+| Berlin    | 754                | 139,445               | 94.7                             |
+| Vienna    | 392                | 74,178                | 94.2                             |
+| Amsterdam | 385                | 156,973               | 93.3                             |
+| Athens    | 196                | 21,829                | 93.2                             |
+| Budapest  | 203                | 23,616                | 93.2                             |
+| Rome      | 1,723              | 262,759               | 92.5                             |
+| Paris     | 769                | 228,027               | 92.3                             |
+| Barcelona | 1,094              | 249,070               | 91.5                             |
+| Lisbon    | 917                | 138,008               | 90.3                             |
 
 ## Outlier Detection and Removal
 ```sql
