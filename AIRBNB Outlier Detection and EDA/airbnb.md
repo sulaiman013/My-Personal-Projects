@@ -216,7 +216,12 @@ SELECT
     COUNT (*) AS "NUMBER OF OUTLIERS IN PRICE FIELD" 
 FROM OUTLIER
 WHERE PRICE < (SELECT LOWER_HINGE FROM HINGES) OR PRICE > (SELECT UPPER_HINGE FROM HINGES); -- Total outliers: 2,891
+```
+This query creates a view called "OUTLIER" to identify and store outlier data based on the "PRICE" field. It calculates the five-number summary, interquartile range (IQR), and hinges for outlier detection. It then selects rows where prices are outside the hinges, indicating outliers.
 
+Also, counts the number of outliers present in the "PRICE" field using the "OUTLIER" view. The result indicates that there are 2,891 outliers.
+
+```sql
 -- Check outlier data statistics (minimum, average, maximum) grouped by room type
 SELECT 
     ROOM_TYPE AS "ROOM TYPE",
@@ -226,7 +231,10 @@ SELECT
     ROUND(AVG(PRICE), 1) AS "AVERAGE OUTLIER PRICE VALUE"
 FROM OUTLIER
 GROUP BY ROOM_TYPE;
+```
+This query presents statistics (minimum, maximum, average) of outlier data grouped by room type. It reveals the range of outlier prices within different room types.
 
+```sql
 -- Compare outlier data statistics with the main dataset
 -- Check minimum, average, and maximum prices grouped by room type
 SELECT 
@@ -237,7 +245,10 @@ SELECT
     ROUND(AVG(PRICE), 1) AS "AVERAGE PRICE VALUE"
 FROM AIRBNB
 GROUP BY ROOM_TYPE; -- Notice the difference in average outlier price value vs. average price value
+```
+This query compares the statistics (minimum, maximum, average) of the main dataset with the outlier data, grouped by room type. It highlights the difference in average outlier price values compared to average price values.
 
+```sql
 -- Create a view named "CLEANED" by removing outliers
 -- Apply similar outlier detection logic to filter out outliers
 CREATE VIEW CLEANED AS
@@ -253,7 +264,12 @@ CREATE VIEW CLEANED AS
 
 -- Count the number of records in the cleaned dataset
 SELECT COUNT(*) FROM CLEANED;
+```
+This query creates a view called "CLEANED" by removing outliers using a similar approach as the "OUTLIER" view. It selects rows where prices fall within the hinges, effectively cleaning the data.
 
+Also, counts the number of records in the cleaned dataset using the "CLEANED" view.
+
+```sql
 -- Check statistics of cleaned data (minimum, average, maximum) grouped by room type
 SELECT 
     ROOM_TYPE AS "ROOM TYPE",
@@ -264,4 +280,87 @@ SELECT
 FROM CLEANED
 GROUP BY ROOM_TYPE;
 ```
+This query presents statistics (minimum, maximum, average) of the cleaned data grouped by room type. It shows the revised range of prices after outliers have been removed.
 
+## Weekend-Weekday Comparative Analysis
+```sql
+/* Analysis of Booking Prices by Day Type */
+
+-- Select booking statistics based on day type
+SELECT 
+    DAY AS DAY_TYPE,                             -- Select the day type (weekday or weekend)
+    ROUND(AVG(PRICE), 0) AS AVERAGE_PRICE,       -- Calculate average booking price and round
+    ROUND(MIN(PRICE), 1) AS MINIMUM_BOOKING_PRICE, -- Calculate minimum booking price and round
+    ROUND(MAX(PRICE), 1) AS MAXIMUM_BOOKING_PRICE, -- Calculate maximum booking price and round
+    ROUND(SUM(PRICE), 0) AS "TOTAL BOOKING PRICE", -- Calculate total booking price and round
+    COUNT(ROOM_TYPE) AS NUMBER_OF_BOOKING         -- Count the number of bookings for each day type
+FROM CLEANED                                       -- Use the cleaned dataset
+GROUP BY DAY                                       -- Group the results by day type (weekday or weekend)
+ORDER BY "TOTAL BOOKING PRICE" DESC;                -- Order the results by total booking price in descending order
+```
+This SQL query focuses on analyzing booking prices based on the type of day (weekday or weekend) in the cleaned dataset. It calculates various statistics for each day type, including the average, minimum, and maximum booking prices, as well as the total booking price and the number of bookings. The results are grouped by day type and ordered in descending order of total booking price.
+
+This analysis provides insights into how booking prices vary between weekdays and weekends, offering a clear overview of the price distribution and potential patterns in the dataset.
+
+## Causal Relationship with Guest Satisfaction Scores
+```sql
+/* Guest Satisfaction Analysis */
+
+-- Query 1: Calculate overall guest satisfaction statistics
+-- Calculate the average, minimum, and maximum guest satisfaction scores in the cleaned dataset
+SELECT 
+    ROUND(AVG(GUEST_SATISFACTION), 1) AS AVERAGE_GUEST_SATISFACTION_SCORE,
+    ROUND(MIN(GUEST_SATISFACTION), 1) AS MINIMUM_GUEST_SATISFACTION_SCORE,
+    ROUND(MAX(GUEST_SATISFACTION), 1) AS MAXIMUM_GUEST_SATISFACTION_SCORE
+FROM CLEANED; -- Average: 93.0, Min: 20.0, Max: 100.0
+
+-- Query 2: Analyze guest satisfaction by city
+-- Calculate average, minimum, and maximum guest satisfaction scores by city, ordered by average guest satisfaction
+SELECT 
+    CITY,
+    ROUND(AVG(GUEST_SATISFACTION), 1) AS AVERAGE_GUEST_SATISFACTION_SCORE,
+    ROUND(MIN(GUEST_SATISFACTION), 1) AS MINIMUM_GUEST_SATISFACTION_SCORE,
+    ROUND(MAX(GUEST_SATISFACTION), 1) AS MAXIMUM_GUEST_SATISFACTION_SCORE
+FROM CLEANED
+GROUP BY CITY
+ORDER BY AVERAGE_GUEST_SATISFACTION_SCORE DESC;
+
+-- Query 3: Explore factors behind the difference in average guest satisfaction scores
+-- Analyze various factors' averages for cities with higher guest satisfaction
+SELECT 
+    CITY,
+    ROUND(AVG(GUEST_SATISFACTION), 1) AS AVERAGE_GUEST_SATISFACTION_SCORE,
+    ROUND(AVG(CLEANINGNESS_RATING), 2) AS AVERAGE_CLEANLINESS_RATING,
+    ROUND(AVG(PRICE), 0) AS AVERAGE_PRICE,
+    ROUND(AVG(NORMALSED_ATTACTION_INDEX), 1) AS AVERAGE_ATTRACTION_INDEX,
+    ROUND(MAX(CITY_CENTER_KM), 1) AS AVERAGE_DISTANCE_FROM_CITY_CENTER,
+    ROUND(MAX(METRO_DISTANCE_KM), 1) AS AVERAGE_DISTANCE_FROM_METRO
+FROM CLEANED
+GROUP BY CITY
+ORDER BY AVERAGE_GUEST_SATISFACTION_SCORE DESC;
+
+-- Correlation analysis of guest satisfaction
+-- Calculate the correlation between guest satisfaction and attraction index
+SELECT 
+    ROUND(CORR(GUEST_SATISFACTION, NORMALSED_ATTACTION_INDEX), 2) AS "CORRELATION BET GUEST SATISFACTION AND ATTRACTION INDEX"
+FROM CLEANED; -- Indicates not much association
+
+-- Calculate the correlation between guest satisfaction and price, and guest satisfaction and cleanliness rating
+SELECT 
+    ROUND(CORR(GUEST_SATISFACTION, PRICE), 2) AS "CORRELATION BET GUEST SATISFACTION AND PRICE",
+    ROUND(CORR(GUEST_SATISFACTION, CLEANINGNESS_RATING), 2) AS "CORRELATION BET GUEST SATISFACTION AND CLEANINGNESS RATING"
+FROM CLEANED; -- Price doesn't have a significant association, but cleanliness rating does have a moderate to strong positive association
+```
+Interpretation:
+
+Overall Guest Satisfaction Statistics: This query calculates the average, minimum, and maximum guest satisfaction scores in the cleaned dataset, providing insights into the overall satisfaction level.
+
+Guest Satisfaction by City: This query presents average, minimum, and maximum guest satisfaction scores grouped by city, ordered by average guest satisfaction. It reveals variations in guest satisfaction among different cities.
+
+Factors Behind Guest Satisfaction: This query explores the factors contributing to the difference in average guest satisfaction scores across cities. It analyzes average cleanliness rating, price, attraction index, and distances to assess potential influencers of guest satisfaction.
+
+Correlation with Attraction Index: This query calculates the correlation between guest satisfaction and attraction index, indicating the strength and direction of their association.
+
+Correlation with Price and Cleanliness Rating: These queries compute the correlations between guest satisfaction and price, as well as guest satisfaction and cleanliness rating. They reveal the degree of association between guest satisfaction and these factors.
+
+These queries and interpretations shed light on guest satisfaction patterns, potential influencers, and associations with different factors within the dataset.
