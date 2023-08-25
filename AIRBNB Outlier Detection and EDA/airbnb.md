@@ -327,6 +327,12 @@ SELECT
 FROM OUTLIER
 GROUP BY ROOM_TYPE;
 ```
+| ROOM TYPE       | NO. OF Bookings | MINIMUM OUTLIER PRICE VALUE | MAXIMUM OUTLIER PRICE VALUE | AVERAGE OUTLIER PRICE VALUE |
+|-----------------|-----------------|-----------------------------|-----------------------------|-----------------------------|
+| Private room    | 353             | 528.2                       | 13,664.3                    | 822.8                       |
+| Entire home/apt | 2,536           | 527.5                       | 18,545.5                    | 853.2                       |
+| Shared room     | 2               | 556.2                       | 591.2                       | 573.7                       |
+
 This query presents statistics (minimum, maximum, average) of outlier data grouped by room type. It reveals the range of outlier prices within different room types.
 
 ```sql
@@ -341,6 +347,12 @@ SELECT
 FROM AIRBNB
 GROUP BY ROOM_TYPE; -- Notice the difference in average outlier price value vs. average price value
 ```
+| ROOM TYPE       | NO. OF Bookings | MINIMUM PRICE VALUE | MAXIMUM PRICE VALUE | AVERAGE PRICE VALUE |
+|-----------------|-----------------|---------------------|---------------------|---------------------|
+| Private room    | 13,134          | 34.8                | 13,664.3            | 198.4               |
+| Entire home/apt | 28,264          | 37.1                | 18,545.5            | 290.1               |
+| Shared room     | 316             | 53.3                | 591.2               | 137.8               |
+
 This query compares the statistics (minimum, maximum, average) of the main dataset with the outlier data, grouped by room type. It highlights the difference in average outlier price values compared to average price values.
 
 ```sql
@@ -362,7 +374,7 @@ SELECT COUNT(*) FROM CLEANED;
 ```
 This query creates a view called "CLEANED" by removing outliers using a similar approach as the "OUTLIER" view. It selects rows where prices fall within the hinges, effectively cleaning the data.
 
-Also, counts the number of records in the cleaned dataset using the "CLEANED" view.
+Also, counts the number of records in the cleaned dataset using the "CLEANED" view. There are 38,823 observations.
 
 ```sql
 -- Check statistics of cleaned data (minimum, average, maximum) grouped by room type
@@ -375,7 +387,18 @@ SELECT
 FROM CLEANED
 GROUP BY ROOM_TYPE;
 ```
+| ROOM TYPE       | NO. OF Bookings | MINIMUM PRICE VALUE | MAXIMUM PRICE VALUE | AVERAGE PRICE VALUE |
+|-----------------|-----------------|---------------------|---------------------|---------------------|
+| Private room    | 12,781          | 34.8                | 527.1               | 181.2               |
+| Entire home/apt | 25,728          | 37.1                | 527.3               | 234.6               |
+| Shared room     | 314             | 53.3                | 479.2               | 135.1               |
+
 This query presents statistics (minimum, maximum, average) of the cleaned data grouped by room type. It shows the revised range of prices after outliers have been removed.
+
+### Summary:
+On the Airbnb dataset, the provided SQL queries carry out data cleansing and outlier detection. To find outliers in the "PRICE" field, a view called "OUTLIER" is initially created. This is accomplished by computing the interquartile range (IQR), hinges for outlier detection, and a five-number summary. The view effectively captures outliers by capturing rows with prices outside the hinges. 2,891 outliers are discovered to exist. The range of outlier prices for each type of room is then revealed through an analysis of outlier data statistics based on room types.
+
+Another query computes statistics grouped by room types to compare the outlier statistics with the main dataset. This demonstrates the variation between the average outlier price values and the average dataset price values. Then, outliers are eliminated to produce a view called "CLEANED."  A cleaned dataset is produced by applying similar outlier detection logic to retain only the rows within the hinges. The count of records in the cleaned dataset is 38,823. Following the removal of outliers, the statistics of the cleaned data, grouped by room types, display the revised price ranges. These procedures offer a thorough method for identifying and handling outliers in the Airbnb dataset, resulting in more precise analyses and insights.
 
 ## Weekend-Weekday Comparative Analysis
 ```sql
