@@ -1,3 +1,5 @@
+Download Data from here: https://codebasics.io/challenge/codebasics-resume-project-challenge/7
+
 ## Introduction
 
 Welcome to the Atliq Hardwares! In the fast-paced world of consumer goods, where data-driven decisions are paramount, Atliq Hardwares, an industry leader in computer hardware production, has recognized the need for quick and informed decision-making. To meet this demand, they are expanding their data analytics team with the goal of hiring junior data analysts who possess both technical expertise and essential soft skills.
