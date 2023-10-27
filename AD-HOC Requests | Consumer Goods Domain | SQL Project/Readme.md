@@ -121,3 +121,33 @@ percentage_chg
 | 245                  | 334                  | 36.33          |
 
 The results indicate that between 2020 and 2021, there was a 36.33% increase in the number of unique products. This percentage change represents the growth in the variety of products offered over the two years.
+
+### Request No.3
+Provide a report with all the unique product counts for each segment and
+sort them in descending order of product counts. The final output contains
+2 fields,
+segment
+product_count
+
+### MySQL Query
+![req3](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/0b71b5a5-a974-45b2-8101-b19ebe7941a6)
+
+### Query Explanation
+
+1. The query begins with the SELECT statement to retrieve data from the dim_product table.
+2. It calculates the count of distinct product codes (product_code) for each segment.
+3. The GROUP BY clause groups the results by the segment column, which categorizes products into different segments.
+4. Finally, the ORDER BY clause sorts the results in descending order based on the product_count, which represents the number of unique products in each segment.
+
+### Answer
+| segment     | product_count |
+|-------------|---------------|
+| Notebook    | 129           |
+| Accessories | 116           |
+| Peripherals | 84            |
+| Desktop     | 32            |
+| Storage     | 27            |
+| Networking  | 9             |
+
+The report provides a breakdown of the count of unique products within each segment. It is sorted in descending order based on the product counts, which means that the segment "Notebook" has the highest count with 129 unique products, followed by "Accessories" with 116 unique products. This information is valuable for understanding the diversity of products within each segment and can aid in product management and decision-making processes.
+
