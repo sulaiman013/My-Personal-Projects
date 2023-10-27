@@ -380,3 +380,25 @@ rank_order
 
 The report lists the top 3 products with the highest total quantity sold in each division for the fiscal year 2021. This information is useful for identifying the best-performing products within each product division. It can help in making decisions related to inventory management, marketing, and product development.
 
+
+## Project Summary
+
+In the course of this project, we delved into a comprehensive analysis of Atliq Hardwares, an imaginary leading computer hardware producer in India with a global presence. The goal of this project was to gain valuable insights into the company's data, aiding the decision-making process and better understanding the performance of different aspects of the business. Here's what we've uncovered:
+
+1. **Customer and Market Insights**: We explored the `dim_customer` table to understand the company's customer base and geographic reach. By extracting data related to markets, regions, and customer channels, we were able to discern critical information about the company's clientele. For instance, we identified the markets in which "Atliq Exclusive" operates in the APAC region, providing a clearer picture of the company's market presence.
+
+2. **Product Analysis**: The `dim_product` table provided insights into the diverse product range offered by Atliq Hardwares. By examining product attributes like division, segment, and category, we gained a comprehensive view of the products in the company's portfolio.
+
+3. **Sales and Revenue**: To evaluate the company's sales and revenue performance, we looked at the `fact_sales_monthly` and `fact_gross_price` tables. Analyzing sales quantities and gross prices allowed us to calculate gross sales amounts and examine how different channels contributed to sales in the fiscal year 2021.
+
+4. **Manufacturing Costs**: We delved into the `fact_manufacturing_cost` table to explore the cost incurred in the production of each product. This analysis was crucial for understanding the financial aspects of product manufacturing.
+
+5. **Pre-Invoice Deductions**: The `fact_pre_invoice_deductions` table was a valuable resource for examining pre-invoice deductions and their impact on product pricing. We were able to identify the top customers who received high pre-invoice discounts in the fiscal year 2021.
+
+6. **Time-Series Sales Analysis**: Using data from `fact_sales_monthly`, we conducted time-series analysis to understand monthly sales patterns, particularly for "Atliq Exclusive." This analysis allowed us to identify high and low-performing months, which can inform strategic decisions.
+
+7. **Quarterly Performance**: We segmented sales data into quarters and identified which quarter of 2020 had the maximum total_sold_quantity. This information is vital for understanding seasonality and making informed decisions regarding stock management and marketing strategies.
+
+8. **Top-Performing Products**: We identified the top 3 products in each product division that had the highest total_sold_quantity in the fiscal year 2021. This insight can guide inventory management and product development efforts.
+
+In summary, this project has equipped Atliq Hardwares with a wealth of data-driven insights to make informed decisions and enhance various aspects of their business. From understanding customer markets to analyzing product performance, sales patterns, and cost structures, the company can use these findings to refine strategies, optimize operations, and ultimately drive growth and success in the highly competitive computer hardware industry. These analytical tools and techniques provide a foundation for ongoing data-driven decision-making and strategic planning within the organization.
