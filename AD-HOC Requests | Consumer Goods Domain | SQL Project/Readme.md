@@ -64,3 +64,60 @@ The "Atliq Hardware DB" database consists of six tables, each containing essenti
 - **fiscal_year:** Fiscal period of product sale.
 
 These tables collectively form the foundation for data analysis, enabling Atliq Hardwares to make data-informed decisions and drive business success in the consumer goods domain.
+
+## Requests
+
+### Request No.1
+Retrieve the list of markets in which the customer "Atliq Exclusive" operates its business in the APAC region.
+
+### MySQL Query
+![req1](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/0bd5399c-7203-451f-bbc0-d139d4e4fd18)
+
+### Query Explanation
+1. We are using the SELECT statement to fetch data from the dim_customer table.
+2. The DISTINCT keyword ensures that we only receive unique market names.
+3. In the WHERE clause, we specify two conditions:
+4. customer = "Atliq Exclusive" to filter records where the customer name is "Atliq Exclusive."
+5. region = "APAC" to further narrow down the results to the APAC region.
+6. The ORDER BY clause is used to sort the results in alphabetical order based on the "market" column.
+
+### Answer
+The query returns the following list of markets where "Atliq Exclusive" operates in the APAC region:
+
+| market      |
+|-------------|
+| Australia   |
+| Bangladesh  |
+| India       |
+| Indonesia   |
+| Japan       |
+| Newzealand  |
+| Philiphines |
+| South Korea |
+
+The results show the distinct markets within the APAC region where the customer "Atliq Exclusive" conducts its business operations. These markets include Australia, Bangladesh, India, Indonesia, Japan, New Zealand, Philippines, and South Korea. This information can be valuable for understanding the geographic reach of the customer within the APAC region.
+
+### Request No.2
+What is the percentage of unique product increase in 2021 vs. 2020? The
+final output contains these fields,
+unique_products_2020
+unique_products_2021
+percentage_chg
+
+### MySQL Query
+![req2](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/39ce83e4-32dc-45af-82fc-dd261fee014e)
+
+### Query Explanation
+
+1. We start by creating two common table expressions (CTEs), cte1 and cte2.
+2. In cte1, we count the number of distinct product codes for the fiscal year 2020 from the fact_sales_monthly table.
+3. In cte2, we count the number of distinct product codes for the fiscal year 2021 from the same table.
+4. The main query then selects values from both CTEs and calculates the percentage change between 2021 and 2020.
+5. The percentage change is calculated as (unique_products_2021 - unique_products_2020) / unique_products_2020 * 100 and rounded to two decimal places.
+
+### Answer
+| unique_products_2020 | unique_products_2021 | percentage_chg |
+|----------------------|----------------------|----------------|
+| 245                  | 334                  | 36.33          |
+
+The results indicate that between 2020 and 2021, there was a 36.33% increase in the number of unique products. This percentage change represents the growth in the variety of products offered over the two years.
