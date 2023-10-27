@@ -344,30 +344,39 @@ percentage
 The report reveals that in the fiscal year 2021, the "Retailer" channel contributed the most to gross sales, with a total of $1,924.2 million in sales. This channel accounts for 73.22% of the total gross sales in the fiscal year. The "Direct" channel contributed $406.7 million (15.48%), while the "Distributor" channel contributed $297.2 million (11.31%). This information is essential for understanding which sales channels are most effective and where to focus sales and marketing efforts.
 
 ### Request No.10
-Which channel helped to bring more gross sales in the fiscal year 2021
-and the percentage of contribution? The final output contains these fields,
-channel
-gross_sales_mln
-percentage
+Get the Top 3 products in each division that have a high
+total_sold_quantity in the fiscal_year 2021? The final output contains these
+fields,
+division
+product_code
+product
+total_sold_quantity
+rank_order
 
 ### MySQL Query
-![req9](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/f9738e43-eb0b-4c8e-875e-ed9442f27180)
+![req10](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/4b0b7f42-d35b-48af-b842-4d0f282d8d18)
+
 
 ### Query Explanation
 
-1. This query uses common table expressions (CTEs) to join data from the dim_customer, fact_sales_monthly, and fact_gross_price tables to calculate gross sales for each channel in the fiscal year 2021.
-2. cte1 combines channel information with monthly sales data, including sold quantities.
-3. cte2 further combines the data from cte1 with gross price information for products.
-4. cte3 calculates the total gross sales in millions of dollars for each channel in the fiscal year 2021.
-5. The final query calculates the percentage contribution of each channel to the total gross sales in the fiscal year 2021.
+1. This query uses a common table expression (CTE) cte1 to combine product information with total sold quantities from the dim_product and fact_sales_monthly tables.
+2. The CTE filters the data for the fiscal year 2021 and groups it by division, product code, and product name.
+3. The main query assigns a rank to each product within its division based on the total sold quantity in descending order.
+4. The query selects the top 3 products in each division by filtering for products with a ranking of 1, 2, or 3.
 
 
 ### Answer
-| Channel     | Gross Sales (In Millions $) | Percentage Contribution |
-|-------------|-----------------------------|-------------------------|
-| Retailer    | 1924.2                      | 73.22                   |
-| Direct      | 406.7                       | 15.48                   |
-| Distributor | 297.2                       | 11.31                   |
+| Division | product_code | product             | total_quantity_sold | ranking |
+|----------|--------------|---------------------|---------------------|---------|
+| N & S    | A6720160103  | AQ Pen Drive 2 IN 1 | 701373              | 1       |
+| N & S    | A6818160202  | AQ Pen Drive DRC    | 688003              | 2       |
+| N & S    | A6819160203  | AQ Pen Drive DRC    | 676245              | 3       |
+| P & A    | A2319150302  | AQ Gamers Ms        | 428498              | 1       |
+| P & A    | A2520150501  | AQ Maxima Ms        | 419865              | 2       |
+| P & A    | A2520150504  | AQ Maxima Ms        | 419471              | 3       |
+| PC       | A4218110202  | AQ Digit            | 17434               | 1       |
+| PC       | A4319110306  | AQ Velocity         | 17280               | 2       |
+| PC       | A4218110208  | AQ Digit            | 17275               | 3       |
 
-The report reveals that in the fiscal year 2021, the "Retailer" channel contributed the most to gross sales, with a total of $1,924.2 million in sales. This channel accounts for 73.22% of the total gross sales in the fiscal year. The "Direct" channel contributed $406.7 million (15.48%), while the "Distributor" channel contributed $297.2 million (11.31%). This information is essential for understanding which sales channels are most effective and where to focus sales and marketing efforts.
+The report lists the top 3 products with the highest total quantity sold in each division for the fiscal year 2021. This information is useful for identifying the best-performing products within each product division. It can help in making decisions related to inventory management, marketing, and product development.
 
