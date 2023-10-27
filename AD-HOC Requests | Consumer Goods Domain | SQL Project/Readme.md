@@ -237,32 +237,137 @@ average_discount_percentage
 
 The report lists the top 5 customers in the Indian market for the fiscal year 2021 who received the highest average pre-invoice discount percentages. Flipkart received the highest average discount of 30.83%, followed by Viveks, Ezone, Croma, and Amazon. This information is crucial for evaluating customer relationships and discount strategies in the Indian market.
 
-### Request No.6
-Generate a report which contains the top 5 customers who received an
-average high pre_invoice_discount_pct for the fiscal year 2021 and in the
-Indian market. The final output contains these fields,
-customer_code
-customer
-average_discount_percentage
+### Request No.7
+Get the complete report of the Gross sales amount for the customer “Atliq
+Exclusive” for each month. This analysis helps to get an idea of low and
+high-performing months and take strategic decisions.
+The final report contains these columns:
+Month
+Year
+Gross sales Amount
 
 ### MySQL Query
-![req6](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/e0500746-6b92-4029-bdb7-35b8d1a2f88b)
+![req7](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/21601db6-2bae-41b6-a14b-c1dad694c5a4)
 
 ### Query Explanation
 
-1. This query uses common table expressions (CTEs) to break down the process into two parts.
-2. cte1 joins the dim_customer and fact_pre_invoice_deductions tables to gather data on customer codes, names, markets, fiscal years, and pre-invoice discount percentages.
-3. cte2 filters the data from cte1 to select records for the fiscal year 2021 in the Indian market. It also rounds the pre-invoice discount percentage to two decimal places.
-4. The final query selects the customer code, customer name, and the rounded average discount percentage, and then sorts the results in descending order based on the average discount percentage. It limits the output to the top 5 customers.
+1. This query involves two common table expressions (CTEs) to consolidate data from the dim_customer, fact_sales_monthly, and fact_gross_price tables.
+2. cte1 combines customer information with monthly sales data, including sold quantities.
+3. cte2 further combines the data from cte1 with gross price information for products.
+4. The main query calculates the gross sales amount by multiplying the gross price with the sold quantity and then sums it up for each month. The results are rounded to two decimal places and represented in millions of dollars.
+5. The query filters the results for the customer "Atliq Exclusive" and groups the data by month and fiscal year.
 
 ### Answer
-| customer_code | customer | average_discount_percentage |
-|---------------|----------|-----------------------------|
-| 90002009      | Flipkart | 30.83                       |
-| 90002006      | Viveks   | 30.38                       |
-| 90002003      | Ezone    | 30.28                       |
-| 90002002      | Croma    | 30.25                       |
-| 90002016      | Amazon   | 29.33                       |
+| Month     | Year | Gross Sales Amount (in Millions $) |
+|-----------|------|------------------------------------|
+| September | 2020 | 9.09                               |
+| October   | 2020 | 10.38                              |
+| November  | 2020 | 15.23                              |
+| December  | 2020 | 9.76                               |
+| January   | 2020 | 9.58                               |
+| February  | 2020 | 8.08                               |
+| March     | 2020 | 0.77                               |
+| April     | 2020 | 0.80                               |
+| May       | 2020 | 1.59                               |
+| June      | 2020 | 3.43                               |
+| July      | 2020 | 5.15                               |
+| August    | 2020 | 5.64                               |
+| September | 2021 | 19.53                              |
+| October   | 2021 | 21.02                              |
+| November  | 2021 | 32.25                              |
+| December  | 2021 | 20.41                              |
+| January   | 2021 | 19.57                              |
+| February  | 2021 | 15.99                              |
+| March     | 2021 | 19.15                              |
+| April     | 2021 | 11.48                              |
+| May       | 2021 | 19.20                              |
+| June      | 2021 | 15.46                              |
+| July      | 2021 | 19.04                              |
+| August    | 2021 | 11.32                              |
 
-The report lists the top 5 customers in the Indian market for the fiscal year 2021 who received the highest average pre-invoice discount percentages. Flipkart received the highest average discount of 30.83%, followed by Viveks, Ezone, Croma, and Amazon. This information is crucial for evaluating customer relationships and discount strategies in the Indian market.
+The report presents the gross sales amounts for the customer "Atliq Exclusive" for each month in 2020 and 2021. It provides insights into the performance of the customer over these months, helping to identify low and high-performing periods. This information can be used to make strategic decisions related to sales, marketing, and inventory management.
+
+### Request No.8
+In which quarter of 2020, got the maximum total_sold_quantity? The final
+output contains these fields sorted by the total_sold_quantity,
+Quarter
+total_sold_quantity
+
+### MySQL Query
+![req8](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/6ae68803-c4a6-4d48-ba47-7e439f76a655)
+
+### Query Explanation
+
+1. This query categorizes sales data into quarters based on the date range of each quarter.
+2. It uses a CASE statement to assign a quarter number (1, 2, 3, or 4) to each record, depending on the date within that quarter.
+3. The query calculates the total sold quantity for each quarter.
+4. It filters the results for the fiscal year 2020.
+5. The results are then grouped by quarters and sorted in descending order of total sold quantity.
+
+
+### Answer
+| Quarters | Total Sold Quantity |
+|----------|---------------------|
+| 1        | 7005619             |
+| 2        | 6649642             |
+| 4        | 5042541             |
+| 3        | 2075087             |
+
+The report shows that in the year 2020, the maximum total sold quantity occurred in the first quarter (Q1), with a total of 7,005,619 units sold. This information is valuable for identifying the highest-performing quarter and can assist in making decisions related to inventory management, marketing, and sales strategies.
+
+### Request No.9
+Which channel helped to bring more gross sales in the fiscal year 2021
+and the percentage of contribution? The final output contains these fields,
+channel
+gross_sales_mln
+percentage
+
+### MySQL Query
+![req9](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/f9738e43-eb0b-4c8e-875e-ed9442f27180)
+
+### Query Explanation
+
+1. This query uses common table expressions (CTEs) to join data from the dim_customer, fact_sales_monthly, and fact_gross_price tables to calculate gross sales for each channel in the fiscal year 2021.
+2. cte1 combines channel information with monthly sales data, including sold quantities.
+3. cte2 further combines the data from cte1 with gross price information for products.
+4. cte3 calculates the total gross sales in millions of dollars for each channel in the fiscal year 2021.
+5. The final query calculates the percentage contribution of each channel to the total gross sales in the fiscal year 2021.
+
+
+### Answer
+| Channel     | Gross Sales (In Millions $) | Percentage Contribution |
+|-------------|-----------------------------|-------------------------|
+| Retailer    | 1924.2                      | 73.22                   |
+| Direct      | 406.7                       | 15.48                   |
+| Distributor | 297.2                       | 11.31                   |
+
+The report reveals that in the fiscal year 2021, the "Retailer" channel contributed the most to gross sales, with a total of $1,924.2 million in sales. This channel accounts for 73.22% of the total gross sales in the fiscal year. The "Direct" channel contributed $406.7 million (15.48%), while the "Distributor" channel contributed $297.2 million (11.31%). This information is essential for understanding which sales channels are most effective and where to focus sales and marketing efforts.
+
+### Request No.10
+Which channel helped to bring more gross sales in the fiscal year 2021
+and the percentage of contribution? The final output contains these fields,
+channel
+gross_sales_mln
+percentage
+
+### MySQL Query
+![req9](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/f9738e43-eb0b-4c8e-875e-ed9442f27180)
+
+### Query Explanation
+
+1. This query uses common table expressions (CTEs) to join data from the dim_customer, fact_sales_monthly, and fact_gross_price tables to calculate gross sales for each channel in the fiscal year 2021.
+2. cte1 combines channel information with monthly sales data, including sold quantities.
+3. cte2 further combines the data from cte1 with gross price information for products.
+4. cte3 calculates the total gross sales in millions of dollars for each channel in the fiscal year 2021.
+5. The final query calculates the percentage contribution of each channel to the total gross sales in the fiscal year 2021.
+
+
+### Answer
+| Channel     | Gross Sales (In Millions $) | Percentage Contribution |
+|-------------|-----------------------------|-------------------------|
+| Retailer    | 1924.2                      | 73.22                   |
+| Direct      | 406.7                       | 15.48                   |
+| Distributor | 297.2                       | 11.31                   |
+
+The report reveals that in the fiscal year 2021, the "Retailer" channel contributed the most to gross sales, with a total of $1,924.2 million in sales. This channel accounts for 73.22% of the total gross sales in the fiscal year. The "Direct" channel contributed $406.7 million (15.48%), while the "Distributor" channel contributed $297.2 million (11.31%). This information is essential for understanding which sales channels are most effective and where to focus sales and marketing efforts.
 
