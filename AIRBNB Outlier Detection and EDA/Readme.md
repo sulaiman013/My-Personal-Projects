@@ -1,4 +1,5 @@
 # Airbnb data Outlier Detection & EDA using SQL
+![0_1s0p0nQiz5xzfLQy](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/becd51ca-016b-4f83-a0c9-d63635255fa8)
 ## Introduction
 
 The way people experience cities around the world has been completely transformed by Airbnb in the fields of contemporary travel and hospitality. Airbnb provides a variety of lodging options, ranging from comfortable private rooms to roomy entire apartments, as an online marketplace that connects hosts with travelers. The European Booking Dataset, a thorough compilation of information from nine renowned cities—Amsterdam, Athens, Barcelona, Berlin, Budapest, Lisbon, Paris, Rome, and Vienna—is the subject of this project. The dataset has undergone meticulous curation and cleaning, making it a useful tool for analysis and insight.
