@@ -283,3 +283,98 @@ The query returns the following result:
 The table provides a monthly breakdown of sessions for different traffic sources, including Gsearch, Bsearch, organic search, and direct type-ins. By presenting data from multiple channels, it showcases the diversity of traffic sources, which can help alleviate concerns about a high percentage of traffic from Gsearch.
 
 This analysis allows the company to demonstrate a comprehensive understanding of its traffic sources, reinforcing the board's confidence in the company's ability to manage and diversify its marketing channels effectively. This information can be used to address concerns during the board meeting.
+
+Here's the information in Markdown format, including the request, query, query explanation, answer, and answer interpretation:
+
+## Request 5
+
+Cindy wants to showcase the story of website performance improvements over the first 8 months by presenting session to order conversion rates on a monthly basis.
+
+### SQL Query
+![5](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/b01de56f-1a17-46c5-afdd-8ea682e84f41)
+
+### Query Explanation
+
+In this SQL query:
+
+- We select the year and month of the `created_at` column to group the data on a monthly basis.
+- We count the distinct website sessions and orders.
+- We calculate the session to order conversion rate by dividing the count of orders by the count of sessions and multiplying by 100 to express it as a percentage.
+
+The data is filtered to include records created before November 27, 2012. The results are grouped by year and month.
+
+### Answer
+
+The query returns the following result:
+
+| # year | month | sessions | orders | conv_rate |
+|:------:|:-----:|:--------:|:------:|:---------:|
+|  2012  |   3   |   1879   |   60   |    3.19   |
+|  2012  |   4   |   3734   |   99   |    2.65   |
+|  2012  |   5   |   3736   |   108  |    2.89   |
+|  2012  |   6   |   3963   |   140  |    3.53   |
+|  2012  |   7   |   4249   |   169  |    3.98   |
+|  2012  |   8   |   6097   |   228  |    3.74   |
+|  2012  |   9   |   6546   |   287  |    4.38   |
+|  2012  |   10  |   8183   |   371  |    4.53   |
+|  2012  |   11  |   12750  |   561  |    4.40   |
+
+### Answer Interpretation
+
+The table provides a monthly overview of website performance improvements over the course of the first 8 months. It includes the number of sessions, the number of orders, and the session to order conversion rate expressed as a percentage. 
+
+The data shows an increase in both sessions and orders over the period, with the conversion rate gradually improving. This information allows the company to tell a positive story about its website's performance and growth. The board can gain confidence in the company's ability to optimize its website and convert more sessions into orders.
+
+Here's the information in Markdown format, including the request, query, query explanation, answer, and answer interpretation:
+
+## Request 6
+
+Cindy wants to estimate the revenue earned from the "gsearch lander test" by looking at the increase in conversion rate (CVR) during the test period (June 19 – July 28). The calculation should consider nonbrand sessions and revenue generated since the end of the test.
+
+### SQL Query 
+![6](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/dad1126d-66e1-4399-ac3e-9c1677c0c899)
+
+### Query Explanation 
+
+In this SQL query:
+
+- We first find the entry ID for the "gsearch lander test" page ('/lander-1').
+- We use Common Table Expressions (CTEs) to gather data for the test, including sessions, landing pages, and orders.
+- The data is filtered to focus on the specified date range and UTM conditions.
+
+The result provides sessions, orders, and conversion rates for the home and lander-1 pages.
+
+### Answer (Part 1)
+
+The query returns the following result:
+
+| Landing Page | Sessions | Orders | Conversion Rate |
+|:------------:|:--------:|:------:|:--------------:|
+|     /home    |   2261   |   72   |      3.18      |
+|   /lander-1  |   2316   |   94   |      4.06      |
+
+
+
+In the second part of the query, we estimate the number of website sessions since the end of the test that belong to the "gsearch nonbrand" category with the "home" page as the landing page:
+
+In this SQL query:
+
+- We find the most recent pageview for "gsearch nonbrand" where the traffic was sent to the "/home" page.
+- We calculate the number of website sessions since the end of the test that meet the specified conditions.
+
+### Answer (Part 2)
+
+The query returns the following result:
+
+| Sessions Since Test |
+|:-------------------:|
+|        22,972        |
+
+### Answer Interpretation
+
+To estimate the incremental value from the "gsearch lander test," we first compare the conversion rates for the "home" and "lander-1" pages. The "lander-1" page had a higher conversion rate, indicating the effectiveness of the test. 
+
+To estimate revenue, we consider the number of sessions since the test that meet the "gsearch nonbrand" and "/home" landing page criteria, resulting in 22,972 sessions. We estimate incremental orders by multiplying this count by the incremental conversion rate. The estimated incremental orders are roughly 202 since July 29, which equates to approximately 50 extra orders per month over a four-month period.
+
+This analysis helps showcase the positive impact of the "gsearch lander test" in terms of conversion rate improvement and potential revenue increase. It can be used to demonstrate the value of such tests to the board.
+
