@@ -223,3 +223,63 @@ The query returns the following result:
 The table presents a monthly breakdown of Gsearch sessions and orders for the nonbrand campaign, categorized by mobile and desktop devices. This analysis highlights the company's in-depth understanding of its traffic sources, showcasing the traffic patterns for nonbrand Gsearch sessions on different devices.
 
 The data demonstrates the growth and composition of nonbrand Gsearch sessions and orders, allowing the board to appreciate the company's analytical capabilities and its ability to track and optimize traffic sources effectively. This information can be used to impress the board during the presentation.
+
+Here's the information in Markdown format, including the request, query, query explanation, answer, and answer interpretation:
+
+## Request 4
+
+Cindy is concerned about a board member's worries regarding the high percentage of traffic coming from Gsearch. She wants to compare monthly trends for Gsearch alongside monthly trends for each of the company's other marketing channels. The objective is to provide a comprehensive view of traffic sources and reassure the board about the diversity of traffic channels.
+
+### SQL Query
+
+In the first part of the query, we identify the various UTM sources and HTTP referrers to understand the traffic sources:
+In the second part of the query, we analyze the monthly trends for different traffic sources, including Gsearch and other channels:
+
+![4](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/280f078d-b64b-4d83-ba21-b69d32255798)
+
+### Query Explanation
+
+In this SQL query:
+
+- We select the year and month of the `created_at` column to group the data on a monthly basis.
+- We use conditional statements to count sessions for Gsearch, Bsearch, organic search, and direct type-ins.
+- We perform a `LEFT JOIN` between the `website_sessions` and `orders` tables using the `website_session_id` to ensure all sessions are included, whether they have orders or not.
+
+The data is filtered to include records created before November 27, 2012. The results are grouped by year and month.
+
+### Answer (Part 1)
+
+The result shows distinct UTM sources, UTM campaigns, and HTTP referrers:
+
+| utm_source | utm_campaign |       http_referer      |
+|:----------:|:------------:|:-----------------------:|
+|   gsearch  |   nonbrand   | https://www.gsearch.com |
+|     na     |      na      |            na           |
+|   gsearch  |     brand    | https://www.gsearch.com |
+|     na     |      na      | https://www.gsearch.com |
+|   bsearch  |     brand    | https://www.bsearch.com |
+|     na     |      na      | https://www.bsearch.com |
+|   bsearch  |   nonbrand   | https://www.bsearch.com |
+
+
+### Answer (Part 2)
+
+The query returns the following result:
+
+| year  | month | gsearch_paid_sessions | bsearch_paid_sessions | organic_search_sessions | direct_type_in_sessions |
+|:-----:|:-----:|:---------------------:|:---------------------:|:-----------------------:|:-----------------------:|
+|  2012 |   3   |          1860         |           2           |            8            |            9            |
+|  2012 |   4   |          3574         |           11          |            78           |            71           |
+|  2012 |   5   |          3410         |           25          |           150           |           151           |
+|  2012 |   6   |          3578         |           25          |           190           |           170           |
+|  2012 |   7   |          3811         |           44          |           207           |           187           |
+|  2012 |   8   |          4877         |          705          |           265           |           250           |
+|  2012 |   9   |          4491         |          1439         |           331           |           285           |
+|  2012 |   10  |          5534         |          1781         |           428           |           440           |
+|  2012 |   11  |          8889         |          2840         |           536           |           485           |
+
+### Answer Interpretation
+
+The table provides a monthly breakdown of sessions for different traffic sources, including Gsearch, Bsearch, organic search, and direct type-ins. By presenting data from multiple channels, it showcases the diversity of traffic sources, which can help alleviate concerns about a high percentage of traffic from Gsearch.
+
+This analysis allows the company to demonstrate a comprehensive understanding of its traffic sources, reinforcing the board's confidence in the company's ability to manage and diversify its marketing channels effectively. This information can be used to address concerns during the board meeting.
