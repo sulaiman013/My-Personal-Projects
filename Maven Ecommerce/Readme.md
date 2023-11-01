@@ -387,7 +387,11 @@ Cindy wants to create a full conversion funnel for each of the two pages, `/home
 ### SQL Query
 
 In this query, we create a temporary table called "funnel" and build the conversion funnel by identifying which pages users visited during their sessions and tracking the flow from the landing pages to orders:
-![7](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/0e8912a4-30ae-43f2-969c-86632ed95f71)
+![7_1](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/9e573305-0150-4ec1-be13-89cadfb0a5a0)
+
+![7_2](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/f16fb44e-477b-47b9-9a1d-712a4b5d5c6c)
+
+![7_3](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/5e304a06-806e-4e3a-bfbb-71d6c9346e60)
 
 ### Query Explanation
 
@@ -432,6 +436,7 @@ Cindy wants to quantify the impact of the billing test that took place from Sept
 ### SQL Query
 
 In this query, we calculate the revenue per billing page session during the test period for two billing page versions and then count the number of billing page sessions in the past month:
+
 ![8](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/bbcd04ed-a610-4334-a5fa-6a0c02449031)
 
 ### Query Explanation
