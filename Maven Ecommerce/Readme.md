@@ -95,4 +95,49 @@ The Maven Fuzzy Factory database consists of six tables, each serving a specific
 
 These tables hold crucial data that will enable you to quantify the company's growth, optimize marketing channels, and measure website performance. In the upcoming sections, you will explore how to extract and analyze this data to create a compelling growth story for Maven Fuzzy Factory's presentation to the board.
 
+Here's the information in Markdown format, including the request, query, query explanation, answer, and answer interpretation:
+
+# Requests:
+
+## Request 1
+
+Cindy has requested information to showcase the growth of Gsearch sessions and orders on a monthly basis. We need to extract monthly trends for Gsearch sessions and orders to demonstrate their impact on the company's growth.
+
+### SQL Query
+![1](https://github.com/sulaiman013/My-Personal-Projects/assets/55143390/f46a70e2-7c37-4a98-abd2-390cdf358621)
+
+### Query Explanation
+
+In this SQL query:
+
+- We select the year and month of the `created_at` column to group the data on a monthly basis.
+- We count the distinct website sessions associated with Gsearch as "sessions."
+- We count the distinct orders linked to these sessions as "orders."
+- We calculate the conversion rate as the percentage of orders divided by sessions, rounded to two decimal places.
+
+We use a `LEFT JOIN` to ensure that all Gsearch sessions are included, even if there were no orders associated with them.
+
+We filter the data to include only records created before November 27, 2012, and where the `utm_source` is 'gsearch.' The results are grouped by year and month.
+
+### Answer
+
+The query returns the following result:
+
+| Year | Month | Sessions | Orders | Conversion Rate (%) |
+|------|-------|----------|--------|---------------------|
+| 2012 | 3     | 1860     | 60     | 3.23                |
+| 2012 | 4     | 3574     | 92     | 2.57                |
+| 2012 | 5     | 3410     | 97     | 2.84                |
+| 2012 | 6     | 3578     | 121    | 3.38                |
+| 2012 | 7     | 3811     | 145    | 3.80                |
+| 2012 | 8     | 4877     | 184    | 3.77                |
+| 2012 | 9     | 4491     | 188    | 4.19                |
+| 2012 | 10    | 5534     | 234    | 4.23                |
+| 2012 | 11    | 8889     | 373    | 4.20                |
+
+### Answer Interpretation
+
+The table provides a monthly breakdown of Gsearch-related website sessions and orders. It is clear that both sessions and orders have been consistently increasing over the months. The conversion rate, which represents the percentage of orders relative to sessions, shows positive growth as well.
+
+This data demonstrates the significant impact of Gsearch on the company's growth story, making it a valuable marketing channel. This information can be used to showcase the company's growth to the board as requested.
 
