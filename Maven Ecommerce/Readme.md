@@ -6,6 +6,29 @@ Maven Fuzzy Factory is an eCommerce retailer that specializes in SITUATION produ
 
 In your role as an eCommerce Database Analyst at Maven Fuzzy Factory, you are responsible for extracting and analyzing data from the company's database to understand and communicate the story of its growth over the first eight months of operation. The CEO is due to present company performance metrics to the board, and this is an opportunity to showcase the company's analytical capabilities. This report will help you effectively communicate the growth story to the board and highlight your role as the data expert for the company.
 
+## Midterm Project
+
+### Project Overview
+
+Maven Fuzzy Factory has been operational for approximately eight months, and your CEO needs to present company performance metrics to the board in the upcoming week. As the eCommerce Database Analyst, your primary responsibility is to extract and analyze data from the company's database to quantify the company's growth during this period and effectively communicate this growth story to the board.
+
+### Data Analysis Goals
+
+1. **Quantify Growth**: Use SQL to extract and analyze website traffic and performance data from the Maven Fuzzy Factory database to measure the company's growth over the first eight months of operation.
+
+2. **Create a Compelling Story**: Present the data in a way that tells the story of how the company achieved this growth, demonstrating your analytical capabilities.
+
+## Email from Cindy (November 27, 2012)
+
+> Good morning,
+> I need some help preparing a presentation for the board meeting next week.
+> The board would like to have a better understanding of our growth story over our first 8 months. This will also be a good excuse to show off our analytical capabilities a bit.
+> -Cindy
+
+Cindy, the CEO, has reached out to you on November 27, 2012, requesting your assistance in preparing a presentation for the board meeting. The board's primary interest is gaining insights into the company's growth story during the initial eight months of operation. This presentation is also an opportunity to showcase the analytical capabilities of the company.
+
+Now, you are tasked with leveraging your expertise in SQL to extract, analyze, and effectively communicate the company's growth story to the board. The next sections of your report will delve into the details of the data analysis and presentation.
+
 ## Data Information
 
 The Maven Fuzzy Factory database consists of six tables, each serving a specific purpose. These tables are as follows:
@@ -71,3 +94,5 @@ The Maven Fuzzy Factory database consists of six tables, each serving a specific
    - Primary Key: `order_item_refund_id`
 
 These tables hold crucial data that will enable you to quantify the company's growth, optimize marketing channels, and measure website performance. In the upcoming sections, you will explore how to extract and analyze this data to create a compelling growth story for Maven Fuzzy Factory's presentation to the board.
+
+
