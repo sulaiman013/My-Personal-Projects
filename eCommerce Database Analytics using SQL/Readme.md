@@ -2586,6 +2586,244 @@ For example, in the case of order '27061,' two order items had associated refund
 This analysis can help businesses understand customer behavior related to refunds and potentially identify patterns or trends related to repeat customer behavior or product quality issues.
 
 
+**Request (November 01, 2014):**
+Tom is interested in understanding the value of customers who have repeat sessions on the website. The company has been primarily evaluating customer value based on their first session conversion and revenue. However, if customers return for multiple sessions, they may be more valuable than initially thought. To assess this, Tom requests data on how many website visitors return for another session during the year 2014 to date.
+
+**SQL Query:**
+The SQL query is designed to identify and count visitors who return for multiple sessions on the website in 2014. It does this in several steps:
+
+1. **cte1:** It initially selects user IDs and website session IDs for visitors in 2014 who have not had a repeat session.
+
+2. **cte2:** This step identifies users who had at least one repeat session in 2014, distinguishing their new and repeat session IDs.
+
+3. **cte3:** Here, it aggregates the data, counting the number of new sessions and repeat sessions for each user.
+
+The final part of the query groups and counts users by the number of repeat sessions they have.
+
+**SQL Query:**
+```sql
+with
+cte1 as (select user_id, website_session_id
+from website_sessions
+where created_at between '2014-01-01' and '2014-11-01'
+and is_repeat_session = 0),
+cte2 as (select a.user_id, a.website_session_id as new_session_id,
+b.website_session_id as repeat_session_id
+from cte1 a
+left join website_sessions b
+on b.user_id = a.user_id
+and b.is_repeat_session = 1
+and b.website_session_id > a.website_session_id
+and b.created_at BETWEEN '2014-01-01' and '2014-11-01'),
+cte3 as(select user_id, count(DISTINCT new_session_id) as new_sessions,
+count(DISTINCT repeat_session_id) as repeat_sessions
+from cte2
+GROUP BY 1
+ORDER BY 3 desc)
+select repeat_sessions,
+count(DISTINCT user_id) as users
+from cte3
+GROUP BY 1;
+```
+
+**Explanation:**
+This SQL query uses common table expressions (CTEs) to first identify users with repeat sessions in 2014 and then aggregates the data to provide insights into customer behavior. The key components are:
+
+- **cte1**: This CTE selects users who visited the website in 2014 without having a repeat session (is_repeat_session = 0).
+
+- **cte2**: It links the first sessions (cte1) with any repeat sessions that occurred after them. This CTE also filters for sessions that fall within the specified date range.
+
+- **cte3**: Here, the query aggregates the data, counting new sessions and repeat sessions for each user. It also calculates the number of repeat sessions and sorts the results by the number of repeat sessions in descending order.
+
+The final part of the query counts the number of users based on the count of their repeat sessions and presents the results in a tabular format.
+
+**Answer Table:**
+
+| # repeat_sessions | users  |
+|-------------------|--------|
+| 0                 | 126813 |
+| 1                 | 14086  |
+| 2                 | 315    |
+| 3                 | 4686   |
+
+The answer table displays the number of users who had 0, 1, 2, or 3 repeat sessions in 2014.
+
+**Interpretation:**
+The table provides valuable insights into user behavior on the website during 2014. It shows that a significant number of users (approximately 126,813) had no repeat sessions. However, a noteworthy portion of users did return for multiple sessions, with 14,086 having one repeat session, 315 with two repeat sessions, and 4,686 with three repeat sessions.
+
+Tom acknowledges the breakdown and expresses an interest in learning more about this pattern, suggesting future steps to explore the value of customers with repeat sessions further.
+
+
+**Request (November 03, 2014):**
+Tom is curious to understand the behavior of repeat customers who return to the website. Specifically, he wants to know the minimum, maximum, and average time between a customer's first session and their second session for those who do come back. The analysis should cover the period from January 1, 2014, to November 3, 2014.
+
+**SQL Query:**
+The SQL query is designed to calculate the minimum, maximum, and average time between the first and second sessions for customers who return to the website. The query follows these steps:
+
+1. **cte1:** It identifies users and their first sessions, filtering for visitors in 2014 who have not had a repeat session.
+
+2. **cte2:** This step links the first sessions (cte1) with any repeat sessions that occurred after them. It also captures the timestamps for both sessions, focusing on sessions in 2014.
+
+3. **cte3:** It identifies users, their new sessions, and related details. This step filters out cases where no repeat session exists.
+
+4. The main query calculates the difference in days between the first and second sessions for each user, based on the data from cte3.
+
+5. Finally, the query aggregates the user-level data to find the average, minimum, and maximum differences in days between first and second sessions.
+
+**SQL Query:**
+```sql
+create temporary table first_to_second_session
+with
+cte1 as (select user_id, website_session_id, created_at
+from website_sessions
+where created_at between '2014-01-01' and '2014-11-03'
+and is_repeat_session = 0),
+cte2 as (select a.user_id, a.website_session_id as new_session_id, a.created_at as new_session_created_at,
+b.website_session_id as repeat_session_id, b.created_at as repeat_session_created_at
+from cte1 a
+left join website_sessions b
+on b.user_id = a.user_id
+and b.is_repeat_session = 1
+and b.website_session_id > a.website_session_id
+and b.created_at BETWEEN '2014-01-01' and '2014-11-03'),
+cte3 as (select user_id, new_session_id, new_session_created_at, 
+min(repeat_session_id) as second_session_id, 
+min(repeat_session_created_at) as second_session_created_at
+from cte2
+where repeat_session_id is not null
+GROUP BY 1,2,3)
+select user_id, 
+datediff(second_session_created_at, new_session_created_at) as days_first_to_second_session
+from cte3;
+ 
+select avg(days_first_to_second_session) as avg_days_first_to_second,
+min(days_first_to_second_session) as min_days_first_to_second,
+max(days_first_to_second_session) as max_days_first_to_second
+from first_to_second_session;
+```
+
+**Explanation:**
+The SQL query is divided into several parts, as previously explained. It calculates the time difference in days between the first and second sessions for customers who return. The key components include identifying these sessions, linking first and second sessions, and calculating the differences.
+
+**Answer Table:**
+
+| # avg_days_first_to_second | min_days_first_to_second | max_days_first_to_second |
+|----------------------------|--------------------------|--------------------------|
+| 33.2622                    | 1                        | 69                       |
+
+The answer table provides statistics related to the time between the first and second sessions for returning customers. It includes the average, minimum, and maximum differences in days.
+
+**Interpretation:**
+The analysis reveals that, on average, customers who return to the website for a second session do so approximately a month later, with an average of 33.26 days between their first and second sessions. The fastest return was within just 1 day, while the longest period before returning was 69 days.
+
+Tom finds this data interesting and suggests investigating the channels that these returning visitors are using, indicating potential plans for further analysis.
+
+
+**Request (November 05, 2014):**
+Tom wants to explore the behavior of repeat customers and understand the channels through which they return to the website. He's particularly interested in whether these customers are mainly coming back through direct type-ins or if paid search ads play a role. Tom suggests comparing new and repeat sessions by channel, with a focus on data from 2014 to the current date.
+
+**SQL Query:**
+The SQL query is designed to categorize sessions into different channel groups and count the number of new and repeat sessions for each channel. It classifies sessions into the following channel groups:
+
+- **Organic Search:** Sessions with no UTM source and coming from specific search referers.
+- **Paid Nonbrand:** Sessions with a specific UTM campaign.
+- **Paid Brand:** Sessions with a different UTM campaign.
+- **Direct Type-In:** Sessions with no UTM source and no HTTP referer.
+- **Paid Social:** Sessions with a specific UTM source.
+
+The query counts new sessions (is_repeat_session = 0) and repeat sessions (is_repeat_session = 1) within each channel group.
+
+**SQL Query:**
+```sql
+SELECT case 
+    when utm_source is null and http_referer in ('https://www.gsearch.com', 'https://www.bsearch.com') then 'organic_search'
+    when utm_campaign = 'nonbrand' then 'paid_nonbrand'
+    when utm_campaign = 'brand' then 'paid_brand'
+    when utm_source is null and http_referer is null then 'direct_type_in'
+    when utm_source = 'socialbook' then 'paid_social'
+    end as channel_group,
+    count(case when is_repeat_session = 0 then website_session_id else null end) as new_sessions,
+    count(case when is_repeat_session = 1 then website_session_id else null end) as repeat_sessions
+from website_sessions
+where created_at BETWEEN '2014-01-01' and '2014-11-05'
+GROUP BY 1
+order by 3 desc;
+```
+
+**Explanation:**
+The SQL query categorizes sessions into different channel groups based on various criteria such as UTM parameters, HTTP referer, and UTM source. It then counts new and repeat sessions for each channel group, focusing on the specified date range of 2014 to the current date.
+
+**Answer Table:**
+
+| # channel_group | new_sessions | repeat_sessions |
+|-----------------|--------------|-----------------|
+| organic_search  | 7139         | 11507           |
+| paid_brand      | 6432         | 11027           |
+| direct_type_in  | 6591         | 10564           |
+| paid_nonbrand   | 119950       | 0               |
+| paid_social     | 7652         | 0               |
+
+The answer table provides a breakdown of the channel groups, showing the number of new and repeat sessions for each group.
+
+**Interpretation:**
+The analysis reveals how customers return to the website through different channels. The major findings are as follows:
+
+- **Organic Search:** Both new and repeat sessions are significant, with repeat sessions outnumbering new ones. This suggests that organic search attracts repeat visitors.
+
+- **Paid Brand:** Similar to organic search, paid brand campaigns also attract a substantial number of repeat sessions.
+
+- **Direct Type-In:** Direct type-in sessions, where users enter the website URL directly, account for a significant portion of both new and repeat sessions.
+
+- **Paid Nonbrand and Paid Social:** Interestingly, the data shows that no repeat sessions were attributed to paid nonbrand and paid social channels during the specified period.
+
+Tom notes that most repeat visitors are returning through organic search, direct type-ins, and paid brand channels. Only about one-third of repeat visitors come through paid channels, and since brand clicks are cheaper than nonbrand clicks, the cost for subsequent visits is relatively low. He expresses interest in whether these repeat sessions convert into orders, hinting at potential further investigation.
+
+**Comment by the Requester:**
+Tom's comment reflects his interest in the analysis results. He finds it valuable to discover that many repeat customers return through channels that do not involve significant ad spend. He's now considering whether these repeat sessions lead to order conversions, indicating his intent to explore this aspect further.
+
+
+**Request (November 08, 2014):**
+Morgan is interested in conducting a comparison of conversion rates and revenue per session for repeat sessions and new sessions. The analysis will focus on data from 2014 year-to-date.
+
+**SQL Query:**
+The SQL query is designed to compare conversion rates (CVR) and revenue per session for repeat sessions (is_repeat_session = 1) and new sessions (is_repeat_session = 0). It counts the number of sessions, calculates the CVR, and computes the revenue per session for both groups.
+
+**SQL Query:**
+```sql
+select a.is_repeat_session, 
+    count(DISTINCT a.website_session_id) as sessions,
+    count(distinct b.order_id)/count(DISTINCT a.website_session_id) as cvr, 
+    sum(b.price_usd)/count(DISTINCT a.website_session_id) as rev_per_session
+from website_sessions a
+left join orders b
+on a.website_session_id = b.website_session_id
+where a.created_at between '2014-01-01' and '2014-11-08'
+GROUP BY 1;
+```
+
+**Explanation:**
+The SQL query categorizes sessions into repeat sessions and new sessions and calculates the count of sessions, CVR, and revenue per session for both groups. The analysis is limited to data from January 1, 2014, to November 8, 2014.
+
+**Answer Table:**
+
+| # is_repeat_session | sessions | cvr    | rev_per_session |
+|---------------------|----------|--------|-----------------|
+| 0                   | 149787   | 0.0680 | 4.343754        |
+| 1                   | 33577    | 0.0811 | 5.168828        |
+
+The answer table presents a comparison between repeat sessions and new sessions, showing the number of sessions, CVR, and revenue per session for each group.
+
+**Interpretation:**
+The analysis reveals the following insights:
+
+- **New Sessions:** There are 149,787 new sessions with a CVR of 6.80% and revenue per session of approximately $4.34.
+
+- **Repeat Sessions:** There are 33,577 repeat sessions with a higher CVR of 8.11% and a greater revenue per session of about $5.17.
+
+Morgan finds this comparison interesting. Repeat sessions have a higher CVR and generate more revenue per session compared to new sessions. This discovery suggests that considering repeat sessions in paid traffic bidding strategies could be beneficial.
+
+**Comment by the Requester:**
+Morgan expresses her excitement about the findings. She acknowledges that repeat sessions are more likely to convert and produce higher revenue per session. She plans to discuss these insights with Tom and emphasizes that, given the low cost of repeat sessions, they should be factored into their paid traffic bidding decisions.
 
 
 
