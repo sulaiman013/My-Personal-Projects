@@ -1155,3 +1155,221 @@ The answer table presents data for different marketing channels, focusing on the
 
 The analysis provides insights into the performance of different marketing channels, helping marketing professionals allocate their budget and resources more effectively to achieve the desired conversion rates and optimize their channel portfolio. It also highlights the importance of tracking and analyzing CVR to assess channel effectiveness.
 
+**Request (November 29, 2012):**
+
+Hi there,
+
+With gsearch doing well and the site performing better, we launched a second paid search channel, bsearch, around August 22. Can you pull weekly trended session volume since then and compare to gsearch nonbrand so I can get a sense for how important this will be for the business?
+
+Thanks,
+Tom
+
+**Request Explanation:**
+
+The request from Tom is to analyze the performance of a new paid search channel called "bsearch," which was launched on August 22. Specifically, he wants to understand how the session volume for this new channel compares to the existing "gsearch" nonbrand channel on a weekly basis. This comparison will help Tom gauge the significance of the new channel's impact on the business.
+
+**SQL Query:**
+
+```sql
+SELECT
+    MIN(DATE(created_at)) AS week_start_date,
+    COUNT(DISTINCT CASE WHEN utm_source = 'gsearch' THEN website_session_id ELSE NULL END) AS gsearch_sessions,
+    COUNT(DISTINCT CASE WHEN utm_source = 'bsearch' THEN website_session_id ELSE NULL END) AS bsearch_sessions
+FROM website_sessions
+WHERE created_at BETWEEN '2012-08-22' AND '2012-11-29'
+    AND utm_campaign = 'nonbrand'
+GROUP BY YEARWEEK(created_at);
+```
+
+**Query Explanation:**
+
+The SQL query retrieves weekly trended session volumes for "gsearch" and "bsearch" channels. Here's how it works:
+
+1. The `SELECT` statement selects the minimum date within each week as the `week_start_date`. It also counts the number of distinct sessions for "gsearch" and "bsearch" channels. These session counts are calculated using conditional aggregation.
+
+2. The `FROM` clause specifies the source table as "website_sessions."
+
+3. The `WHERE` clause filters the data to the specified date range, from August 22, 2012, to November 29, 2012, and selects only the records where the campaign is "nonbrand."
+
+4. The results are grouped by the week using the `YEARWEEK` function, which groups sessions by the year and week.
+
+**Answer Table:**
+
+The query provides a table with the following columns and data:
+
+| # week_start_date | gsearch_sessions | bsearch_sessions |
+|-------------------|------------------|------------------|
+| 2012-08-22        | 590              | 197              |
+| 2012-08-26        | 1056             | 343              |
+| 2012-09-02        | 925              | 290              |
+| 2012-09-09        | 951              | 329              |
+| 2012-09-16        | 1151             | 365              |
+| 2012-09-23        | 1050             | 321              |
+| 2012-09-30        | 999              | 316              |
+| 2012-10-07        | 1002             | 330              |
+| 2012-10-14        | 1257             | 420              |
+| 2012-10-21        | 1302             | 431              |
+| 2012-10-28        | 1211             | 384              |
+| 2012-11-04        | 1350             | 429              |
+| 2012-11-11        | 1246             | 438              |
+| 2012-11-18        | 3508             | 1093             |
+| 2012-11-25        | 2286             | 774              |
+
+**Interpretation of the Answer:**
+
+The answer table presents a comparison of weekly session volumes between the "gsearch" nonbrand channel and the newly launched "bsearch" channel. Here's the interpretation:
+
+- The "gsearch" channel consistently had a higher number of sessions compared to "bsearch" throughout the period.
+
+- In the early weeks after the launch of "bsearch," "gsearch" had approximately three times as many sessions.
+
+- While "bsearch" experienced growth in sessions over time, it did not surpass "gsearch."
+
+Tom's follow-up comment suggests that "bsearch" tends to receive about one-third of the traffic of "gsearch." This insight is essential for assessing the importance of the new channel and planning future strategies.
+
+Tom also mentions that he will follow up with requests to understand channel characteristics and conversion performance, indicating a deeper analysis of the "bsearch" channel to determine its impact on the business.
+
+The analysis helps provide a clear picture of how the new marketing channel, "bsearch," is performing in terms of session volume compared to the existing "gsearch" channel.
+
+**Request (November 30, 2012):**
+
+Hi there,
+
+I’d like to learn more about the bsearch nonbrand campaign. Could you please pull the percentage of traffic coming on Mobile, and compare that to gsearch? Feel free to dig around and share anything else you find interesting. Aggregate data since August 22nd is great, no need to show trending at this point.
+
+Thanks,
+Tom
+
+**Request Explanation:**
+
+Tom's request is to gain a deeper understanding of the "bsearch" nonbrand campaign. Specifically, he wants to know the percentage of website traffic that is coming from mobile devices for this campaign. Additionally, he wants to compare this data to the "gsearch" campaign. Tom encourages the analyst to explore and share any other interesting findings. The analysis should consider data since August 22nd.
+
+**SQL Query:**
+
+```sql
+SELECT
+    utm_source,
+    COUNT(DISTINCT website_session_id) AS sessions,
+    COUNT(DISTINCT CASE WHEN device_type = 'mobile' THEN website_session_id ELSE NULL END) AS mobile_sessions,
+    ROUND((COUNT(DISTINCT CASE WHEN device_type = 'mobile' THEN website_session_id ELSE NULL END) / COUNT(DISTINCT website_session_id)) * 100, 2) AS pct_mobile,
+    COUNT(DISTINCT website_session_id) - COUNT(DISTINCT CASE WHEN device_type = 'mobile' THEN website_session_id ELSE NULL END) AS desktop_sessions,
+    100 - ROUND((COUNT(DISTINCT CASE WHEN device_type = 'mobile' THEN website_session_id ELSE NULL END) / COUNT(DISTINCT website_session_id)) * 100, 2) AS pct_desktop
+FROM website_sessions
+WHERE created_at BETWEEN '2012-08-22' AND '2012-11-30'
+    AND utm_campaign = 'nonbrand'
+GROUP BY utm_source;
+```
+
+**Query Explanation:**
+
+The SQL query is designed to analyze and compare the percentage of mobile and desktop traffic for the "bsearch" and "gsearch" nonbrand campaigns. Here's how the query works:
+
+1. The `SELECT` statement includes the `utm_source` (campaign source), total sessions, mobile sessions, the percentage of mobile sessions (`pct_mobile`), desktop sessions, and the percentage of desktop sessions (`pct_desktop`).
+
+2. In the `FROM` clause, data is selected from the "website_sessions" table.
+
+3. The `WHERE` clause filters the data to the specified date range, from August 22, 2012, to November 30, 2012, and selects only the records where the campaign is "nonbrand."
+
+4. The results are grouped by `utm_source` to provide separate statistics for the "bsearch" and "gsearch" campaigns.
+
+**Answer Table:**
+
+The query yields a table with the following columns and data:
+
+| # utm_source | sessions | mobile_sessions | pct_mobile | desktop_sessions | pct_desktop |
+|--------------|----------|-----------------|------------|------------------|-------------|
+| bsearch      | 6522     | 562             | 8.62       | 5960             | 91.38       |
+| gsearch      | 20073    | 4921            | 24.52      | 15152            | 75.48       |
+
+**Interpretation of the Answer:**
+
+The answer table provides insights into the device-specific distribution of traffic for the "bsearch" and "gsearch" nonbrand campaigns. Here's the interpretation:
+
+- **bsearch Campaign:**
+  - Total sessions: 6,522
+  - Mobile sessions: 562 (8.62% of total sessions)
+  - Desktop sessions: 5,960 (91.38% of total sessions)
+
+- **gsearch Campaign:**
+  - Total sessions: 20,073
+  - Mobile sessions: 4,921 (24.52% of total sessions)
+  - Desktop sessions: 15,152 (75.48% of total sessions)
+
+The analysis reveals significant differences in device distribution between the two campaigns. The "gsearch" campaign has a notably higher percentage of mobile sessions compared to the "bsearch" campaign. This insight can be valuable for optimizing marketing strategies and adjusting bids for each campaign based on device-specific performance.
+
+Tom's follow-up comment acknowledges the interesting insights regarding the desktop-to-mobile splits. He emphasizes the importance of recognizing these differences between the channels and suggests that further analysis is needed to optimize bids effectively. Tom expresses his appreciation for the work and encourages continued efforts in this direction.
+
+**Request (December 01, 2012):**
+
+Hi there,
+
+I’m wondering if bsearch nonbrand should have the same bids as gsearch. Could you pull nonbrand conversion rates from session to order for gsearch and bsearch, and slice the data by device type? Please analyze data from August 22 to September 18; we ran a special pre-holiday campaign for gsearch starting on September 19th, so the data after that isn’t fair game.
+
+Thanks,
+Tom
+
+**Request Explanation:**
+
+Tom's request is to compare the conversion rates from sessions to orders for the "bsearch" and "gsearch" nonbrand campaigns. He wants this comparison to be segmented by device type. The purpose is to determine if both campaigns should have the same bidding strategy. Tom specifies that the analysis should cover the period from August 22 to September 18, excluding data after September 19 due to a special pre-holiday campaign for "gsearch."
+
+**SQL Query:**
+
+```sql
+select a.utm_source, a.device_type, 
+count(DISTINCT a.website_session_id) as sessions, 
+count(DISTINCT b.order_id) as orders,
+round((count(DISTINCT b.order_id)/count(DISTINCT a.website_session_id))*100,2) as cvr
+from website_sessions a 
+left join orders b on b.website_session_id = a.website_session_id
+where a.created_at between '2012-08-22' AND '2012-09-18'
+AND utm_campaign = 'nonbrand'
+GROUP BY 1,2;
+```
+
+**Query Explanation:**
+
+The SQL query is designed to calculate and compare conversion rates (CVR) from sessions to orders for the "bsearch" and "gsearch" nonbrand campaigns, while segmenting the data by device type. Here's how the query works:
+
+1. The `SELECT` statement includes the `utm_source` (campaign source), `device_type`, total sessions, total orders, and the conversion rate (`cvr`).
+
+2. In the `FROM` clause, data is selected from the "website_sessions" table, and an outer join with the "orders" table is performed based on the `website_session_id`.
+
+3. The `WHERE` clause filters the data for the specified date range, from August 22, 2012, to September 18, 2012, and ensures that the campaign is "nonbrand."
+
+4. The results are grouped by both `utm_source` and `device_type` to provide detailed conversion rate data for each combination.
+
+**Answer Table:**
+
+The query yields a table with the following columns and data:
+
+| # utm_source | device_type | sessions | orders | cvr  |
+|--------------|-------------|----------|--------|------|
+| bsearch      | desktop     | 1118     | 43     | 3.85 |
+| bsearch      | mobile      | 125      | 1      | 0.80 |
+| gsearch      | desktop     | 2850     | 130    | 4.56 |
+| gsearch      | mobile      | 962      | 11     | 1.14 |
+
+**Interpretation of the Answer:**
+
+The answer table provides conversion rate data for the "bsearch" and "gsearch" nonbrand campaigns, segmented by device type. Here's the interpretation:
+
+- **bsearch Campaign:**
+  - Desktop sessions: 1,118
+  - Desktop orders: 43
+  - Desktop conversion rate (CVR): 3.85%
+  - Mobile sessions: 125
+  - Mobile orders: 1
+  - Mobile conversion rate (CVR): 0.80%
+
+- **gsearch Campaign:**
+  - Desktop sessions: 2,850
+  - Desktop orders: 130
+  - Desktop conversion rate (CVR): 4.56%
+  - Mobile sessions: 962
+  - Mobile orders: 11
+  - Mobile conversion rate (CVR): 1.14%
+
+The analysis clearly shows that the two campaigns have different conversion rates, particularly when considering desktop and mobile devices. The "gsearch" campaign generally outperforms the "bsearch" campaign in terms of conversion rates.
+
+In response to the analysis, Tom acknowledges the differences in performance between the two channels and expresses his intention to adjust the bidding strategy. He plans to bid down the "bsearch" campaign based on its underperformance. This demonstrates the practical implications of the analysis on optimizing the overall paid marketing budget. Tom appreciates the work and encourages further efforts in this direction.
+
