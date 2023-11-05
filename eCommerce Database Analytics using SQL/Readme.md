@@ -1618,7 +1618,374 @@ The answer table displays the breakdown of various traffic sources by month, ill
 Cindy expresses satisfaction with the analysis results, indicating that the brand, direct, and organic traffic volumes are not only increasing but also growing as a percentage of the paid traffic volume. She mentions this data as an encouraging narrative to present to an investor, suggesting that it portrays positive momentum for the brand's organic and direct traffic, showcasing potential growth beyond reliance solely on paid traffic.
 
 ## ANALYZING SEASONALITY & BUSINESS PATTERNS
+The SQL query is designed to analyze business patterns, specifically focusing on the time and date of website sessions. It extracts information such as the session ID, the date and time of the session, the hour of the day, the day of the week, the quarter, the month, the date, and the week number for a range of website session IDs. This data can help in understanding the patterns and trends in website traffic, which is valuable for optimizing efficiency and anticipating future business trends.
+
+**SQL Query:**
+```sql
+select 
+	website_session_id, 
+    created_at, 
+    hour(created_at) as hr,
+    weekday(created_at) as wkday,
+    case 
+		when weekday(created_at) = 0 then 'Monday'
+        when weekday(created_at) = 1 then 'Tuesday'
+        when weekday(created_at) = 2 then 'Wednesday'
+        when weekday(created_at) = 3 then 'Thursday'
+        when weekday(created_at) = 4 then 'Friday'
+        when weekday(created_at) = 5 then 'Saturday'
+        when weekday(created_at) = 6 then 'Sunday'
+        else 'other_day'
+	end as clean_weekday,
+    quarter(created_at) as qtr,
+    month(created_at) as month,
+    date(created_at) as date,
+    week(created_at) as wk
+from website_sessions
+where website_session_id between 150000 and 155000;
+```
+
+**Explanation:**
+- The query selects specific columns from the `website_sessions` table and calculates additional attributes based on the `created_at` timestamp.
+- `hour(created_at) as hr` extracts the hour of the day from the timestamp.
+- `weekday(created_at) as wkday` calculates the numeric day of the week (0 for Sunday, 6 for Saturday).
+- The `case` statement transforms the numeric day of the week into a human-readable format, such as 'Monday,' 'Tuesday,' etc., and assigns it to the column `clean_weekday`.
+- `quarter(created_at) as qtr` extracts the quarter from the timestamp.
+- `month(created_at) as month` gets the month.
+- `date(created_at) as date` retrieves the date.
+- `week(created_at) as wk` calculates the week number of the year.
+
+This query is applied to a specific range of `website_session_id` values between 150000 and 155000, presumably to focus the analysis on a specific subset of website sessions.
+
+**Answer Table:**
+
+| # website_session_id | created_at          | hr | wkday | clean_weekday | qtr | month | date       | wk |
+|----------------------|---------------------|----|-------|---------------|-----|-------|------------|----|
+| 150000               | 2013-11-14 10:46:56 | 10 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+| 150001               | 2013-11-14 10:50:42 | 10 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+| 150002               | 2013-11-14 10:53:39 | 10 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+| 150003               | 2013-11-14 10:59:46 | 10 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+| 150004               | 2013-11-14 11:01:11 | 11 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+| 150005               | 2013-11-14 11:02:39 | 11 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+| 150006               | 2013-11-14 11:12:59 | 11 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+| 150007               | 2013-11-14 11:16:06 | 11 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+| 150008               | 2013-11-14 11:17:09 | 11 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+| 150009               | 2013-11-14 11:18:09 | 11 | 3     | Thursday      | 4   | 11    | 2013-11-14 | 45 |
+
+P.S: ONLY A FRACTION OF THE OUTPUT HAS BEEN SHOWN!
+
+The answer table contains the extracted data for website sessions within the specified range of `website_session_id` values. It provides information on the session ID, the timestamp, the hour of the day, the day of the week, the day of the week in a more readable format, the quarter, the month, the date, and the week number for each session.
+
+**Interpretation:**
+The query generates a dataset that can be used for analyzing business patterns. It helps in understanding how website traffic varies by different time-related attributes, such as hour, day of the week, and more. This information can be valuable for identifying trends and optimizing business operations based on the patterns observed in the data.
+
+**Request Date: January 02, 2013**
+
+**Request by Cindy:**
+Good morning,
+2012 was a great year for us. As we continue to grow, we should take a look at 2012’s monthly and weekly volume patterns, to see if we can find any seasonal trends we should plan for in 2013.
+If you can pull session volume and order volume, that would be excellent.
+Thanks,
+-Cindy
+
+**SQL Query:**
+```sql
+select year(a.created_at) as yr, 
+month(a.created_at) as month,
+count(DISTINCT a.website_session_id) as sessions,
+count(DISTINCT b.order_id) as orders
+from website_sessions a
+left join orders b on b.website_session_id = a.website_session_id
+where a.created_at < '2013-01-01'
+GROUP BY 1,2;
+```
+
+**Explanation:**
+- The query is designed to provide an analysis of monthly volume patterns for the year 2012 by counting the number of website sessions and orders.
+- It selects the year and month from the `created_at` timestamp, calculates the number of unique website sessions (sessions), and the number of unique orders (orders).
+- The data is obtained from the `website_sessions` table and the `orders` table, with a LEFT JOIN based on the common key `website_session_id`.
+- The data is filtered to include only records with a `created_at` date before January 1, 2013.
+- The results are grouped by year and month, providing a summary of monthly session and order volumes for 2012.
+
+**Answer Table:**
+| # yr | month | sessions | orders |
+|------|-------|----------|--------|
+| 2012 | 3     | 1879     | 60     |
+| 2012 | 4     | 3734     | 99     |
+| 2012 | 5     | 3736     | 108    |
+| 2012 | 6     | 3963     | 140    |
+| 2012 | 7     | 4249     | 169    |
+| 2012 | 8     | 6097     | 228    |
+| 2012 | 9     | 6546     | 287    |
+| 2012 | 10    | 8183     | 371    |
+| 2012 | 11    | 14011    | 618    |
+| 2012 | 12    | 10072    | 506    |
+
+The answer table displays the analysis of monthly volume patterns for the year 2012. It includes columns for the year, month, the number of website sessions (sessions), and the number of orders (orders) for each month.
+
+Additionally, there is another SQL query related to weekly volume patterns.
+
+**SQL Query for Weekly Volume Patterns:**
+```sql
+select min(date(a.created_at)) as week_start_date,
+count(DISTINCT a.website_session_id) as sessions,
+count(DISTINCT b.order_id) as orders
+from website_sessions a
+left join orders b on b.website_session_id = a.website_session_id
+where a.created_at < '2013-01-01'
+GROUP BY yearweek(a.created_at);
+```
+
+**Explanation (Weekly Query):**
+- This query is similar to the monthly query but focuses on weekly volume patterns for the year 2012.
+- It calculates the number of sessions and orders on a weekly basis.
+- The `yearweek()` function is used to group the data by year and week.
+- The results provide insights into the weekly session and order volumes for 2012.
+
+**Answer Table:**
+| # week_start_date | sessions | orders |
+|-------------------|----------|--------|
+| 2012-03-19        | 896      | 25     |
+| 2012-03-25        | 983      | 35     |
+| 2012-04-01        | 1193     | 29     |
+| 2012-04-08        | 1029     | 28     |
+| 2012-04-15        | 679      | 22     |
+| 2012-04-22        | 655      | 18     |
+| 2012-04-29        | 770      | 19     |
+| 2012-05-06        | 798      | 17     |
+| 2012-05-13        | 706      | 23     |
+| 2012-05-20        | 965      | 28     |
+
+**Interpretation:**
+The results show that 2012 saw steady growth throughout the year, with significant volume increases during holiday months, particularly during the weeks of Black Friday and Cyber Monday. This information is crucial for planning customer support and inventory management strategies in 2013 to accommodate these seasonal trends.
+
+**Comment by Cindy:**
+Cindy's comment expresses appreciation for the provided analysis, noting the steady growth observed throughout the year and the significance of holiday-related volume increases. She acknowledges the importance of considering these patterns when planning for customer support and inventory management in 2013. Overall, Cindy finds the analysis great and valuable for future business planning.
 
 
+**Request Date: January 05, 2013**
 
+**Request by Cindy:**
+Good morning,
+We’re considering adding live chat support to the website to improve our customer experience. Could you analyze the average website session volume, by hour of day and by day week, so that we can staff appropriately? Let’s avoid the holiday time period and use a date range of Sep 15 - Nov 15, 2013.
+Thanks, Cindy
+
+**SQL Query:**
+```sql
+with
+cte1 as (
+	select date(created_at) as created_date,
+    weekday(created_at) as wkday,
+    hour(created_at) as hr,
+    count(DISTINCT website_session_id) as website_sessions
+    
+    from website_sessions
+    where created_at between '2012-09-15' AND '2012-11-15'
+    group by 1,2,3
+)
+select hr, 
+round(avg(case when wkday = 0 then website_sessions else null end),1) as mon,
+round(avg(case when wkday = 1 then website_sessions else null end),1) as tue,
+round(avg(case when wkday = 2 then website_sessions else null end),1) as wed,
+round(avg(case when wkday = 3 then website_sessions else null end),1) as thu,
+round(avg(case when wkday = 4 then website_sessions else null end),1) as fri,
+round(avg(case when wkday = 5 then website_sessions else null end),1) as sat,
+round(avg(case when wkday = 6 then website_sessions else null end),1) as sun
+from cte1
+GROUP BY 1
+order by 1;
+```
+
+**Explanation:**
+- Cindy's request aims to analyze the average website session volume to help determine staffing needs for adding live chat support to the website.
+- The SQL query calculates the average number of website sessions per hour of the day and by the day of the week for the specified date range (September 15 - November 15, 2013).
+- It starts by creating a Common Table Expression (CTE) named `cte1` to aggregate website session data by date, weekday, and hour, focusing on the specified date range.
+- The main query then calculates the average session volume for each hour of the day on different days of the week (Monday to Sunday) based on the `cte1` data.
+- The results are rounded to one decimal place and presented in a tabular format.
+
+**Answer Table:**
+
+| # hr | mon  | tue  | wed  | thu  | fri  | sat | sun  |
+|------|------|------|------|------|------|-----|------|
+| 0    | 8.7  | 7.7  | 6.3  | 7.4  | 6.8  | 5.0 | 5.0  |
+| 1    | 6.6  | 6.7  | 5.3  | 4.9  | 7.1  | 5.0 | 3.0  |
+| 2    | 6.1  | 4.4  | 4.4  | 6.1  | 4.6  | 3.7 | 3.0  |
+| 3    | 5.7  | 4.0  | 4.7  | 4.6  | 3.6  | 3.9 | 3.4  |
+| 4    | 5.9  | 6.3  | 6.0  | 4.0  | 6.1  | 2.8 | 2.4  |
+| 5    | 5.0  | 5.4  | 5.1  | 5.4  | 4.6  | 4.3 | 3.9  |
+| 6    | 5.4  | 5.6  | 4.8  | 6.0  | 6.8  | 4.0 | 2.6  |
+| 7    | 7.3  | 7.8  | 7.4  | 10.6 | 7.0  | 5.7 | 4.8  |
+| 8    | 12.3 | 12.2 | 13.0 | 16.5 | 10.5 | 4.3 | 4.1  |
+| 9    | 17.6 | 15.7 | 19.6 | 19.3 | 17.5 | 7.6 | 6.0  |
+| 10   | 18.4 | 17.7 | 21.0 | 18.4 | 19.0 | 8.3 | 6.3  |
+| 11   | 18.0 | 19.1 | 24.9 | 21.6 | 20.9 | 7.2 | 7.7  |
+| 12   | 21.1 | 23.3 | 22.8 | 24.1 | 19.0 | 8.6 | 6.1  |
+| 13   | 17.8 | 23.0 | 20.8 | 20.6 | 21.6 | 8.1 | 8.4  |
+| 14   | 17.9 | 21.6 | 22.3 | 18.5 | 19.5 | 8.7 | 6.7  |
+| 15   | 21.6 | 17.1 | 25.3 | 23.5 | 21.3 | 6.9 | 7.1  |
+| 16   | 21.1 | 23.7 | 23.7 | 19.6 | 20.9 | 7.6 | 6.6  |
+| 17   | 19.4 | 15.9 | 20.2 | 19.8 | 12.9 | 6.4 | 7.6  |
+| 18   | 12.7 | 15.0 | 14.8 | 15.3 | 10.9 | 5.3 | 6.8  |
+| 19   | 12.4 | 14.1 | 13.3 | 11.6 | 14.3 | 7.1 | 6.4  |
+| 20   | 12.1 | 12.4 | 14.2 | 10.6 | 10.3 | 5.7 | 8.4  |
+| 21   | 9.1  | 12.6 | 11.4 | 9.4  | 7.3  | 5.7 | 10.2 |
+| 22   | 9.1  | 10.0 | 9.8  | 12.1 | 6.0  | 5.7 | 10.2 |
+| 23   | 8.8  | 8.6  | 9.6  | 10.6 | 7.6  | 5.3 | 8.3  |
+
+The answer table provides the average website session volume by hour of the day and day of the week, allowing for a detailed view of website activity patterns during the specified date range.
+
+**Interpretation:**
+Cindy's interpretation of the results suggests that ~10 sessions per hour per employee staffed is an appropriate benchmark. She plans to have one support staff available around the clock and then doubles the staffing to two support members from 8 am to 5 pm, Monday through Friday. This staffing approach is designed to align with the observed website session volume trends, ensuring that there are adequate support staff members available during peak activity hours.
+
+**Comment by Cindy:**
+Cindy expresses her appreciation, stating that the provided analysis is really helpful for planning live chat support staffing. She mentions that she has been in discussions with support companies and notes that approximately 10 sessions per hour per employee is the right staffing ratio. She outlines her staffing plan based on the analysis, which involves 24/7 support with additional staffing during regular business hours to meet customer needs efficiently.
+
+## Product Sales Analysis
+This SQL query is designed for product sales analysis. Analyzing product sales is crucial for businesses to understand the performance of each product, how they contribute to overall revenue, and how product launches affect the product portfolio. In this specific case, the analysis focuses on sales of primary products within a range of order IDs (between 10000 and 11000). The query retrieves key metrics, including the number of orders, total revenue, margin, and average revenue for each primary product.
+
+**Request Explanation:**
+The request for this SQL query is to obtain insights into product sales within the specified order ID range. It aims to identify the performance of each primary product by analyzing order counts, total revenue, margin, and the average revenue per order for products within this range.
+
+**SQL Query:**
+```sql
+select 
+ primary_product_id,
+ count(order_id) as orders,
+ sum(price_usd) as revenue,
+ sum(price_usd - cogs_usd) as margin,
+ avg(price_usd) as average_revenue
+ from orders 
+ where order_id between 10000 and 11000
+ group by 1
+ order by 4 desc;
+```
+
+**Explanation:**
+- The SQL query begins with a `SELECT` statement that retrieves specific information for analysis.
+- It selects the `primary_product_id` to identify the product, and then aggregates data for each product by using several aggregate functions.
+- The `COUNT` function counts the number of orders for each product, `SUM` calculates the total revenue for each product, and `SUM(price_usd - cogs_usd)` computes the margin by subtracting the cost of goods sold (COGS) from the revenue.
+- The `AVG` function calculates the average revenue per order for each product.
+- The data used for analysis is filtered using a `WHERE` clause, which restricts it to orders with order IDs between 10000 and 11000.
+- The results are grouped by `primary_product_id` and ordered in descending order based on the margin.
+
+**Answer Table:**
+
+| # primary_product_id | orders | revenue  | margin   | average_revenue |
+|----------------------|--------|----------|----------|-----------------|
+| 1                    | 731    | 42009.62 | 25900.00 | 57.468700       |
+| 2                    | 144    | 9118.46  | 5710.00  | 63.322639       |
+| 3                    | 126    | 6474.61  | 4386.50  | 51.385794       |
+
+The answer table provides insights into the sales performance of primary products within the specified order ID range. It includes columns for the primary product ID, the number of orders, total revenue, margin, and average revenue per order for each product.
+
+**Interpretation:**
+The analysis reveals key information about the products sold within the specified range of order IDs:
+- Product 1 had the highest number of orders (731), generating $42,009.62 in revenue, with a margin of $25,900.00. The average revenue per order for this product is approximately $57.47.
+- Product 2 had 144 orders, resulting in $9,118.46 in revenue, a margin of $5,710.00, and an average revenue per order of approximately $63.32.
+- Product 3 had 126 orders, leading to $6,474.61 in revenue, a margin of $4,386.50, and an average revenue per order of approximately $51.39.
+
+This analysis provides valuable insights into the performance of these products, enabling data-driven decisions and strategies for the product portfolio. It can help businesses understand which products are top performers and may indicate the need for additional marketing efforts or adjustments to product offerings.
+
+**Request (January 04, 2013):**  
+Cindy has requested a deep dive analysis into the company's current flagship product to prepare for the upcoming launch of a new product. Specifically, she asks for monthly trends in sales, total revenue, and total margin generated by the business. The goal is to establish baseline data that will help in tracking the evolution of revenue and margin as the new product is introduced. This analysis will also provide insights into the company's overall growth pattern.
+
+**SQL Query:**  
+```sql
+select year(created_at) as year,
+month(created_at) as month,
+count(DISTINCT order_id) as number_of_sales,
+sum(price_usd) as total_revenue,
+sum(price_usd - cogs_usd) as total_margin
+from orders
+where created_at < '2013-01-04'
+GROUP BY 1,2;
+```
+
+**Explanation:**  
+- The SQL query begins with a `SELECT` statement to extract relevant data for analysis.
+- It selects the `year` and `month` from the `created_at` timestamp to organize the data into monthly intervals.
+- The query calculates key metrics for each month:
+  - `number_of_sales`: Counts the number of distinct order IDs to determine the total sales for the flagship product during each month.
+  - `total_revenue`: Sums the total revenue generated by the product for each month.
+  - `total_margin`: Computes the total margin for each month by subtracting the cost of goods sold (COGS) from the total revenue.
+- The data used for analysis is filtered using a `WHERE` clause. It includes only orders created before January 4, 2013, providing historical data up to that point.
+- The results are then grouped by the year and month using `GROUP BY`, allowing for the calculation of monthly trends.
+
+**Answer Table:**  
+
+| # year | month | number_of_sales | total_revenue | total_margin |
+|--------|-------|-----------------|---------------|--------------|
+| 2012   | 3     | 60              | 2999.40       | 1830.00      |
+| 2012   | 4     | 99              | 4949.01       | 3019.50      |
+| 2012   | 5     | 108             | 5398.92       | 3294.00      |
+| 2012   | 6     | 140             | 6998.60       | 4270.00      |
+| 2012   | 7     | 169             | 8448.31       | 5154.50      |
+| 2012   | 8     | 228             | 11397.72      | 6954.00      |
+| 2012   | 9     | 287             | 14347.13      | 8753.50      |
+| 2012   | 10    | 371             | 18546.29      | 11315.50     |
+| 2012   | 11    | 618             | 30893.82      | 18849.00     |
+| 2012   | 12    | 506             | 25294.94      | 15433.00     |
+
+The answer table displays the historical data regarding the flagship product's performance in terms of number of sales, total revenue, and total margin, organized on a monthly basis.
+
+**Interpretation:**  
+The analysis presents monthly trends for the flagship product up to January 4, 2013. It shows a consistent pattern of growth throughout the year 2012, with the number of sales, total revenue, and total margin increasing over time. This historical data serves as valuable baseline information, enabling the company to monitor how revenue and margin evolve following the launch of the new product.
+
+Cindy's comment expresses her satisfaction with the provided data, emphasizing its importance as a baseline for tracking the impact of the new product. She also appreciates the insight into the company's overall growth pattern, which can inform future business strategies and decision-making.
+
+**Request (April 05, 2013):**  
+Cindy has requested a trended analysis for the period since April 1, 2013, following the launch of the company's second product on January 6th. She seeks insights into several key performance indicators to assess the impact of this new product. The analysis includes monthly order volume, overall conversion rates, revenue per session, and a breakdown of sales by product.
+
+**SQL Query:**  
+```sql
+select 
+	year(a.created_at) as year,
+    month(a.created_at) as month,
+    count(DISTINCT b.order_id) as orders,
+    count(distinct b.order_id)/count(DISTINCT a.website_session_id) as cvr,
+    round(sum(b.price_usd)/count(DISTINCT a.website_session_id),2) as revenue_sessions,
+    count(distinct case when b.primary_product_id = 1 then order_id else null end) as product_one_orders,
+    count(distinct case when b.primary_product_id = 2 then order_id else null end) as product_two_orders
+    
+from website_sessions a 
+left join orders b on b.website_session_id = a.website_session_id
+where a.created_at between '2012-04-01' AND '2013-04-05'
+GROUP BY 1,2;
+```
+
+**Explanation:**  
+- The SQL query begins with a `SELECT` statement to extract and calculate relevant metrics for analysis.
+- It selects the `year` and `month` from the `created_at` timestamp to group the data into monthly intervals.
+- The query counts the number of distinct order IDs as `orders`, which represents the monthly order volume.
+- It calculates the conversion rate (`cvr`) by dividing the count of distinct order IDs by the count of distinct website sessions, providing an overall conversion rate for each month.
+- The revenue per session (`revenue_sessions`) is calculated by dividing the sum of `price_usd` by the count of distinct website sessions. The result is rounded to two decimal places.
+- Two additional columns provide a breakdown of sales by product. The count of distinct order IDs is calculated for each product ID, representing `product_one_orders` and `product_two_orders`.
+
+- The data used for analysis is filtered using a `WHERE` clause. It includes records created between April 1, 2012, and April 5, 2013, aligning with Cindy's request for data since April 1, 2013.
+- The results are then grouped by the year and month, allowing for the calculation of monthly trends.
+
+**Answer Table:**  
+
+| # year | month | orders | cvr    | revenue_sessions | product_one_orders | product_two_orders |
+|--------|-------|--------|--------|------------------|--------------------|--------------------|
+| 2012   | 4     | 99     | 0.0265 | 1.33             | 99                 | 0                  |
+| 2012   | 5     | 108    | 0.0289 | 1.45             | 108                | 0                  |
+| 2012   | 6     | 140    | 0.0353 | 1.77             | 140                | 0                  |
+| 2012   | 7     | 169    | 0.0398 | 1.99             | 169                | 0                  |
+| 2012   | 8     | 228    | 0.0374 | 1.87             | 228                | 0                  |
+| 2012   | 9     | 287    | 0.0438 | 2.19             | 287                | 0                  |
+| 2012   | 10    | 371    | 0.0453 | 2.27             | 371                | 0                  |
+| 2012   | 11    | 618    | 0.0441 | 2.20             | 618                | 0                  |
+| 2012   | 12    | 506    | 0.0502 | 2.51             | 506                | 0                  |
+| 2013   | 1     | 391    | 0.0611 | 3.13             | 344                | 47                 |
+
+The answer table presents the trended analysis for monthly order volume, conversion rates, revenue per session, and sales by product, spanning from April 2012 to April 2013.
+
+**Interpretation:**  
+The analysis reveals the following insights:
+- Conversion rates (`cvr`) have been steadily improving over time, from approximately 2.65% in April 2012 to around 6.11% in January 2013.
+- Revenue per session (`revenue_sessions`) has also shown a positive trend, increasing from $1.33 per session in April 2012 to $3.13 per session in January 2013.
+- The breakdown of sales by product shows that product one dominated the sales until January 2013, after which product two started contributing significantly.
+
+Cindy's comment expresses her satisfaction with the analysis results, particularly regarding the improvements in conversion rates and revenue per session over time. However, she raises a valid question about whether the growth observed since January is primarily due to the new product's launch or part of the company's ongoing business improvements. To address this question, she plans to connect with Tom to conduct a more detailed analysis.
 
