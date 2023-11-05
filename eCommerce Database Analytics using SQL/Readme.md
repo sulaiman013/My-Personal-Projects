@@ -1373,3 +1373,252 @@ The analysis clearly shows that the two campaigns have different conversion rate
 
 In response to the analysis, Tom acknowledges the differences in performance between the two channels and expresses his intention to adjust the bidding strategy. He plans to bid down the "bsearch" campaign based on its underperformance. This demonstrates the practical implications of the analysis on optimizing the overall paid marketing budget. Tom appreciates the work and encourages further efforts in this direction.
 
+**Request (December 22, 2012):**
+
+Hi there,
+
+Based on your last analysis, we bid down bsearch nonbrand on December 2nd. Can you pull weekly session volume for gsearch and bsearch nonbrand, broken down by device, since November 4th? If you can include a comparison metric to show bsearch as a percent of gsearch for each device, that would be great too.
+
+Thanks,
+Tom
+
+**Request Explanation:**
+
+Tom's request is to analyze the weekly session volumes for the "gsearch" and "bsearch" nonbrand campaigns, categorized by device type. This analysis covers the period from November 4th to December 22nd. Additionally, Tom requests a comparison metric that shows "bsearch" as a percentage of "gsearch" for each device type. The purpose is to understand how session volumes changed after they bid down the "bsearch" campaign and assess the impact on the two channels.
+
+**SQL Query:**
+
+```sql
+select 
+min(date(created_at)) as week_start_date,
+count(DISTINCT case when device_type = 'desktop' and utm_source = 'gsearch' then website_session_id else null end) as g_dtop_sessions,
+count(DISTINCT case when device_type = 'desktop' and utm_source = 'bsearch' then website_session_id else null end) as b_dtop_sessions,
+round((count(DISTINCT case when device_type = 'desktop' and utm_source = 'bsearch' then website_session_id else null end)/count(DISTINCT 
+case when device_type = 'desktop' and utm_source = 'gsearch' then website_session_id else null end))*100,2) as b_pct_g_dtop,
+count(DISTINCT case when device_type = 'mobile' and utm_source = 'gsearch' then website_session_id else null end) as g_mob_sessions,
+count(DISTINCT case when device_type = 'mobile' and utm_source = 'bsearch' then website_session_id else null end) as b_mob_sessions,
+round((count(DISTINCT case when device_type = 'mobile' and utm_source = 'bsearch' then website_session_id else null end)/count(DISTINCT 
+case when device_type = 'mobile' and utm_source = 'gsearch' then website_session_id else null end))*100,2) as b_pct_g_mob
+from website_sessions
+where created_at BETWEEN '2012-11-04' AND '2012-12-22'
+AND utm_campaign = 'nonbrand'
+GROUP BY yearweek(created_at);
+```
+
+**Query Explanation:**
+
+The SQL query aims to calculate and compare weekly session volumes for the "gsearch" and "bsearch" nonbrand campaigns, divided by device type. It also includes a metric showing "bsearch" as a percentage of "gsearch" for each device type. Here's how the query works:
+
+1. The `SELECT` statement includes several calculated fields:
+   - `week_start_date`: The earliest date within each week.
+   - `g_dtop_sessions`: Count of desktop sessions for "gsearch."
+   - `b_dtop_sessions`: Count of desktop sessions for "bsearch."
+   - `b_pct_g_dtop`: The percentage of "bsearch" sessions compared to "gsearch" for desktop.
+   - `g_mob_sessions`: Count of mobile sessions for "gsearch."
+   - `b_mob_sessions`: Count of mobile sessions for "bsearch."
+   - `b_pct_g_mob`: The percentage of "bsearch" sessions compared to "gsearch" for mobile.
+
+2. The data is selected from the "website_sessions" table, and conditions are set to filter sessions between November 4, 2012, and December 22, 2012, for the "nonbrand" campaign.
+
+3. The results are grouped by the week's starting date using the `yearweek` function.
+
+**Answer Table:**
+
+The query provides a table with the following columns and data:
+
+| # week_start_date | g_dtop_sessions | b_dtop_sessions | b_pct_g_dtop | g_mob_sessions | b_mob_sessions | b_pct_g_mob |
+|-------------------|-----------------|-----------------|--------------|----------------|----------------|-------------|
+| 2012-11-04        | 1027            | 400             | 38.95        | 323            | 29             | 8.98        |
+| 2012-11-11        | 956             | 401             | 41.95        | 290            | 37             | 12.76       |
+| 2012-11-18        | 2655            | 1008            | 37.97        | 853            | 85             | 9.96        |
+| 2012-11-25        | 2058            | 843             | 40.96        | 692            | 62             | 8.96        |
+| 2012-12-02        | 1326            | 517             | 38.99        | 396            | 31             | 7.83        |
+| 2012-12-09        | 1277            | 293             | 22.94        | 424            | 46             | 10.85       |
+| 2012-12-16        | 1270            | 348             | 27.40        | 376            | 41             | 10.90       |
+
+**Interpretation of the Answer:**
+
+The answer table provides weekly session volume data for "gsearch" and "bsearch" nonbrand campaigns, broken down by device type, along with the percentage of "bsearch" as compared to "gsearch" for each device type. Here's the interpretation:
+
+- **Desktop Sessions:**
+  - For the week starting on November 4th, there were 1,027 "gsearch" desktop sessions and 400 "bsearch" desktop sessions, making "bsearch" 38.95% of "gsearch" for desktop.
+  - The percentage fluctuates over the weeks but tends to be lower for "bsearch."
+
+- **Mobile Sessions:**
+  - For mobile devices, "bsearch" has a much smaller share of sessions compared to "gsearch." The percentage of "bsearch" sessions relative to "gsearch" sessions is considerably lower on mobile.
+
+Tom's comment acknowledges that traffic for both "gsearch" and "bsearch" declined after Black Friday and Cyber Monday. However, he notes that "bsearch" experienced a more substantial drop. He considers this to be acceptable, especially given the lower conversion rate for "bsearch." This insight reflects the impact of bid adjustments and provides valuable information for optimizing the marketing strategy. Tom appreciates the work that has been done in this regard.
+
+## Analyzing Direct Traffic
+This analysis focuses on evaluating direct traffic sources to gain insights into how well a brand is performing and how effectively it drives business. Direct traffic typically consists of users who directly type in a website's URL, visit from bookmarks, or do not have referral sources. The goal is to categorize and quantify different types of direct traffic, such as organic traffic from specific search engines and other sources.
+
+**Request Explanation:**
+
+The SQL query is designed to categorize and count different types of direct traffic sources and the number of sessions associated with each source. It analyzes website sessions within a specific range of website_session_id values (between 100,000 and 115,000). The traffic sources are categorized into four groups:
+1. 'direct_type_in': Users who directly type in the website URL or visit via bookmarks.
+2. 'gsearch_organic': Users arriving from 'https://www.gsearch.com' with no specific utm_source, indicating organic traffic from Gsearch.
+3. 'bsearch_organic': Users arriving from 'https://www.bsearch.com' with no specific utm_source, indicating organic traffic from Bsearch.
+4. 'other': All other sources of direct traffic not falling into the above categories.
+
+**SQL Query:**
+
+```sql
+select
+    case 
+        when http_referer is null then 'direct_type_in'
+        when http_referer = 'https://www.gsearch.com' AND utm_source is null then 'gsearch_organic'
+        when http_referer = 'https://www.bsearch.com' AND utm_source is null then 'bsearch_organic'
+        else 'other'
+    end as Traffics,
+    count(DISTINCT website_session_id) as sessions
+from website_sessions
+where website_session_id between 100000 and 115000
+GROUP BY 1
+ORDER BY 2 desc;
+```
+
+**Query Explanation:**
+
+The SQL query uses a `CASE` statement to categorize the direct traffic based on the criteria explained in the request. Here's how the query works:
+
+- It categorizes the traffic into four types: 'direct_type_in,' 'gsearch_organic,' 'bsearch_organic,' and 'other' based on the conditions defined.
+- The data is selected from the "website_sessions" table, and the session IDs are limited to those falling within the specified range (between 100,000 and 115,000).
+- The result is grouped by the 'Traffics' categories.
+- The final output is ordered by the number of sessions in descending order.
+
+**Answer Table:**
+
+The answer table provides the following data:
+
+| # Traffics      | sessions |
+|-----------------|----------|
+| other           | 12,760   |
+| direct_type_in  | 1,055    |
+| gsearch_organic | 966      |
+| bsearch_organic | 220      |
+
+**Interpretation of the Answer:**
+
+The answer table shows the count of sessions for different types of direct traffic sources within the specified session ID range. Here's the interpretation:
+
+- 'other': This category has the highest number of sessions, with 12,760 sessions. These are likely visitors who accessed the website through various unspecified direct methods.
+- 'direct_type_in': Users who directly typed in the website URL or used bookmarks accounted for 1,055 sessions.
+- 'gsearch_organic': There were 966 sessions from users arriving through 'https://www.gsearch.com' with no specific utm_source, indicating organic traffic from Gsearch.
+- 'bsearch_organic': Users arriving from 'https://www.bsearch.com' with no specific utm_source contributed 220 sessions, indicating organic traffic from Bsearch.
+
+The analysis provides a breakdown of different types of direct traffic sources, allowing for a better understanding of how users access the website. This information can be valuable for assessing the brand's performance and the effectiveness of various traffic sources.
+
+### Request Explanation:
+
+Cindy is requesting an analysis to understand the trend of different traffic sources by month (organic search, direct type-in, and paid brand search) and their relative percentage concerning paid search nonbrand. The goal is to ascertain if the brand is gaining momentum, particularly in organic, direct, and paid brand searches, and to demonstrate these growth trends as a percentage of the total paid nonbrand traffic.
+
+### SQL Queries:
+
+#### 1. Initial Query for Data Collection:
+```sql
+SELECT DISTINCT utm_source, utm_campaign, http_referer
+FROM website_sessions
+WHERE created_at < '2012-12-23';
+```
+This query fetches distinct values of 'utm_source', 'utm_campaign', and 'http_referer' from 'website_sessions' created before December 23, 2012, providing insight into various traffic sources.
+
+**ANSWER:**
+| # utm_source | utm_campaign | http_referer            |
+|--------------|--------------|-------------------------|
+| gsearch      | nonbrand     | https://www.gsearch.com |
+| null         | null         | null                    |
+| gsearch      | brand        | https://www.gsearch.com |
+| null         | null         | https://www.gsearch.com |
+| bsearch      | brand        | https://www.bsearch.com |
+| null         | null         | https://www.bsearch.com |
+| bsearch      | nonbrand     | https://www.bsearch.com |
+
+#### 2. Channel Categorization Query:
+```sql
+SELECT DISTINCT
+	CASE 
+		WHEN utm_source IS NULL AND http_referer IN ('https://www.gsearch.com', 'https://www.bsearch.com') THEN 'organic_search'
+        WHEN utm_campaign = 'nonbrand' THEN 'paid_nonbrand'
+        WHEN utm_campaign = 'brand' THEN 'paid_brand'
+        WHEN utm_source IS NULL AND http_referer IS NULL THEN 'direct_type_in'
+	END AS channel_group,
+    utm_source,
+	utm_campaign,
+    http_referer
+FROM website_sessions 
+WHERE created_at < '2012-12-23';
+```
+This query categorizes the traffic into different groups ('organic_search', 'paid_nonbrand', 'paid_brand', and 'direct_type_in') based on specific conditions related to 'utm_source', 'utm_campaign', and 'http_referer'.
+
+**ANSWER:**
+| # channel_group | utm_source | utm_campaign | http_referer            |
+|-----------------|------------|--------------|-------------------------|
+| paid_nonbrand   | gsearch    | nonbrand     | https://www.gsearch.com |
+| null            | null       | null         | direct_type_in          |
+| paid_brand      | gsearch    | brand        | https://www.gsearch.com |
+| organic_search  | null       | null         | https://www.gsearch.com |
+| paid_brand      | bsearch    | brand        | https://www.bsearch.com |
+| organic_search  | null       | null         | https://www.bsearch.com |
+| paid_nonbrand   | bsearch    | nonbrand     | https://www.bsearch.com |
+
+#### 3. Analysis Query for Traffic Sessions by Month:
+```sql
+WITH cte1 AS (
+	SELECT
+		website_session_id,
+		created_at,
+		CASE 
+			WHEN utm_source IS NULL AND http_referer IN ('https://www.gsearch.com', 'https://www.bsearch.com') THEN 'organic_search'
+            WHEN utm_campaign = 'nonbrand' THEN 'paid_nonbrand'
+            WHEN utm_campaign = 'brand' THEN 'paid_brand'
+            WHEN utm_source IS NULL AND http_referer IS NULL THEN 'direct_type_in'
+		END AS channel_group
+	FROM website_sessions 
+    WHERE created_at < '2012-12-23'
+)
+SELECT
+	year(created_at) AS yr,
+	month(created_at) AS month,
+	COUNT(DISTINCT CASE WHEN channel_group = 'paid_nonbrand' THEN website_session_id ELSE NULL END) AS nonbrand,
+	COUNT(DISTINCT CASE WHEN channel_group = 'paid_brand' THEN website_session_id ELSE NULL END) AS nonbrand,
+	COUNT(DISTINCT CASE WHEN channel_group = 'paid_brand' THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN channel_group = 'paid_nonbrand' THEN website_session_id ELSE NULL END) AS brand_pct_of_nonbrand,
+	COUNT(DISTINCT CASE WHEN channel_group = 'direct_type_in' THEN website_session_id ELSE NULL END) AS direct,
+	COUNT(DISTINCT CASE WHEN channel_group = 'direct_type_in' THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN channel_group = 'paid_nonbrand' THEN website_session_id ELSE NULL END) AS direct_pct_of_nonbrand,
+	COUNT(DISTINCT CASE WHEN channel_group = 'organic_search' THEN website_session_id ELSE NULL END) AS organic,
+	COUNT(DISTINCT CASE WHEN channel_group = 'organic_search' THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN channel_group = 'paid_nonbrand' THEN website_session_id ELSE NULL END) AS organic_pct_of_nonbrand
+FROM cte1
+GROUP BY 1,2;
+```
+
+**ANSWER:**
+
+| # yr | month | nonbrand | nonbrand | brand_pct_of_nonbrand | direct | direct_pct_of_nonbrand | organic | organic_pct_of_nonbrand |
+|------|-------|----------|----------|-----------------------|--------|------------------------|---------|-------------------------|
+| 2012 | 3     | 1852     | 10       | 0.0054                | 9      | 0.0049                 | 8       | 0.0043                  |
+| 2012 | 4     | 3509     | 76       | 0.0217                | 71     | 0.0202                 | 78      | 0.0222                  |
+| 2012 | 5     | 3295     | 140      | 0.0425                | 151    | 0.0458                 | 150     | 0.0455                  |
+| 2012 | 6     | 3439     | 164      | 0.0477                | 170    | 0.0494                 | 190     | 0.0552                  |
+| 2012 | 7     | 3660     | 195      | 0.0533                | 187    | 0.0511                 | 207     | 0.0566                  |
+| 2012 | 8     | 5318     | 264      | 0.0496                | 250    | 0.0470                 | 265     | 0.0498                  |
+| 2012 | 9     | 5591     | 339      | 0.0606                | 285    | 0.0510                 | 331     | 0.0592                  |
+| 2012 | 10    | 6883     | 432      | 0.0628                | 440    | 0.0639                 | 428     | 0.0622                  |
+| 2012 | 11    | 12260    | 556      | 0.0454                | 571    | 0.0466                 | 624     | 0.0509                  |
+| 2012 | 12    | 6643     | 464      | 0.0698                | 482    | 0.0726                 | 492     | 0.0741                  |
+
+### Interpretation of the Answer:
+
+The answer table displays the breakdown of various traffic sources by month, illustrating the sessions for each category and their respective percentages concerning the total paid nonbrand sessions.
+
+- For each month of the year 2012, the table includes counts for 'nonbrand,' 'paid_brand,' 'direct,' and 'organic' sessions, along with their proportions in relation to the total 'paid_nonbrand' sessions.
+- These columns highlight the absolute growth of different types of sessions over time and demonstrate how each channel contributes as a proportion of the paid nonbrand traffic.
+- The growing counts of 'brand,' 'direct,' and 'organic' sessions are depicted in both absolute numbers and their increasing shares in the total 'paid_nonbrand' sessions.
+
+### Comment Explanation by Cindy:
+
+Cindy expresses satisfaction with the analysis results, indicating that the brand, direct, and organic traffic volumes are not only increasing but also growing as a percentage of the paid traffic volume. She mentions this data as an encouraging narrative to present to an investor, suggesting that it portrays positive momentum for the brand's organic and direct traffic, showcasing potential growth beyond reliance solely on paid traffic.
+
+## ANALYZING SEASONALITY & BUSINESS PATTERNS
+
+
+
+
