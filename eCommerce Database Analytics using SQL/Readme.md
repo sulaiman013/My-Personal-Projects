@@ -151,7 +151,7 @@ The provided data showcases a comprehensive breakdown of website sessions, sorte
 
 As we observe the dominance of 'g_ad_1' nonbrand sessions, it is advisable to conduct a more detailed analysis of this particular source to identify optimization opportunities. To gain further insights and establish next steps, involving Tom for his expertise is a practical course of action.
 
-**Request:**
+**Request 1:**
 
 Tom wants to determine the conversion rate (CVR) from website sessions to orders, specifically focusing on sessions generated through the "gsearch" source with a "nonbrand" campaign. The goal is to calculate whether the CVR meets the minimum threshold of 4% needed to make the financial numbers work. If the CVR is below this threshold, adjustments to reduce search bids might be necessary. Tom's request aims to evaluate the economic viability of their paid search campaigns.
 
@@ -188,7 +188,7 @@ The analysis shows that the CVR for sessions generated through the "gsearch" sou
 **Comment by Tom:**
 Tom acknowledges the analysis and mentions that, based on the findings, they need to dial down their search bids. The reason for this is that they are currently over-spending on their campaigns due to the lower-than-desired conversion rate. The analysis has helped them make more cost-effective decisions and saved them money.
 
-**Request:**
+**Request 2:**
 The request is to analyze traffic sources and bid optimization based on website sessions and orders data. The goal is to understand the value of different segments of paid traffic for bid optimization.
 
 **Query 1: Trended Sessions**
@@ -227,7 +227,7 @@ This query creates a pivot table to show how different primary product categorie
 **Answer 2:**
 The second answer offers a pivot table displaying the count of single-item and two-item orders for each primary product category in the specified `order_id` range.
 
-**Request (May 10, 2012):**
+**Request 3 (May 10, 2012):**
 The request is to analyze the trended session volume for the "gsearch nonbrand" traffic source by week. This analysis aims to determine if the bid changes made on 2012-04-15 have affected the volume of sessions for this traffic source.
 
 **Query:**
@@ -264,7 +264,7 @@ The answer table presents the week's starting date and the corresponding number 
 **Comment by the Requester (Tom - May 10, 2012):**
 The requester acknowledges the analysis and expresses that it appears that bid changes have a significant impact on the sensitivity of "gsearch nonbrand" traffic. While the goal is to maximize volume, it's crucial not to overspend on ads, and they plan to contemplate potential strategies based on this insight.
 
-**Request (May 11, 2012):**
+**Request 4 (May 11, 2012):**
 The request is to calculate conversion rates from website session to order, categorized by device type (desktop and mobile). This analysis aims to compare the performance of desktop and mobile devices. The goal is to identify whether desktop performance is superior to mobile performance, as this insight could inform bid adjustments for desktop to potentially increase sales volume.
 
 **Query:**
@@ -300,7 +300,7 @@ The answer table presents the device types (desktop and mobile), along with the 
 **Comment by the Requester (Tom - May 11, 2012):**
 The requester acknowledges the results and confirms their decision to increase bids specifically for desktop devices. By bidding higher, they aim to improve their ranking in auctions, which, based on the provided insights, is expected to boost sales. The requester praises the analysis and expresses gratitude for the insights.
 
-**Request (June 09, 2012):**
+**Request 5 (June 09, 2012):**
 In this request, the requester asks for an analysis of weekly trends for both desktop and mobile devices following recent bid changes for "gsearch nonbrand" campaigns. The analysis aims to understand the impact on website session volumes for desktop and mobile devices after the bid changes. The specified date range for the analysis is from April 15, 2012, to June 9, 2012. This period is considered the baseline for comparison.
 
 **Query:**
@@ -468,7 +468,7 @@ The answer table presents the pageview_url that served as the entry point the mo
 
 In summary, this analysis provides insights into the most popular pages on the website, with "/home" being the top-viewed page and the most frequently used entry point. This information can be valuable for optimizing and tailoring content and strategies to meet user preferences and business objectives.
 
-**Request - June 09, 2012:**
+**Request 6 - June 09, 2012:**
 
 Hi there!
 I’m Morgan, the new Website Manager.
@@ -508,7 +508,7 @@ The answer table provides a list of the most-viewed website pages, with session 
 **Comment**
 Thank you! It definitely seems like the homepage, the products page, and the Mr. Fuzzy page get the bulk of our traffic. I would like to understand traffic patterns more. I’ll follow up soon with a request to look at entry pages. Thanks! -Morgan
 
-**Request - June 12, 2012:**
+**Request 7 - June 12, 2012:**
 
 Hi there! Would you be able to pull a list of the top entry pages? I want to confirm where our users are hitting the site. If you could pull all entry pages and rank them on entry volume, that would be great. Thanks! -Morgan
 
@@ -614,7 +614,7 @@ The answer table provides landing page performance data for the specified time p
 
 This analysis helps in understanding how well landing pages are retaining users, and it highlights areas that may need improvement to reduce bounce rates and increase user engagement.
 
-**Request (June 14, 2012):**
+**Request 8 (June 14, 2012):**
 Morgan requested information about the performance of the landing page, specifically the homepage. They wanted to know the sessions, bounced sessions, and the bounce rate for traffic landing on the homepage.
 
 **SQL Query:**
@@ -672,7 +672,7 @@ The answer table provides the requested information for the homepage. The homepa
 **Comment by the Requester:**
 Morgan acknowledges the high bounce rate of almost 60% and expresses concern about the quality of paid search traffic. They plan to create a custom landing page for search and set up an experiment to analyze its performance with the help of more data. The comment indicates that Morgan intends to take actions to improve the bounce rate on the homepage.
 
-**Request (July 28, 2012):**
+**Request 9 (July 28, 2012):**
 Morgan requested bounce rate information for two specific landing pages, "/home" and "/lander-1." These pages were part of a 50/50 test for gsearch nonbrand traffic. Morgan wanted to evaluate the new page, "/lander-1," by comparing the bounce rates for the two pages during the time period when "/lander-1" was receiving traffic.
 
 **SQL Query:**
@@ -743,7 +743,7 @@ The answer table provides the requested information for the two landing pages. F
 **Comment by the Requester:**
 Morgan expresses satisfaction with the results, noting that the custom landing page "/lander-1" has a lower bounce rate, indicating success. Morgan plans to update campaigns to direct all nonbrand paid traffic to the new page. They also express the intention to have trends analyzed in a few weeks to ensure that things have moved in the right direction.
 
-**Request (August 31, 2012):**
+**Request 10 (August 31, 2012):**
 Morgan requested data related to paid search nonbrand traffic landing on two pages, "/home" and "/lander-1," trended weekly since June 1st. The goal was to confirm that the traffic routing was correct and to assess the impact of the change on the overall paid search bounce rate.
 
 **SQL Query:**
@@ -912,7 +912,7 @@ This query is a continuation of the analysis, using the same CTEs (CTE1 and CTE2
 
 In summary, these SQL queries and the resulting tables help assess and optimize the conversion funnel's performance for "/lander-2" traffic, particularly for users interested in "Mr. Fuzzy." The click-through rates indicate how well users are transitioning from one step to the next in the funnel.
 
-**Request (September 5, 2012):**
+**Request 11 (September 5, 2012):**
 
 Morgan, the requester, is interested in understanding the user journey of "gsearch" visitors on their website, specifically, how visitors navigate from the "/lander-1" page to placing an order. The objective is to create a full conversion funnel analysis, breaking down how many customers successfully complete each step of the process. The analysis should start at the "/lander-1" page and encompass the entire journey to the "thank you" page. The data used for this analysis spans from August 5th to September 5th, 2012.
 
@@ -1033,7 +1033,7 @@ The requester's comment in the initial email expressed the desire to understand 
 
 The analysis enables the requester to pinpoint which step in the conversion process has the highest drop-off rate, providing insights for optimization and potential improvements.
 
-**Request (November 10, 2012):**
+**Request 12 (November 10, 2012):**
 
 Morgan, the requester, inquired about the effectiveness of an updated billing page, denoted as "/billing-2," compared to the original "/billing" page. The objective was to determine what percentage of sessions on these pages ultimately led to a successful order placement. It's worth noting that this test encompassed all website traffic, not just "gsearch" visitors. The request was made on November 10, 2012.
 
@@ -1158,7 +1158,7 @@ The answer table presents data for different marketing channels, focusing on the
 
 The analysis provides insights into the performance of different marketing channels, helping marketing professionals allocate their budget and resources more effectively to achieve the desired conversion rates and optimize their channel portfolio. It also highlights the importance of tracking and analyzing CVR to assess channel effectiveness.
 
-**Request (November 29, 2012):**
+**Request 13 (November 29, 2012):**
 
 Hi there,
 
@@ -1234,7 +1234,7 @@ Tom also mentions that he will follow up with requests to understand channel cha
 
 The analysis helps provide a clear picture of how the new marketing channel, "bsearch," is performing in terms of session volume compared to the existing "gsearch" channel.
 
-**Request (November 30, 2012):**
+**Request 14 (November 30, 2012):**
 
 Hi there,
 
@@ -1302,7 +1302,7 @@ The analysis reveals significant differences in device distribution between the 
 
 Tom's follow-up comment acknowledges the interesting insights regarding the desktop-to-mobile splits. He emphasizes the importance of recognizing these differences between the channels and suggests that further analysis is needed to optimize bids effectively. Tom expresses his appreciation for the work and encourages continued efforts in this direction.
 
-**Request (December 01, 2012):**
+**Request 15 (December 01, 2012):**
 
 Hi there,
 
@@ -1376,7 +1376,7 @@ The analysis clearly shows that the two campaigns have different conversion rate
 
 In response to the analysis, Tom acknowledges the differences in performance between the two channels and expresses his intention to adjust the bidding strategy. He plans to bid down the "bsearch" campaign based on its underperformance. This demonstrates the practical implications of the analysis on optimizing the overall paid marketing budget. Tom appreciates the work and encourages further efforts in this direction.
 
-**Request (December 22, 2012):**
+**Request 16 (December 22, 2012):**
 
 Hi there,
 
@@ -1682,7 +1682,7 @@ The answer table contains the extracted data for website sessions within the spe
 **Interpretation:**
 The query generates a dataset that can be used for analyzing business patterns. It helps in understanding how website traffic varies by different time-related attributes, such as hour, day of the week, and more. This information can be valuable for identifying trends and optimizing business operations based on the patterns observed in the data.
 
-**Request Date: January 02, 2013**
+**Request 17 Date: January 02, 2013**
 
 **Request by Cindy:**
 Good morning,
@@ -1768,7 +1768,7 @@ The results show that 2012 saw steady growth throughout the year, with significa
 Cindy's comment expresses appreciation for the provided analysis, noting the steady growth observed throughout the year and the significance of holiday-related volume increases. She acknowledges the importance of considering these patterns when planning for customer support and inventory management in 2013. Overall, Cindy finds the analysis great and valuable for future business planning.
 
 
-**Request Date: January 05, 2013**
+**Request 18 Date: January 05, 2013**
 
 **Request by Cindy:**
 Good morning,
@@ -1891,7 +1891,7 @@ The analysis reveals key information about the products sold within the specifie
 
 This analysis provides valuable insights into the performance of these products, enabling data-driven decisions and strategies for the product portfolio. It can help businesses understand which products are top performers and may indicate the need for additional marketing efforts or adjustments to product offerings.
 
-**Request (January 04, 2013):**  
+**Request 19 (January 04, 2013):**  
 Cindy has requested a deep dive analysis into the company's current flagship product to prepare for the upcoming launch of a new product. Specifically, she asks for monthly trends in sales, total revenue, and total margin generated by the business. The goal is to establish baseline data that will help in tracking the evolution of revenue and margin as the new product is introduced. This analysis will also provide insights into the company's overall growth pattern.
 
 **SQL Query:**  
@@ -1997,7 +1997,7 @@ Cindy's comment expresses her satisfaction with the analysis results, particular
 ## Product Level Website Analysis:
 The concept presented here involves a product-level website analysis aimed at understanding how customers interact with specific products and how well each product converts customers. This analysis can provide insights into the performance of individual products on the company's website and their ability to attract and convert visitors into customers.
 
-**Request:**  
+**Request 20:**  
 Cindy has requested a product-level website analysis for two specific products: "the-original-mr-fuzzy" and "the-forever-love-bear." The analysis focuses on the time period between February 1, 2013, and March 1, 2013. Specifically, she wants to know the following key metrics for each of the two products:
 1. The number of website sessions (`sessions`).
 2. The number of orders placed for each product (`orders`).
@@ -2041,7 +2041,7 @@ The analysis reveals the following insights for the specified products during th
 
 This information allows the company to evaluate how effectively each product's webpage converts visitors into customers. It also helps in identifying potential areas for improvement in the customer journey or product presentation.
 
-**Request (April 06, 2013):**  
+**Request 21 (April 06, 2013):**  
 Morgan has requested an analysis of user paths and conversion funnels on the company's website. Specifically, she is interested in understanding the clickthrough rates from the "/products" page to other product pages, comparing data before and after the launch of a new product on January 6, 2013. The analysis should include a breakdown of clickthrough rates by product.
 
 **SQL Query:**  
@@ -2127,7 +2127,7 @@ The analysis provides a comparison of user paths and clickthrough rates before a
 
 Morgan acknowledges the analysis and notes that while the percentage of sessions clicking through to "Mr. Fuzzy" has decreased, the overall clickthrough rate has improved, suggesting increased interest in the product lineup. Further analysis is suggested to examine the conversion funnels for each product individually.
 
-**Request (April 10, 2013):**  
+**Request 22 (April 10, 2013):**  
 Morgan is interested in analyzing the conversion funnels for the company's two products since January 6th. He wants to compare the conversion funnels for both products, focusing on all website traffic. The analysis should provide insights into the clickthrough rates at various stages of the conversion funnel for each product.
 
 **SQL Query:**  
@@ -2323,7 +2323,7 @@ In this specific example, product 1 has a cross-sell rate of 5.34% for product 2
 The analysis aids in understanding which products are often bought together, enabling businesses to make informed decisions about product bundling and recommendations to boost sales.
 
 
-**Request (November 22, 2013):**
+**Request 23 (November 22, 2013):**
 Cindy requested an analysis of the impact of a recent change introduced on September 25th. The change allowed customers to add a second product while on the /cart page. Cindy wanted to compare the month before and the month after the change. The specific metrics of interest were Click-Through Rate (CTR) from the /cart page, Average Products per Order, Average Order Value (AOV), and overall revenue per /cart page view.
 
 **SQL Query:**
@@ -2402,7 +2402,7 @@ The answer table displays data divided into two time periods: 'pre_cross_sell' a
 The analysis compares the month before and the month after the cross-sell feature was implemented. The CTR from the /cart page didn't decrease, which was a concern. Instead, it remained consistent, and there were slight improvements in the number of products per order, AOV, and revenue per /cart session after the feature was introduced. While not a game changer, these positive trends suggest that the cross-sell feature has had a favorable impact on user behavior and revenue.
 
 
-**Request (January 12, 2014):**
+**Request 24 (January 12, 2014):**
 Cindy requested a pre-post analysis to compare the month before and the month after the launch of a third product, "Birthday Bear," which was introduced on December 12, 2013. The analysis should focus on several key metrics, including session-to-order conversion rate (CVR), average order value (AOV), products per order, and revenue per session.
 
 **SQL Query:**
@@ -2475,7 +2475,7 @@ The table illustrates the relationships between order items and refunds for spec
 
 This data can be valuable for assessing product refund rates and identifying patterns or issues related to specific products or orders. It allows businesses to monitor product quality and take appropriate actions to minimize refund rates.
 
-**Request (October 15, 2014):**  
+**Request 25 (October 15, 2014):**  
 Cindy requested a monthly product refund rate analysis to determine whether the quality issues with the "Mr. Fuzzy" product have been resolved. She specifically wanted to assess the product refund rates for different months, focusing on each product category.
 
 **SQL Query:**
@@ -2591,7 +2591,7 @@ For example, in the case of order '27061,' two order items had associated refund
 This analysis can help businesses understand customer behavior related to refunds and potentially identify patterns or trends related to repeat customer behavior or product quality issues.
 
 
-**Request (November 01, 2014):**
+**Request 26 (November 01, 2014):**
 Tom is interested in understanding the value of customers who have repeat sessions on the website. The company has been primarily evaluating customer value based on their first session conversion and revenue. However, if customers return for multiple sessions, they may be more valuable than initially thought. To assess this, Tom requests data on how many website visitors return for another session during the year 2014 to date.
 
 **SQL Query:**
@@ -2659,7 +2659,7 @@ The table provides valuable insights into user behavior on the website during 20
 Tom acknowledges the breakdown and expresses an interest in learning more about this pattern, suggesting future steps to explore the value of customers with repeat sessions further.
 
 
-**Request (November 03, 2014):**
+**Request 27 (November 03, 2014):**
 Tom is curious to understand the behavior of repeat customers who return to the website. Specifically, he wants to know the minimum, maximum, and average time between a customer's first session and their second session for those who do come back. The analysis should cover the period from January 1, 2014, to November 3, 2014.
 
 **SQL Query:**
@@ -2724,7 +2724,7 @@ The analysis reveals that, on average, customers who return to the website for a
 Tom finds this data interesting and suggests investigating the channels that these returning visitors are using, indicating potential plans for further analysis.
 
 
-**Request (November 05, 2014):**
+**Request 28 (November 05, 2014):**
 Tom wants to explore the behavior of repeat customers and understand the channels through which they return to the website. He's particularly interested in whether these customers are mainly coming back through direct type-ins or if paid search ads play a role. Tom suggests comparing new and repeat sessions by channel, with a focus on data from 2014 to the current date.
 
 **SQL Query:**
@@ -2787,7 +2787,7 @@ Tom notes that most repeat visitors are returning through organic search, direct
 Tom's comment reflects his interest in the analysis results. He finds it valuable to discover that many repeat customers return through channels that do not involve significant ad spend. He's now considering whether these repeat sessions lead to order conversions, indicating his intent to explore this aspect further.
 
 
-**Request (November 08, 2014):**
+**Request 29 (November 08, 2014):**
 Morgan is interested in conducting a comparison of conversion rates and revenue per session for repeat sessions and new sessions. The analysis will focus on data from 2014 year-to-date.
 
 **SQL Query:**
