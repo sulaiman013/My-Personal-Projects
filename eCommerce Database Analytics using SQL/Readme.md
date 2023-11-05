@@ -909,3 +909,190 @@ This query is a continuation of the analysis, using the same CTEs (CTE1 and CTE2
 
 In summary, these SQL queries and the resulting tables help assess and optimize the conversion funnel's performance for "/lander-2" traffic, particularly for users interested in "Mr. Fuzzy." The click-through rates indicate how well users are transitioning from one step to the next in the funnel.
 
+**Request (September 5, 2012):**
+
+Morgan, the requester, is interested in understanding the user journey of "gsearch" visitors on their website, specifically, how visitors navigate from the "/lander-1" page to placing an order. The objective is to create a full conversion funnel analysis, breaking down how many customers successfully complete each step of the process. The analysis should start at the "/lander-1" page and encompass the entire journey to the "thank you" page. The data used for this analysis spans from August 5th to September 5th, 2012.
+
+**SQL Query 1 (Counting Users at Each Funnel Step):**
+
+```sql
+WITH
+-- Step 1: Select All Pageviews for Relevant Sessions (CTE1)
+cte1 AS (
+    SELECT a.website_session_id, b.pageview_url, b.created_at as pageview_created_at,
+    CASE WHEN pageview_url = '/products' THEN 1 ELSE 0 END AS product_page,
+    CASE WHEN pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS mrfuzzy_page,
+    CASE WHEN pageview_url = '/cart' THEN 1 ELSE 0 END AS cart_page,
+    CASE WHEN pageview_url = '/shipping' THEN 1 ELSE 0 END AS shipping_page,
+    CASE WHEN pageview_url = '/billing' THEN 1 ELSE 0 END AS billing_page,
+    CASE WHEN pageview_url = '/thank-you-for-your-order' THEN 1 ELSE 0 END AS thanks_page
+    FROM website_sessions a
+    LEFT JOIN website_pageviews b ON a.website_session_id = b.website_session_id
+    WHERE a.created_at BETWEEN '2012-08-05' AND '2012-09-05'
+    AND utm_source = "gsearch"
+    AND utm_campaign = "nonbrand"
+    AND b.pageview_url IN ('/lander-1', '/products', '/the-original-mr-fuzzy', '/cart', '/shipping', '/billing', '/thank-you-for-your-order')
+    ORDER BY 1, 3
+),
+-- Step 2: Identify Each Relevant Pageview as a Funnel Step (CTE2)
+cte2 AS (
+    SELECT website_session_id, 
+    MAX(product_page) AS product_made_it,
+    MAX(mrfuzzy_page) AS mrfuzzy_made_it,
+    MAX(cart_page) AS cart_made_it,
+    MAX(shipping_page) AS shipping_made_it,
+    MAX(billing_page) AS billing_made_it,
+    MAX(thanks_page) AS thanks_made_it
+    FROM cte1
+    GROUP BY 1
+)
+-- Step 3: Create the Session-Level Conversion Funnel View (Main Query)
+SELECT 
+    COUNT(DISTINCT website_session_id) AS sessions,
+    COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END) AS to_product,
+    COUNT(DISTINCT CASE WHEN mrfuzzy_made_it = 1 THEN website_session_id ELSE NULL END) AS to_mrfuzzy,
+    COUNT(DISTINCT CASE WHEN cart_made_it = 1 THEN website_session_id ELSE NULL END) AS to_cart,
+    COUNT(DISTINCT CASE WHEN shipping_made_it = 1 THEN website_session_id ELSE NULL END) AS to_shipping,
+    COUNT(DISTINCT CASE WHEN billing_made_it = 1 THEN website_session_id ELSE NULL END) AS to_billing,
+    COUNT(DISTINCT CASE WHEN thanks_made_it = 1 THEN website_session_id ELSE NULL END) AS to_thanks
+FROM cte2;
+```
+
+**Explanation of Query 1:**
+
+1. **Step 1 (CTE1)** selects relevant pageviews for sessions within the specified date range, focusing on "gsearch" visitors who arrived via the "nonbrand" campaign. It matches specific pageview URLs that correspond to the conversion funnel steps and assigns binary values to track if a session reached a particular step.
+
+2. **Step 2 (CTE2)** summarizes the data by grouping it based on the website session. It calculates binary values for each session, indicating whether they reached the '/products,' '/the-original-mr-fuzzy,' '/cart,' '/shipping,' '/billing,' and '/thank-you-for-your-order' pages.
+
+3. **Step 3 (Main Query)** calculates the following metrics:
+   - `sessions`: The total number of distinct sessions that meet the criteria.
+   - `to_product`: The number of sessions that reached the '/products' page (the first step of the funnel).
+   - `to_mrfuzzy`: The number of sessions that reached the '/the-original-mr-fuzzy' page.
+   - `to_cart`: The number of sessions that reached the '/cart' page.
+   - `to_shipping`: The number of sessions that reached the '/shipping' page.
+   - `to_billing`: The number of sessions that reached the '/billing' page.
+   - `to_thanks`: The number of sessions that reached the '/thank-you-for-your-order' page (the final step of the funnel).
+
+**ANSWER:**
+
+| # sessions | to_product | to_mrfuzzy | to_cart | to_shipping | to_billing | to_thanks |
+|------------|------------|------------|---------|-------------|------------|-----------|
+| 4493       | 2115       | 1567       | 683     | 455         | 361        | 158       |
+
+**SQL Query 2 (Calculating Click-Through Rates):**
+
+```sql
+WITH
+-- Reusing the CTE1 and CTE2 from Query 1
+-- Step 3: Create the Session-Level Conversion Funnel View (Main Query)
+SELECT 
+    COUNT(DISTINCT website_session_id) AS sessions,
+    ROUND((COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END) / COUNT(DISTINCT website_session_id) * 100), 2) AS lander_clickthrough_rate,
+    ROUND((COUNT(DISTINCT CASE WHEN mrfuzzy_made_it = 1 THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END) * 100), 2) AS product_clickthrough_rate,
+    ROUND((COUNT(DISTINCT CASE WHEN cart_made_it = 1 THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN mrfuzzy_made_it = 1 THEN website_session_id ELSE NULL END) * 100), 2) AS mrfuzzy_clickthrough_rate,
+    ROUND((COUNT(DISTINCT CASE WHEN shipping_made_it = 1 THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN cart_made_it = 1 THEN website_session_id ELSE NULL END) * 100), 2) AS cart_clickthrough_rate,
+    ROUND((COUNT(DISTINCT CASE WHEN billing_made_it = 1 THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN shipping_made_it = 1 THEN website_session_id ELSE NULL END) * 100), 2) AS shipping_clickthrough_rate,
+    ROUND((COUNT(DISTINCT CASE WHEN thanks_made_it = 1 THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN billing_m
+
+ade_it = 1 THEN website_session_id ELSE NULL END) * 100), 2) AS billing_clickthrough_rate
+FROM cte2;
+```
+
+**Explanation of Query 2:**
+
+This query calculates the click-through rates between each step of the conversion funnel. It builds upon the CTEs created in Query 1.
+
+- `lander_clickthrough_rate`: The percentage of sessions that proceed from "/lander-1" to "/products."
+- `product_clickthrough_rate`: The percentage of sessions that progress from "/products" to "/the-original-mr-fuzzy," relative to those who reached "/products."
+- `mrfuzzy_clickthrough_rate`: The percentage of sessions that advance from "/the-original-mr-fuzzy" to "/cart," relative to those who reached "/the-original-mr-fuzzy."
+- `cart_clickthrough_rate`: The percentage of sessions that continue from "/cart" to "/shipping," relative to those who reached "/cart."
+- `shipping_clickthrough_rate`: The percentage of sessions that move from "/shipping" to "/billing," relative to those who reached "/shipping."
+- `billing_clickthrough_rate`: The percentage of sessions that reach the "/thank-you-for-your-order" page after "/billing," relative to those who reached "/billing."
+
+**ANSWER:**
+
+| # sessions | lander_clickthrough_rate | product_clickthrough_rate | mrfuzzy_clickthrough_rate | cart_clickthrough_rate | shipping_clickthrough_rate | billing_clickthrough_rate |
+|------------|--------------------------|---------------------------|---------------------------|------------------------|----------------------------|---------------------------|
+| 4493       | 47.07                    | 74.09                     | 43.59                     | 66.62                  | 79.34                      | 43.77                     |
+
+**Interpretation of the Answers:**
+
+- Out of 4,493 sessions initiated at "/lander-1," 2,115 sessions proceeded to the "/products" page (to_product).
+- Subsequently, 1,567 sessions reached the "/the-original-mr-fuzzy" page (to_mrfuzzy).
+- Of those, 683 sessions made it to the "/cart" page (to_cart).
+- The funnel continues, with 455 sessions reaching the "/shipping" page (to_shipping).
+- 361 sessions progressed to the "/billing" page (to_billing).
+- Finally, 158 sessions successfully completed the funnel, landing on the "/thank-you-for-your-order" page (to_thanks).
+
+**Comment by the Requester:**
+
+The requester's comment in the initial email expressed the desire to understand where visitors arriving from "gsearch" lose interest in their website. The request specifically asked for a full conversion funnel analysis to track the number of customers at each step of the process. The data used for analysis spans from August 5th to September 5th, 2012.
+
+The analysis enables the requester to pinpoint which step in the conversion process has the highest drop-off rate, providing insights for optimization and potential improvements.
+
+**Request (November 10, 2012):**
+
+Morgan, the requester, inquired about the effectiveness of an updated billing page, denoted as "/billing-2," compared to the original "/billing" page. The objective was to determine what percentage of sessions on these pages ultimately led to a successful order placement. It's worth noting that this test encompassed all website traffic, not just "gsearch" visitors. The request was made on November 10, 2012.
+
+**SQL Query:**
+
+```sql
+-- First, finding the starting point to frame the analysis
+SELECT MIN(website_pageview_id) AS first_entry 
+FROM website_pageviews
+WHERE pageview_url = '/billing-2';
+-- 53550 is the first entry pageview id
+
+WITH
+-- CTE1: Joining Website Pageviews and Orders
+cte1 AS (
+    SELECT a.website_session_id, a.pageview_url AS billing_version_seen, b.order_id
+    FROM website_pageviews a
+    LEFT JOIN orders b ON b.website_session_id = a.website_session_id
+    WHERE a.created_at < '2012-11-10' -- Time of assignment
+    AND a.website_pageview_id >= 53550 -- First pageview id
+    AND a.pageview_url IN ('/billing', '/billing-2')
+)
+-- Main Query: Calculate Billing Page Conversion Metrics
+SELECT billing_version_seen,
+    COUNT(DISTINCT website_session_id) AS sessions,
+    COUNT(DISTINCT order_id) AS orders,
+    ROUND((COUNT(DISTINCT order_id) / COUNT(DISTINCT website_session_id)) * 100, 2) AS billing_order_rt
+FROM cte1
+GROUP BY billing_version_seen;
+```
+
+**Explanation of the Query:**
+
+The SQL query's purpose is to compare the performance of two billing pages, "/billing" and "/billing-2," in terms of their ability to convert visitors into customers.
+
+1. The initial part of the query determines the starting point for the analysis. It identifies the earliest pageview ID for the "/billing-2" page. In this case, the first entry pageview ID is found to be 53550.
+
+2. The query uses a Common Table Expression (CTE), denoted as `cte1`, to join website pageviews and order data. It selects relevant sessions where pageviews occurred before November 10, 2012 (the time of assignment) and had a pageview ID greater than or equal to 53550. It filters the data for both "/billing" and "/billing-2" pages.
+
+3. In the main part of the query, it calculates the following metrics for each billing page version:
+   - `billing_version_seen`: Indicates the version of the billing page (either "/billing" or "/billing-2").
+   - `sessions`: The count of distinct website sessions that viewed the respective billing page.
+   - `orders`: The count of distinct orders placed by users who viewed the billing page.
+   - `billing_order_rt`: The percentage of sessions that resulted in orders on the respective billing page.
+
+**ANSWER:**
+
+| # billing_version_seen | sessions | orders | billing_order_rt |
+|------------------------|----------|--------|------------------|
+| /billing               | 657      | 300    | 45.66            |
+| /billing-2             | 654      | 410    | 62.69            |
+
+**Interpretation of the Answer:**
+
+The query yields the following results for the two billing page versions:
+
+- For "/billing," there were 657 sessions, resulting in 300 orders, with a billing page order conversion rate of 45.66%.
+- For "/billing-2," there were 654 sessions, resulting in 410 orders, with a billing page order conversion rate of 62.69%.
+
+**Comment by the Requester (November 10, 2012):**
+
+Morgan expresses enthusiasm upon receiving the results, as it indicates that the new billing page version ("/billing-2") is significantly outperforming the original billing page ("/billing") in converting customers. The requester plans to have the engineering team roll out the new billing page version to all customers immediately. Morgan acknowledges that the insights provided through this analysis have contributed to a substantial increase in revenue.
+
+This comment reflects the positive impact of data-driven decision-making on the company's bottom line.
+
