@@ -106,3 +106,160 @@ When assessing the session-to-order conversion rates, 'g_ad_1' shows a rate of 3
 
 In summary, this analysis provides insights into the effectiveness of various traffic sources in driving sessions and orders, with 'g_ad_1' being the most significant contributor to both sessions and orders. Understanding these conversion rates is crucial for optimizing our marketing strategies and improving the overall business performance.
 
+**Analysis of Website Sessions – UTM Source Breakdown**
+
+**Request Explanation:**
+Cindy, the date requested is April 12, 2012. The objective is to gain insights into the bulk of website sessions leading up to that date, specifically focusing on the breakdown by UTM source, campaign, and referring domain if available.
+
+**SQL Query:**
+```sql
+select utm_content, utm_campaign, http_referer, count(DISTINCT website_session_id) as sessions
+from website_sessions
+where created_at < '2012-04-12'
+GROUP BY utm_content, utm_campaign, http_referer
+ORDER BY sessions DESC;
+```
+
+**SQL Query Explanation:**
+
+1. `select utm_content, utm_campaign, http_referer, count(DISTINCT website_session_id) as sessions`: This part of the query selects the relevant columns from the `website_sessions` table, including UTM content, UTM campaign, HTTP referer, and calculates the count of distinct website session IDs, which represents the number of sessions.
+
+2. `from website_sessions`: It specifies the source table from which the data is retrieved, which is the `website_sessions` table.
+
+3. `where created_at < '2012-04-12'`: This clause filters the data based on the `created_at` column, ensuring that only records with a creation date before April 12, 2012, are included in the analysis.
+
+4. `GROUP BY utm_content, utm_campaign, http_referer`: This clause groups the data by UTM content, UTM campaign, and HTTP referer, allowing for a breakdown of sessions by these parameters.
+
+5. `ORDER BY sessions DESC`: The results are then ordered in descending order based on the number of sessions, with the most significant number of sessions appearing first in the output.
+
+**Result:**
+
+| utm_content | utm_campaign | http_referer            | sessions |
+|-------------|--------------|-------------------------|----------|
+| g_ad_1      | nonbrand     | https://www.gsearch.com | 3613     |
+|             |              |                         | 28       |
+|             |              | https://www.gsearch.com | 27       |
+| g_ad_2      | brand        | https://www.gsearch.com | 26       |
+|             | 7            | https://www.bsearch.com |          |
+| b_ad_2      | brand        | https://www.bsearch.com | 7        |
+
+**Interpretation:**
+
+The provided data showcases a comprehensive breakdown of website sessions, sorted by UTM source, campaign, and referring domain. It's apparent that 'g_ad_1' nonbrand sessions from 'https://www.gsearch.com' dominate with 3613 sessions. Notably, there are several entries with null values for UTM content and campaign, which collectively contribute 28 sessions.
+
+**Follow-up:**
+
+As we observe the dominance of 'g_ad_1' nonbrand sessions, it is advisable to conduct a more detailed analysis of this particular source to identify optimization opportunities. To gain further insights and establish next steps, involving Tom for his expertise is a practical course of action.
+
+**Request:**
+
+Tom wants to determine the conversion rate (CVR) from website sessions to orders, specifically focusing on sessions generated through the "gsearch" source with a "nonbrand" campaign. The goal is to calculate whether the CVR meets the minimum threshold of 4% needed to make the financial numbers work. If the CVR is below this threshold, adjustments to reduce search bids might be necessary. Tom's request aims to evaluate the economic viability of their paid search campaigns.
+
+**SQL Query:**
+```sql
+SELECT Count(DISTINCT a.website_session_id)    AS sessions,
+       Count(DISTINCT b.order_id)              AS orders,
+       Round(( Count(DISTINCT b.order_id) / Count(DISTINCT
+             a.website_session_id) ) * 100, 2) AS CVR
+FROM   website_sessions a
+       LEFT JOIN orders b
+              ON b.website_session_id = a.website_session_id
+WHERE  a.created_at < '2012-04-14' 
+       AND utm_source = "gsearch"
+       AND utm_campaign = "nonbrand"
+ORDER  BY 3 DESC; 
+```
+
+**SQL Query Explanation:**
+- The query calculates the CVR by counting the number of distinct website sessions and orders.
+- It computes the CVR by dividing the number of orders by the number of sessions and then multiplying by 100 to express it as a percentage.
+- The query filters data based on the "gsearch" source and "nonbrand" campaign to focus on sessions from this specific marketing channel.
+- Results are sorted in descending order based on the CVR.
+
+**Answer:**
+| # sessions | orders | CVR  |
+|------------|--------|------|
+| 3895       | 112    | 2.88 |
+
+**Answer Interpretation:**
+The analysis shows that the CVR for sessions generated through the "gsearch" source with a "nonbrand" campaign is approximately 2.88%. This CVR falls short of the 4% threshold needed to make the economics work for the paid search campaigns. Consequently, there is a need to reduce search bids since the current conversion rate indicates that they are over-spending.
+
+**Comment by Tom:**
+Tom acknowledges the analysis and mentions that, based on the findings, they need to dial down their search bids. The reason for this is that they are currently over-spending on their campaigns due to the lower-than-desired conversion rate. The analysis has helped them make more cost-effective decisions and saved them money.
+
+**Request:**
+The request is to analyze traffic sources and bid optimization based on website sessions and orders data. The goal is to understand the value of different segments of paid traffic for bid optimization.
+
+**Query 1: Trended Sessions**
+This query calculates the trended sessions by year and week. It focuses on sessions falling within the specified `website_session_id` range. The results include the year, week, the start date of the week, and the number of sessions for each week.
+
+```sql
+select year(created_at), week(created_at),
+min(date(created_at)) as week_start,
+count(DISTINCT website_session_id) as sessions
+from website_sessions
+where website_session_id BETWEEN 100000 AND 115000
+GROUP BY 1,2;
+```
+
+**Explanation 1:**
+The query extracts trended sessions, which are useful for understanding website traffic patterns over time. It filters sessions within the defined `website_session_id` range and groups them by year and week. The results show the number of sessions for each week, helping identify trends.
+
+**Answer 1:**
+The first answer provides trended sessions data, including the year, week, week start date, and the number of sessions for each week within the specified `website_session_id` range.
+
+**Query 2: Pivot Table in SQL using Orders Data**
+This query constructs a pivot table to analyze primary product categories' performance in terms of single-item and two-item orders. It counts the number of single-item and two-item orders for each primary product category within the specified `order_id` range.
+
+```sql
+select primary_product_id,
+count(DISTINCT case when items_purchased = 1 then order_id else null end) as count_single_item_orders,
+count(DISTINCT case when items_purchased = 2 then order_id else null end) as count_two_item_orders
+from orders 
+where order_id between 31000 AND 32000
+GROUP BY 1;
+```
+
+**Explanation 2:**
+This query creates a pivot table to show how different primary product categories perform in terms of order types. It categorizes orders as single-item or two-item orders and counts them for each primary product category within the specified `order_id` range. This analysis helps understand how products perform with different order types.
+
+**Answer 2:**
+The second answer offers a pivot table displaying the count of single-item and two-item orders for each primary product category in the specified `order_id` range.
+
+**Request (May 10, 2012):**
+The request is to analyze the trended session volume for the "gsearch nonbrand" traffic source by week. This analysis aims to determine if the bid changes made on 2012-04-15 have affected the volume of sessions for this traffic source.
+
+**Query:**
+This SQL query retrieves the week's starting date and the number of distinct website sessions for the "gsearch nonbrand" traffic source. It filters the data based on the created date and specific UTM source and campaign conditions.
+
+```sql
+SELECT Min(Date(created_at))              AS week_start,
+       Count(DISTINCT website_session_id) AS sessions
+FROM   website_sessions
+WHERE  created_at < '2012-05-10'
+       AND utm_source = "gsearch"
+       AND utm_campaign = "nonbrand"
+GROUP  BY Yearweek(created_at); 
+```
+
+**Explanation:**
+The query extracts data on the number of website sessions for "gsearch nonbrand" by weeks. It calculates the starting date of each week and counts the sessions within the specified date range. The data is grouped by the year and week of the created date.
+
+**Answer:**
+
+| # week_start | sessions |
+|--------------|----------|
+| 2012-03-19   | 896      |
+| 2012-03-25   | 956      |
+| 2012-04-01   | 1152     |
+| 2012-04-08   | 983      |
+| 2012-04-15   | 621      |
+| 2012-04-22   | 594      |
+| 2012-04-29   | 681      |
+| 2012-05-06   | 399      |
+
+The answer table presents the week's starting date and the corresponding number of sessions for "gsearch nonbrand." This data allows for the assessment of changes in session volume over time, particularly concerning the bid adjustments.
+
+**Comment by the Requester (Tom - May 10, 2012):**
+The requester acknowledges the analysis and expresses that it appears that bid changes have a significant impact on the sensitivity of "gsearch nonbrand" traffic. While the goal is to maximize volume, it's crucial not to overspend on ads, and they plan to contemplate potential strategies based on this insight.
+
