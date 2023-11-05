@@ -2397,4 +2397,196 @@ The answer table displays data divided into two time periods: 'pre_cross_sell' a
 The analysis compares the month before and the month after the cross-sell feature was implemented. The CTR from the /cart page didn't decrease, which was a concern. Instead, it remained consistent, and there were slight improvements in the number of products per order, AOV, and revenue per /cart session after the feature was introduced. While not a game changer, these positive trends suggest that the cross-sell feature has had a favorable impact on user behavior and revenue.
 
 
+**Request (January 12, 2014):**
+Cindy requested a pre-post analysis to compare the month before and the month after the launch of a third product, "Birthday Bear," which was introduced on December 12, 2013. The analysis should focus on several key metrics, including session-to-order conversion rate (CVR), average order value (AOV), products per order, and revenue per session.
+
+**SQL Query:**
+```sql
+select 
+case when a.created_at < '2013-12-12' then 'Pre_Birthday_Bear'
+when a.created_at >= '2013-12-12' then 'Post_Birthday_Bear'
+else 'others' end as time_period,
+count(DISTINCT b.order_id)/count(DISTINCT a.website_session_id) as cvr,
+sum(b.price_usd)/count(DISTINCT b.order_id) as average_order_value,
+sum(b.items_purchased)/count(DISTINCT b.order_id) as products_per_order,
+sum(b.price_usd)/count(DISTINCT a.website_session_id) as revenue_per_session
+from website_sessions a
+left join orders b on b.website_session_id = a.website_session_id
+where a.created_at between '2013-11-12' and '2014-01-12'
+GROUP BY 1;
+```
+
+**Explanation:**
+This SQL query conducts a pre-post analysis of key performance metrics after launching the "Birthday Bear" product. It categorizes data into two time periods: "Pre_Birthday_Bear" and "Post_Birthday_Bear," which correspond to the month before and after the product launch. The metrics analyzed include CVR, AOV, products per order, and revenue per session.
+
+**Answer Table:**
+
+| # time_period      | cvr    | average_order_value | products_per_order | revenue_per_session |
+|--------------------|--------|---------------------|--------------------|---------------------|
+| Post_Birthday_Bear | 0.0702 | 56.931319           | 1.1234             | 3.998763            |
+| Pre_Birthday_Bear  | 0.0608 | 54.226502           | 1.0464             | 3.298677            |
+
+The answer table shows the results of the pre-post analysis, presenting metrics for the "Pre_Birthday_Bear" and "Post_Birthday_Bear" time periods.
+
+**Interpretation:**
+The analysis reveals that all critical metrics have improved since the launch of the third product, "Birthday Bear." The post-launch period ("Post_Birthday_Bear") has a higher CVR, AOV, products per order, and revenue per session. These improvements indicate the positive impact of the new product on the website's performance and revenue.
+
+**Comment by the Requester:**
+Cindy expressed her excitement about the positive results of the analysis. She noted that all critical metrics have improved since the introduction of the third product. She mentioned plans to meet with Tom to discuss increasing ad spend, considering the higher revenue per session, and the possibility of adding a fourth product.
+
+
+## Product Refund Analysis:
+Product refund analysis involves examining the refund rates for specific products to control for quality and identify potential issues that may need addressing. This analysis helps in understanding which products have a higher likelihood of being refunded and the associated refund amounts.
+
+**Request:**
+The SQL query retrieves data related to product refunds. It selects information about orders, order items, and refunds for specific order IDs (3489, 27061, and 32049). The data includes details such as order item IDs, prices, creation dates, order item refund IDs, refund amounts, and refund creation dates.
+
+**SQL Query:**
+```sql
+select a.order_id, a.order_item_id, a.price_usd, a.created_at,
+b.order_item_refund_id, b.refund_amount_usd, b.created_at
+from order_items a
+left join order_item_refunds b on b.order_item_id = a.order_item_id
+where a.order_id in (3489, 32049, 27061);
+```
+
+**Explanation:**
+The SQL query utilizes a `LEFT JOIN` between the `order_items` and `order_item_refunds` tables. It links these tables based on the `order_item_id` to associate order items with their corresponding refunds. The query selects data from order items with order IDs 3489, 27061, and 32049. The resulting dataset provides detailed information about each order item, its price, creation date, associated refunds, refund amounts, and refund creation dates.
+
+**Answer Table:**
+
+| # order_id | order_item_id | price_usd | created_at          | order_item_refund_id | refund_amount_usd | created_at          |
+|------------|---------------|-----------|---------------------|----------------------|-------------------|---------------------|
+| 3489       | 3489          | 49.99     | 2013-03-03 09:51:10 | null                 | null              | null                |
+| 27061      | 33000         | 49.99     | 2015-01-03 16:47:12 | 1505                 | 49.99             | 2015-01-12 11:47:12 |
+| 27061      | 33001         | 45.99     | 2015-01-03 16:47:12 | 1526                 | 45.99             | 2015-01-19 13:47:12 |
+| 32049      | 39671         | 49.99     | 2015-03-15 15:33:51 | 1728                 | 49.99             | 2015-03-30 21:33:51 |
+| 32049      | 39672         | 45.99     | 2015-03-15 15:33:51 | null                 | null              | null                |
+
+The answer table displays the extracted data, showing order IDs, order item IDs, prices, creation dates, order item refund IDs, refund amounts, and refund creation dates.
+
+**Interpretation:**
+The table illustrates the relationships between order items and refunds for specific orders. It shows which order items have corresponding refunds and provides information about refund amounts and creation dates. For example, for order 27061, two order items (33000 and 33001) were refunded with corresponding refund amounts and dates. Order 32049 also had refunded items, while order 3489 did not have any associated refunds.
+
+This data can be valuable for assessing product refund rates and identifying patterns or issues related to specific products or orders. It allows businesses to monitor product quality and take appropriate actions to minimize refund rates.
+
+**Request (October 15, 2014):**  
+Cindy requested a monthly product refund rate analysis to determine whether the quality issues with the "Mr. Fuzzy" product have been resolved. She specifically wanted to assess the product refund rates for different months, focusing on each product category.
+
+**SQL Query:**
+```sql
+select year(a.created_at) as year,
+month(a.created_at) as month, 
+count(DISTINCT case when product_id = 1 then a.order_item_id else null end) as p1_orders,
+count(DISTINCT case when product_id = 1 then b.order_item_id else null end)/count(DISTINCT case when product_id = 1 then a.order_item_id else null end) as p1_refund_rt,
+count(DISTINCT case when product_id = 2 then a.order_item_id else null end) as p2_orders,
+count(DISTINCT case when product_id = 2 then b.order_item_id else null end)/count(DISTINCT case when product_id = 2 then a.order_item_id else null end) as p2_refund_rt,
+count(DISTINCT case when product_id = 3 then a.order_item_id else null end) as p3_orders,
+count(DISTINCT case when product_id = 3 then b.order_item_id else null end)/count(DISTINCT case when product_id = 3 then a.order_item_id else null end) as p3_refund_rt,
+count(DISTINCT case when product_id = 4 then a.order_item_id else null end) as p4_orders,
+count(DISTINCT case when product_id = 4 then b.order_item_id else null end)/count(DISTINCT case when product_id = 4 then a.order_item_id else null end) as p4_refund_rt
+from order_items a 
+left join order_item_refunds b on a.order_item_id = b.order_item_id
+where a.created_at < '2014-10-15'
+GROUP BY 1,2;
+```
+
+**Explanation:**
+This SQL query retrieves monthly product refund rates for different products (identified by product_id) up to October 15, 2014. It calculates the number of orders and refund rates for each product category for each month.
+
+The query extracts the year and month from the created_at column to group the data by months. For each product category (p1, p2, p3, and p4), it calculates the total number of orders, the number of refunded orders, and the refund rate (the ratio of refunded orders to total orders).
+
+**Answer Table:**
+
+| # year | month | p1_orders | p1_refund_rt | p2_orders | p2_refund_rt | p3_orders | p3_refund_rt | p4_orders | p4_refund_rt |
+|--------|-------|-----------|--------------|-----------|--------------|-----------|--------------|-----------|--------------|
+| 2012   | 3     | 60        | 0.0167       | 0         | null         | 0         | null         | 0         | null         |
+| 2012   | 4     | 99        | 0.0505       | 0         | null         | 0         | null         | 0         | null         |
+| 2012   | 5     | 108       | 0.0370       | 0         | null         | 0         | null         | 0         | null         |
+| 2012   | 6     | 140       | 0.0571       | 0         | null         | 0         | null         | 0         | null         |
+| 2012   | 7     | 169       | 0.0828       | 0         | null         | 0         | null         | 0         | null         |
+| 2012   | 8     | 228       | 0.0746       | 0         | null         | 0         | null         | 0         | null         |
+| 2012   | 9     | 287       | 0.0906       | 0         | null         | 0         | null         | 0         | null         |
+| 2012   | 10    | 371       | 0.0728       | 0         | null         | 0         | null         | 0         | null         |
+| 2012   | 11    | 618       | 0.0744       | 0         | null         | 0         | null         | 0         | null         |
+| 2012   | 12    | 506       | 0.0593       | 0         | null         | 0         | null         | 0         | null         |
+| 2013   | 1     | 343       | 0.0496       | 47        | 0.0213       | 0         | null         | 0         | null         |
+| 2013   | 2     | 336       | 0.0714       | 162       | 0.0123       | 0         | null         | 0         | null         |
+| 2013   | 3     | 320       | 0.0563       | 65        | 0.0462       | 0         | null         | 0         | null         |
+| 2013   | 4     | 459       | 0.0414       | 94        | 0.0106       | 0         | null         | 0         | null         |
+| 2013   | 5     | 489       | 0.0634       | 82        | 0.0244       | 0         | null         | 0         | null         |
+| 2013   | 6     | 503       | 0.0775       | 90        | 0.0556       | 0         | null         | 0         | null         |
+| 2013   | 7     | 509       | 0.0727       | 95        | 0.0316       | 0         | null         | 0         | null         |
+| 2013   | 8     | 510       | 0.0549       | 98        | 0.0102       | 0         | null         | 0         | null         |
+| 2013   | 9     | 537       | 0.0428       | 98        | 0.0102       | 0         | null         | 0         | null         |
+| 2013   | 10    | 603       | 0.0282       | 135       | 0.0148       | 0         | null         | 0         | null         |
+| 2013   | 11    | 724       | 0.0345       | 174       | 0.0230       | 0         | null         | 0         | null         |
+| 2013   | 12    | 818       | 0.0232       | 183       | 0.0219       | 139       | 0.0719       | 0         | null         |
+| 2014   | 1     | 728       | 0.0426       | 183       | 0.0219       | 200       | 0.0650       | 0         | 0.0099       |
+| 2014   | 2     | 584       | 0.0394       | 351       | 0.0171       | 211       | 0.0664       | 202       | 0.0099       |
+| 2014   | 3     | 785       | 0.0306       | 193       | 0.0155       | 244       | 0.0697       | 205       | 0.0049       |
+| 2014   | 4     | 917       | 0.0349       | 214       | 0.0187       | 267       | 0.0674       | 259       | 0.0154       |
+| 2014   | 5     | 1030      | 0.0291       | 246       | 0.0163       | 299       | 0.0569       | 298       | 0.0067       |
+| 2014   | 6     | 893       | 0.0571       | 245       | 0.0367       | 288       | 0.0556       | 249       | 0.0241       |
+| 2014   | 7     | 961       | 0.0437       | 244       | 0.0369       | 276       | 0.0399       | 264       | 0.0152       |
+| 2014   | 8     | 958       | 0.1378       | 237       | 0.0169       | 294       | 0.0680       | 303       | 0.0066       |
+| 2014   | 9     | 1056      | 0.1326       | 251       | 0.0319       | 317       | 0.0662       | 327       | 0.0122       |
+| 2014   | 10    | 513       | 0.0273       | 135       | 0.0074       | 165       | 0.0485       | 155       | 0.0323       |
+
+SHOWING ONLY A FRACTION OF THE OUTPUT!
+The answer table presents a summary of the monthly product refund rates for different product categories.
+
+**Interpretation:**
+The table provides a historical overview of product refund rates for each product category (p1, p2, p3, and p4) from 2012 to 2014. The refund rates are calculated for each month, with a focus on the period before October 15, 2014. 
+
+This data can help Cindy assess the impact of the quality issues and determine whether the replacement of the supplier in September 2014 has resulted in lower refund rates. By comparing refund rates before and after addressing the quality issues, she can confirm if the problems with the "Mr. Fuzzy" product have been resolved.
+
+**Comment by the Requester (Cindy):**
+The requester is seeking confirmation that the quality issues have been fixed by analyzing the product refund rates. The comment is not provided in the request, so we can't offer a direct interpretation. However, Cindy likely used the analysis results to evaluate whether the quality issues have improved and made informed decisions based on the findings.
+
+## Analysing Repeat Behavior:
+This analysis focuses on understanding repeat customer behavior, specifically tracking the time it takes for customers to request refunds after making a purchase. By calculating the time gap between the order and the refund request, businesses can gain insights into customer satisfaction and identify valuable customers.
+
+**Request:**
+The SQL query aims to analyze repeat customer behavior by examining specific order items and their associated refunds. It retrieves details of order items, including their order IDs, item IDs, prices, creation timestamps, and any corresponding refunds. The key metric of interest is the number of days it takes for customers to request a refund after making a purchase. The query focuses on order IDs '3489,' '32049,' and '27061.'
+
+**SQL Query:**
+```sql
+select a.order_id, a.order_item_id, a.price_usd, a.created_at, 
+b.order_item_refund_id, b.refund_amount_usd, b.created_at,
+datediff(b.created_at, a.created_at) as days_order_to_refund
+from order_items a
+left join order_item_refunds b
+on b.order_item_id = a.order_item_id
+where a.order_id in ('3489', '32049', '27061');
+```
+
+**Explanation:**
+The SQL query retrieves information about order items and associated refunds for the specified order IDs ('3489,' '32049,' '27061'). It uses a left join to combine data from the 'order_items' table (a) and the 'order_item_refunds' table (b) based on the order item ID.
+
+The columns selected include order ID, order item ID, item price, item creation timestamp, refund information (refund ID, refund amount, and refund creation timestamp), and the calculated number of days between the order and the refund request. If there's no associated refund for an order item, the corresponding columns show 'null.'
+
+**Answer Table:**
+
+| # order_id | order_item_id | price_usd | created_at          | order_item_refund_id | refund_amount_usd | created_at          | days_order_to_refund |
+|------------|---------------|-----------|---------------------|----------------------|-------------------|---------------------|----------------------|
+| 3489       | 3489          | 49.99     | 2013-03-03 09:51:10 | null                 | null              | null                | null                 |
+| 27061      | 33000         | 49.99     | 2015-01-03 16:47:12 | 1505                 | 49.99             | 2015-01-12 11:47:12 | 9                    |
+| 27061      | 33001         | 45.99     | 2015-01-03 16:47:12 | 1526                 | 45.99             | 2015-01-19 13:47:12 | 16                   |
+| 32049      | 39671         | 49.99     | 2015-03-15 15:33:51 | 1728                 | 49.99             | 2015-03-30 21:33:51 | 15                   |
+| 32049      | 39672         | 45.99     | 2015-03-15 15:33:51 | null                 | null              | null                | null                 |
+
+The answer table presents the extracted data, showing order item details, refund details (if applicable), and the time gap in days between the order and refund request.
+
+**Interpretation:**
+The answer table provides information on specific order items (identified by order IDs '3489,' '32049,' '27061') and any associated refunds. It includes details such as order item price, creation timestamps, and refund amounts. The 'days_order_to_refund' column represents the number of days it took for a customer to request a refund after the order.
+
+For example, in the case of order '27061,' two order items had associated refunds. One item was refunded 9 days after the order, and the other item was refunded 16 days after the order.
+
+This analysis can help businesses understand customer behavior related to refunds and potentially identify patterns or trends related to repeat customer behavior or product quality issues.
+
+
+
+
+
 
