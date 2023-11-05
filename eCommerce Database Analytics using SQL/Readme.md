@@ -374,3 +374,538 @@ GROUP BY 1, yearweek(a.created_at);
 **Comment by the Requester (Tom - June 09, 2012):**
 The requester acknowledges the analysis results and expresses satisfaction with the insights. They note that the mobile performance appears to have been relatively flat or slightly declining, while desktop performance has improved due to the bid changes made based on the previous conversion rate analysis. The requester appreciates the positive direction in which things are moving.
 
+## ANALYZING TOP WEBSITE CONTENT:
+
+The goal of this analysis is to understand which pages on a website receive the most traffic. This information can help identify the most popular content and, in turn, guide improvements to enhance the user experience or business strategies.
+
+**SQL Query:**
+
+```sql
+-- Retrieve the first 100 website_pageviews
+select * from website_pageviews
+where website_pageview_id < 1000;
+```
+
+**Explanation:**
+
+This SQL query retrieves the first 100 rows from the `website_pageviews` table based on the `website_pageview_id` column. It provides a glimpse of the data, showing the pageview details, including the `website_pageview_id`, `created_at` timestamp, `website_session_id`, and the `pageview_url`.
+
+**Answer:**
+
+| # website_pageview_id | created_at          | website_session_id | pageview_url              |
+|-----------------------|---------------------|--------------------|---------------------------|
+| 1                     | 2012-03-19 08:04:16 | 1                  | /home                     |
+| 2                     | 2012-03-19 08:16:49 | 2                  | /home                     |
+| 3                     | 2012-03-19 08:26:55 | 3                  | /home                     |
+| 4                     | 2012-03-19 08:37:33 | 4                  | /home                     |
+| 5                     | 2012-03-19 09:00:55 | 5                  | /home                     |
+| 6                     | 2012-03-19 09:05:46 | 6                  | /home                     |
+| 7                     | 2012-03-19 09:06:27 | 7                  | /home                     |
+| 8                     | 2012-03-19 09:10:08 | 6                  | /products                 |
+| 9                     | 2012-03-19 09:10:52 | 6                  | /the-original-mr-fuzzy    |
+| 10                    | 2012-03-19 09:14:02 | 6                  | /cart                     |
+| ...                   | ...                 | ...                | ...                       |
+
+The answer shows a portion of the `website_pageviews` table, indicating the website pages visited during specific sessions.
+
+**SQL Query:**
+
+```sql
+-- Top-Content analysis [pages with most views]
+select pageview_url, count(DISTINCT website_pageview_id) as pageviews
+from website_pageviews
+where website_pageview_id < 1000
+GROUP BY 1
+ORDER BY 2 DESC;
+```
+
+**Explanation:**
+
+This SQL query aims to identify the most viewed website pages. It counts the distinct `website_pageview_id` values for each `pageview_url`, filtering only the records where `website_pageview_id` is less than 1000. The results are then grouped by `pageview_url` and ordered by the count of pageviews in descending order.
+
+**Answer:**
+
+| # pageview_url            | pageviews |
+|---------------------------|-----------|
+| /home                     | 523       |
+| /products                 | 195       |
+| /the-original-mr-fuzzy    | 134       |
+| /cart                     | 56        |
+| /shipping                 | 39        |
+| /billing                  | 34        |
+| /thank-you-for-your-order | 18        |
+
+The answer table displays the website pages with the most views (pageview_url) and the respective count of pageviews. The "/home" page is the most visited, with 523 pageviews.
+
+**SQL Query:**
+
+```sql
+-- Top ENTRY Pages
+with
+cte1 as(select website_session_id, min(website_pageview_id) as first_entry
+from website_pageviews
+where website_pageview_id < 1000
+GROUP BY 1)
+SELECT b.pageview_url, count(DISTINCT a.website_session_id ) as number_of_times_first_entered from cte1 a
+left join website_pageviews b on a.first_entry = b.website_pageview_id
+GROUP BY 1;
+```
+
+**Explanation:**
+
+This SQL query focuses on identifying the top entry pages. It utilizes a Common Table Expression (CTE) named `cte1` to find the first pageview (`first_entry`) for each session (`website_session_id`) from the `website_pageviews` table where `website_pageview_id` is less than 1000. It then joins the CTE with the `website_pageviews` table to find the pageview_url of the first entry. The results are grouped by `pageview_url`, and the count of distinct sessions is calculated to show how many times each page served as the entry point.
+
+**Answer:**
+
+| # pageview_url | number_of_times_first_entered |
+|----------------|-------------------------------|
+| /home          | 523                           |
+
+The answer table presents the pageview_url that served as the entry point the most, which is "/home," with 523 occurrences.
+
+In summary, this analysis provides insights into the most popular pages on the website, with "/home" being the top-viewed page and the most frequently used entry point. This information can be valuable for optimizing and tailoring content and strategies to meet user preferences and business objectives.
+
+**Request - June 09, 2012:**
+
+Hi there!
+I’m Morgan, the new Website Manager.
+Could you help me get my head around the site by pulling the most-viewed website pages, ranked by session volume?
+Thanks!
+-Morgan
+
+**SQL Query:**
+
+```sql
+select pageview_url,
+count(DISTINCT website_pageview_id) as sessions
+from website_pageviews
+where created_at < '2012-06-09'
+GROUP BY 1
+ORDER BY 2 DESC;
+```
+
+**Explanation:**
+
+In this request, Morgan, the Website Manager, asks for assistance in understanding the most-viewed website pages, ranked by session volume. The SQL query retrieves data from the `website_pageviews` table, counting the number of distinct session IDs for each `pageview_url` before June 9, 2012. The results are grouped by `pageview_url` and ordered by the count of sessions in descending order.
+
+**Answer:**
+
+| # pageview_url            | sessions |
+|---------------------------|----------|
+| /home                     | 10403    |
+| /products                 | 4239     |
+| /the-original-mr-fuzzy    | 3037     |
+| /cart                     | 1306     |
+| /shipping                 | 869      |
+| /billing                  | 716      |
+| /thank-you-for-your-order | 306      |
+
+The answer table provides a list of the most-viewed website pages, with session counts. It reveals that the homepage ("/home") received the highest number of sessions, followed by the products page and the Mr. Fuzzy page.
+
+**Comment**
+Thank you! It definitely seems like the homepage, the products page, and the Mr. Fuzzy page get the bulk of our traffic. I would like to understand traffic patterns more. I’ll follow up soon with a request to look at entry pages. Thanks! -Morgan
+
+**Request - June 12, 2012:**
+
+Hi there! Would you be able to pull a list of the top entry pages? I want to confirm where our users are hitting the site. If you could pull all entry pages and rank them on entry volume, that would be great. Thanks! -Morgan
+
+**SQL Query:**
+
+```sql
+with
+cte1 as(select website_session_id, min(website_pageview_id) as first_entry
+from website_pageviews
+where created_at < '2012-06-12'
+GROUP BY 1)
+SELECT b.pageview_url, count(DISTINCT a.website_session_id ) as number_of_times_first_entered from cte1 a
+left join website_pageviews b on a.first_entry = b.website_pageview_id
+GROUP BY 1;
+```
+
+**Explanation:**
+
+In the second request, Morgan seeks to understand the entry points of website users. The SQL query first creates a Common Table Expression (CTE) named `cte1`, which identifies the first entry page (`first_entry`) for each session before June 12, 2012. It groups the results by `website_session_id`. The main query then joins this CTE with the `website_pageviews` table to determine which pages users first enter and calculates the count of distinct sessions for each entry page.
+
+**Answer:**
+
+| # pageview_url | number_of_times_first_entered |
+|----------------|-------------------------------|
+| /home          | 10714                         |
+
+The answer table displays the top entry pages ranked by entry volume. In this case, the homepage ("/home") is the primary entry point, with 10,714 instances.
+
+**Comment:**
+In the comment following the second request, Morgan acknowledges that all the website traffic comes in through the homepage. They find it quite obvious that this is the area where they should focus on making improvements, and they hint at the possibility of follow-up requests to examine the performance of the homepage. It shows an understanding of the importance of the homepage as the initial point of interaction with users and the potential for optimization in that area. Morgan's request and comments suggest a proactive approach to website management and improvement.
+
+## LANDING PAGE PERFORMANCE & TESTING:
+
+The goal of this SQL analysis is to evaluate the performance of landing pages during a specific time period. The analysis involves multiple steps:
+1. Finding the first website pageview for relevant sessions.
+2. Identifying the landing page for each session.
+3. Counting pageviews for each session to identify "bounces" (sessions where users viewed only one page).
+4. Summarizing the total sessions and bounced sessions, categorized by landing pages.
+
+**SQL Query:**
+```sql
+WITH
+-- First website_pageview_id for relevant sessions
+cte1 AS (
+    SELECT website_session_id, MIN(website_pageview_id) AS first_entry
+    FROM website_pageviews
+    WHERE created_at BETWEEN '2014-01-01' AND '2014-02-01'
+    GROUP BY 1
+),
+-- Identifying the landing page of each session
+cte2 AS (
+    SELECT a.website_session_id, b.pageview_url AS landing_page
+    FROM cte1 a
+    LEFT JOIN website_pageviews b ON a.first_entry = b.website_pageview_id
+),
+-- Counting pageviews for each session to identify "bounces"
+cte3 AS (
+    SELECT a.website_session_id, a.landing_page, COUNT(b.website_pageview_id) AS count_of_pages_viewed
+    FROM cte2 a
+    LEFT JOIN website_pageviews b ON b.website_session_id = a.website_session_id
+    GROUP BY 1, 2
+    HAVING COUNT(b.website_pageview_id) = 1
+),
+-- Merging all sessions and bounced sessions in a single table
+cte4 AS (
+    SELECT a.landing_page, a.website_session_id, b.website_session_id AS bounced_website_session_id
+    FROM cte2 a
+    LEFT JOIN cte3 b ON a.website_session_id = b.website_session_id
+    ORDER BY a.website_session_id
+)
+-- Summarizing the total sessions and bounced sessions, by Landing Pages
+SELECT landing_page,
+       COUNT(DISTINCT website_session_id) AS sessions,
+       COUNT(DISTINCT bounced_website_session_id) AS bounced_sessions,
+       ROUND((COUNT(DISTINCT bounced_website_session_id) / COUNT(DISTINCT website_session_id)) * 100, 2) AS bounced_cvr
+FROM cte4
+GROUP BY 1
+ORDER BY bounced_cvr DESC;
+```
+
+**Explanation:**
+
+1. **cte1:** The first Common Table Expression (CTE) `cte1` identifies the first pageview (`first_entry`) for each relevant session that occurred between January 1, 2014, and February 1, 2014.
+
+2. **cte2:** The second CTE `cte2` associates each session with its landing page by joining the first pageview URL with the session ID.
+
+3. **cte3:** The third CTE `cte3` counts the number of pageviews for each session, and only includes sessions where users viewed just one page, indicating a "bounce."
+
+4. **cte4:** The fourth CTE `cte4` merges all sessions with their bounced sessions by joining `cte2` and `cte3`.
+
+5. The final query summarizes the data. It groups the results by landing pages and calculates the total sessions, bounced sessions, and the bounce rate (bounced_cvr) as a percentage of total sessions.
+
+**Answer:**
+
+| # landing_page | sessions | bounced_sessions | bounced_cvr |
+|----------------|----------|------------------|-------------|
+| /lander-3      | 4232     | 2606             | 61.58       |
+| /lander-2      | 6500     | 2855             | 43.92       |
+| /home          | 4093     | 1575             | 38.48       |
+| /products      | 1        | 0                | 0.00        |
+
+The answer table provides landing page performance data for the specified time period. It includes the landing page URLs, the number of sessions, the number of bounced sessions, and the bounce rate. The landing page "/lander-3" has the highest bounce rate at 61.58%, followed by "/lander-2" at 43.92%. The homepage "/home" and "/products" have lower bounce rates.
+
+This analysis helps in understanding how well landing pages are retaining users, and it highlights areas that may need improvement to reduce bounce rates and increase user engagement.
+
+**Request (June 14, 2012):**
+Morgan requested information about the performance of the landing page, specifically the homepage. They wanted to know the sessions, bounced sessions, and the bounce rate for traffic landing on the homepage.
+
+**SQL Query:**
+```sql
+WITH
+-- First website_pageview_id for relevant sessions
+cte1 AS (
+    SELECT website_session_id, MIN(website_pageview_id) AS first_entry
+    FROM website_pageviews
+    WHERE created_at < '2012-06-14'
+    GROUP BY 1
+),
+-- Identifying the landing page of each session
+cte2 AS (
+    SELECT a.website_session_id, b.pageview_url AS landing_page
+    FROM cte1 a
+    LEFT JOIN website_pageviews b ON a.first_entry = b.website_pageview_id
+),
+-- Counting pageviews for each session to identify "bounces"
+cte3 AS (
+    SELECT a.website_session_id, a.landing_page, COUNT(b.website_pageview_id) AS count_of_pages_viewed
+    FROM cte2 a
+    LEFT JOIN website_pageviews b ON b.website_session_id = a.website_session_id
+    GROUP BY 1, 2
+    HAVING COUNT(b.website_pageview_id) = 1
+),
+-- Merging all sessions and bounced sessions in a single table
+cte4 AS (
+    SELECT a.landing_page, a.website_session_id, b.website_session_id AS bounced_website_session_id
+    FROM cte2 a
+    LEFT JOIN cte3 b ON a.website_session_id = b.website_session_id
+    ORDER BY a.website_session_id
+)
+-- Summarizing the total sessions and bounced sessions, by Landing Pages
+SELECT landing_page,
+       COUNT(DISTINCT website_session_id) AS sessions,
+       COUNT(DISTINCT bounced_website_session_id) AS bounced_sessions,
+       ROUND((COUNT(DISTINCT bounced_website_session_id) / COUNT(DISTINCT website_session_id)) * 100, 2) AS bounced_cvr
+FROM cte4
+GROUP BY 1
+ORDER BY bounced_cvr DESC;
+```
+
+**Explanation:**
+The SQL query begins by identifying the first website pageview for relevant sessions within a specified time period. It then associates each session with its landing page and counts pageviews to identify bounced sessions (sessions with only one pageview). The data is summarized for the homepage, showing the number of sessions, bounced sessions, and the bounce rate.
+
+**Answer:**
+
+| # landing_page | sessions | bounced_sessions | bounced_cvr |
+|----------------|----------|------------------|-------------|
+| /home          | 11048    | 6538             | 59.18       |
+
+The answer table provides the requested information for the homepage. The homepage "/home" had a total of 11,048 sessions, out of which 6,538 sessions resulted in bounces, resulting in a bounce rate of 59.18%.
+
+**Comment by the Requester:**
+Morgan acknowledges the high bounce rate of almost 60% and expresses concern about the quality of paid search traffic. They plan to create a custom landing page for search and set up an experiment to analyze its performance with the help of more data. The comment indicates that Morgan intends to take actions to improve the bounce rate on the homepage.
+
+**Request (July 28, 2012):**
+Morgan requested bounce rate information for two specific landing pages, "/home" and "/lander-1." These pages were part of a 50/50 test for gsearch nonbrand traffic. Morgan wanted to evaluate the new page, "/lander-1," by comparing the bounce rates for the two pages during the time period when "/lander-1" was receiving traffic.
+
+**SQL Query:**
+```sql
+-- Finding out the /lander-1 first view date
+SELECT created_at, Min(website_pageview_id)
+FROM website_pageviews
+WHERE pageview_url = "/lander-1"
+GROUP BY 1
+LIMIT 1;
+
+WITH
+-- First website_pageview_id for relevant sessions
+cte1 AS (
+    SELECT a.website_session_id, Min(a.website_pageview_id) AS first_entry
+    FROM website_pageviews a
+    INNER JOIN website_sessions b
+    ON b.website_session_id = a.website_session_id
+    AND b.created_at > '2012-06-19'
+    AND b.created_at < '2012-07-28'
+    AND b.utm_source = "gsearch"
+    AND b.utm_campaign = "nonbrand"
+    GROUP BY 1
+),
+-- Identifying the landing page of each session
+cte2 AS (
+    SELECT a.website_session_id, b.pageview_url AS landing_page
+    FROM cte1 a
+    LEFT JOIN website_pageviews b ON a.first_entry = b.website_pageview_id
+),
+-- Counting pageviews for each session to identify "bounces"
+cte3 AS (
+    SELECT a.website_session_id, a.landing_page, COUNT(b.website_pageview_id) AS count_of_pages_viewed
+    FROM cte2 a
+    LEFT JOIN website_pageviews b ON b.website_session_id = a.website_session_id
+    GROUP BY 1, 2
+    HAVING COUNT(b.website_pageview_id) = 1
+),
+-- Merging all sessions and bounced sessions in a single table
+cte4 AS (
+    SELECT a.landing_page, a.website_session_id, b.website_session_id AS bounced_website_session_id
+    FROM cte2 a
+    LEFT JOIN cte3 b ON a.website_session_id = b.website_session_id
+    ORDER BY a.website_session_id
+)
+-- Summarizing the total sessions and bounced sessions, by Landing Pages
+SELECT landing_page,
+       COUNT(DISTINCT website_session_id) AS sessions,
+       COUNT(DISTINCT bounced_website_session_id) AS bounced_sessions,
+       ROUND((COUNT(DISTINCT bounced_website_session_id) / COUNT(DISTINCT website_session_id)) * 100, 2) AS bounce_rate
+FROM cte4
+GROUP BY 1
+ORDER BY bounce_rate DESC;
+```
+
+**Explanation:**
+The SQL query begins by identifying the first view date of the "/lander-1" landing page. It then calculates the bounce rates for both "/home" and "/lander-1" landing pages during the specified time period and for gsearch nonbrand traffic. The bounce rate is calculated as the percentage of bounced sessions out of the total sessions.
+
+**Answer:**
+
+| # landing_page | sessions | bounced_sessions | bounce_rate |
+|----------------|----------|------------------|-------------|
+| /home          | 2261     | 1319             | 58.34       |
+| /lander-1      | 2316     | 1233             | 53.24       |
+
+The answer table provides the requested information for the two landing pages. For "/home," there were 2,261 sessions with 1,319 bounced sessions, resulting in a bounce rate of 58.34%. For "/lander-1," there were 2,316 sessions with 1,233 bounced sessions, resulting in a lower bounce rate of 53.24%.
+
+**Comment by the Requester:**
+Morgan expresses satisfaction with the results, noting that the custom landing page "/lander-1" has a lower bounce rate, indicating success. Morgan plans to update campaigns to direct all nonbrand paid traffic to the new page. They also express the intention to have trends analyzed in a few weeks to ensure that things have moved in the right direction.
+
+**Request (August 31, 2012):**
+Morgan requested data related to paid search nonbrand traffic landing on two pages, "/home" and "/lander-1," trended weekly since June 1st. The goal was to confirm that the traffic routing was correct and to assess the impact of the change on the overall paid search bounce rate.
+
+**SQL Query:**
+```sql
+WITH
+-- First website_pageview_id for relevant sessions
+cte1 AS (
+    SELECT a.website_session_id, Min(a.website_pageview_id) AS first_entry, a.created_at
+    FROM website_pageviews a
+    INNER JOIN website_sessions b
+    ON b.website_session_id = a.website_session_id
+    AND a.created_at > '2012-06-01'
+    AND a.created_at < '2012-08-31'
+    AND b.utm_source = "gsearch"
+    AND b.utm_campaign = "nonbrand"
+    GROUP BY 1, 3
+),
+-- Identifying the landing page of each session
+cte2 AS (
+    SELECT a.website_session_id, a.first_entry, b.pageview_url AS landing_page, a.created_at
+    FROM cte1 a
+    LEFT JOIN website_pageviews b ON a.first_entry = b.website_pageview_id
+),
+-- Counting pageviews for each session to identify "bounces"
+cte3 AS (
+    SELECT a.website_session_id, a.first_entry, a.landing_page, Count(b.website_pageview_id) AS count_of_pages_viewed, a.created_at
+    FROM cte2 a
+    LEFT JOIN website_pageviews b ON b.website_session_id = a.website_session_id
+    GROUP BY 1, 2, 5
+)
+-- Summarizing the total sessions and bounced sessions, by Landing Pages
+SELECT Min(Date(created_at)) AS week_start,
+       Round(( Count(DISTINCT CASE WHEN count_of_pages_viewed = 1 THEN website_session_id ELSE NULL END) / Count(DISTINCT website_session_id) ) * 100, 2) AS bounce_rate,
+       Count(DISTINCT CASE WHEN landing_page = "/home" THEN website_session_id ELSE NULL END) AS home_sessions,
+       Count(DISTINCT CASE WHEN landing_page = "/lander-1" THEN website_session_id ELSE NULL END) AS lander1_sessions
+FROM cte3
+GROUP BY Yearweek(created_at);
+```
+
+**Explanation:**
+The SQL query retrieves data for two landing pages, "/home" and "/lander-1," and trends it weekly since June 1st for paid search nonbrand traffic. The query calculates the bounce rate, home sessions, and "/lander-1" sessions. Data is grouped by week using the `Yearweek` function.
+
+**Answer:**
+
+| # week_start | bounce_rate | home_sessions | lander1_sessions |
+|--------------|-------------|---------------|------------------|
+| 2012-06-01   | 60.23       | 175           | 0                |
+| 2012-06-03   | 58.71       | 792           | 0                |
+| 2012-06-10   | 61.60       | 875           | 0                |
+| 2012-06-17   | 55.82       | 492           | 350              |
+| 2012-06-24   | 58.28       | 369           | 386              |
+| 2012-07-01   | 58.21       | 392           | 388              |
+| 2012-07-08   | 56.68       | 390           | 411              |
+| 2012-07-15   | 54.24       | 429           | 421              |
+| 2012-07-22   | 51.38       | 402           | 394              |
+| 2012-07-29   | 49.71       | 33            | 995              |
+| 2012-08-05   | 53.82       | 0             | 1087             |
+| 2012-08-12   | 51.40       | 0             | 998              |
+| 2012-08-19   | 50.05       | 0             | 1012             |
+| 2012-08-26   | 53.78       | 0             | 833              |
+
+The answer table provides the requested data, showing the trend for each week. It includes the weekly start date, bounce rate, home sessions, and "/lander-1" sessions.
+
+**Comment by the Requester:**
+Morgan expresses gratitude for the provided data, indicating that both pages received traffic for a while and the full switch to the custom lander was successful. They also note that the overall bounce rate has decreased over time, which is considered positive. Morgan mentions plans for a deep dive into the site and hints at future requests.
+
+## ANALYZING & TESTING CONVERSION FUNNELS:
+
+Conversion funnel analysis is a crucial aspect of understanding and optimizing the user journey towards making a purchase or completing a specific action on a website. It involves examining the steps in the conversion flow to evaluate how many users progress through each step and how many drop off at each stage. This analysis helps businesses identify bottlenecks and opportunities for improvement in their conversion process.
+
+**Business Context:**
+
+The request seeks to perform a mini conversion funnel analysis from the "/lander-2" page to the "/cart" page. The primary objectives are to determine the number of users who reach each step in the funnel and calculate drop-off rates. This analysis is specifically focused on the "/lander-2" traffic and customers who have an interest in a product named "Mr. Fuzzy."
+
+**SQL Query 1 (Counting Users at Each Funnel Step):**
+
+```sql
+WITH
+-- Step 1: Select All Pageviews for Relevant Sessions (CTE1)
+cte1 AS (
+    SELECT a.website_session_id, b.pageview_url, b.created_at as pageview_created_at,
+    CASE WHEN pageview_url = '/products' THEN 1 ELSE 0 END AS product_page,
+    CASE WHEN pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS mrfuzzy_page,
+    CASE WHEN pageview_url = '/cart' THEN 1 ELSE 0 END AS cart_page
+    FROM website_sessions a
+    LEFT JOIN website_pageviews b ON a.website_session_id = b.website_session_id
+    WHERE a.created_at BETWEEN '2014-01-01' AND '2014-02-01'
+    AND b.pageview_url IN ('/lander-2', '/products', '/the-original-mr-fuzzy', '/cart')
+    ORDER BY 1, 3
+),
+-- Step 2: Identify Each Relevant Pageview as a Funnel Step (CTE2)
+cte2 AS (
+    SELECT website_session_id, MAX(product_page) AS product_made_it, MAX(mrfuzzy_page) AS mrfuzzy_made_it, MAX(cart_page) AS cart_made_it
+    FROM cte1
+    GROUP BY 1
+)
+-- Step 3: Create the Session-Level Conversion Funnel View (Main Query)
+SELECT 
+    COUNT(DISTINCT website_session_id) AS sessions,
+    COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END) AS to_product,
+    COUNT(DISTINCT CASE WHEN mrfuzzy_made_it = 1 THEN website_session_id ELSE NULL END) AS to_mrfuzzy,
+    COUNT(DISTINCT CASE WHEN cart_made_it = 1 THEN website_session_id ELSE NULL END) AS to_cart
+FROM cte2;
+```
+
+**Explanation of Query 1:**
+
+1. **Step 1 (CTE1)** selects relevant pageviews for sessions within the specified date range and matching specific pageview URLs that correspond to the conversion funnel steps. It assigns binary values to each pageview URL to track if a session reached a specific step.
+
+2. **Step 2 (CTE2)** summarizes the data by grouping it based on the website session. It calculates binary values for each session, indicating whether they reached the '/products,' '/the-original-mr-fuzzy,' and '/cart' pages.
+
+3. **Step 3 (Main Query)** calculates the following metrics:
+   - `sessions`: The total number of distinct sessions that meet the criteria.
+   - `to_product`: The number of sessions that reached the '/products' page (the first step of the funnel).
+   - `to_mrfuzzy`: The number of sessions that reached the '/the-original-mr-fuzzy' page (the second step of the funnel).
+   - `to_cart`: The number of sessions that reached the '/cart' page (the final step of the funnel).
+
+**Answer Table for Query 1:**
+
+| # sessions | to_product | to_mrfuzzy | to_cart |
+|------------|------------|------------|---------|
+| 10644      | 7789       | 4777       | 2889    |
+
+- `sessions`: 10,644 sessions were considered in the analysis.
+- `to_product`: 7,789 sessions progressed to the '/products' page.
+- `to_mrfuzzy`: 4,777 sessions reached the '/the-original-mr-fuzzy' page.
+- `to_cart`: 2,889 sessions advanced to the '/cart' page.
+
+**SQL Query 2 (Calculating Click-Through Rates):**
+
+```sql
+WITH
+-- Reusing the CTE1 and CTE2 from Query 1
+-- Step 3: Create the Session-Level Conversion Funnel View (Main Query)
+SELECT 
+    COUNT(DISTINCT website_session_id) AS sessions,
+    ROUND((COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END) / COUNT(DISTINCT website_session_id)) * 100, 2) AS lander_clickthrough_rate,
+    ROUND((COUNT(DISTINCT CASE WHEN mrfuzzy_made_it = 1 THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END)) * 100, 2) AS product_clickthrough_rate,
+    ROUND((COUNT(DISTINCT CASE WHEN cart_made_it = 1 THEN website_session_id ELSE NULL END) / COUNT(DISTINCT CASE WHEN mrfuzzy_made_it = 1 THEN website_session_id ELSE NULL END)) * 100, 2) AS mrfuzzy_clickthrough_rate
+FROM cte2;
+```
+
+**Explanation of Query 2:**
+
+This query is a continuation of the analysis, using the same CTEs (CTE1 and CTE2) established in Query 1. It calculates click-through rates for each step of the conversion funnel.
+
+- `lander-clickthrough_rate`: The click-through rate from '/lander-2' to '/products.'
+- `product-clickthrough_rate`: The click-through rate from '/products' to '/the-original-mr-fuzzy.'
+- `mrfuzzy-clickthrough_rate`: The click-through rate from '/the-original-mr-fuzzy' to '/cart.'
+
+**Answer Table for Query 2:**
+
+| # sessions | lander_clickthrough_rate | product_clickthrough_rate | mrfuzzy_clickthrough_rate |
+|------------|--------------------------|---------------------------|---------------------------|
+| 10644      | 73.18                    | 61.33                     | 60.48                     |
+
+- `sessions`: 10,644 sessions are part of the analysis.
+- `lander-clickthrough_rate`: The click-through rate from '/lander-2' to '/products' is 73.18%.
+- `product-clickthrough_rate`: The click-through rate from '/products' to '/the-original-mr-fuzzy' is 61.33%.
+- `mrfuzzy-clickthrough-rate`: The click-through rate from '/the-original-mr-fuzzy' to '/cart' is 60.48%.
+
+**Interpretation:**
+
+- The analysis in Query 1 provides insights into the number of users at each step of the conversion funnel. It identifies the drop-off rates as users progress through the funnel.
+- The analysis in Query 2 calculates click-through rates, which are essential for understanding the effectiveness of guiding users through each step of the funnel.
+
+In summary, these SQL queries and the resulting tables help assess and optimize the conversion funnel's performance for "/lander-2" traffic, particularly for users interested in "Mr. Fuzzy." The click-through rates indicate how well users are transitioning from one step to the next in the funnel.
+
