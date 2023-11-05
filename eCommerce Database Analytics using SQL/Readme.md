@@ -177,6 +177,7 @@ ORDER  BY 3 DESC;
 - Results are sorted in descending order based on the CVR.
 
 **Answer:**
+
 | # sessions | orders | CVR  |
 |------------|--------|------|
 | 3895       | 112    | 2.88 |
@@ -321,6 +322,7 @@ GROUP BY yearweek(created_at);
 The query retrieves website session data for both desktop and mobile devices, categorizing sessions by week. It uses conditional statements to count sessions specifically for each device type. The data is filtered based on specific date ranges, UTM source, and campaign criteria, allowing the comparison of trends for desktop and mobile devices.
 
 **Answer:**
+
 | # week_start | dtop_sessions | mob_sessions |
 |--------------|---------------|--------------|
 | 2012-04-15   | 383           | 238          |
@@ -352,6 +354,7 @@ and utm_campaign = "nonbrand"
 GROUP BY 1, yearweek(a.created_at);
 ```
 **ANSWER:**
+
 | # device_type | week_start | sessions | orders | CVR  |
 |---------------|------------|----------|--------|------|
 | desktop       | 2012-04-15 | 383      | 11     | 2.87 |
@@ -1136,7 +1139,7 @@ The query yields a table with the following columns and data:
 | # utm_content | sessions | orders | cvr   |
 |---------------|----------|--------|-------|
 | g_ad_1        | 7500     | 543    | 7.24  |
-|               | 2724     | 194    | 7.12  |
+| null          | 2724     | 194    | 7.12  |
 | social_ad_1   | 1618     | 17     | 1.05  |
 | b_ad_1        | 1614     | 109    | 6.75  |
 | g_ad_2        | 1107     | 91     | 8.22  |
@@ -1708,6 +1711,7 @@ GROUP BY 1,2;
 - The results are grouped by year and month, providing a summary of monthly session and order volumes for 2012.
 
 **Answer Table:**
+
 | # yr | month | sessions | orders |
 |------|-------|----------|--------|
 | 2012 | 3     | 1879     | 60     |
@@ -1743,6 +1747,7 @@ GROUP BY yearweek(a.created_at);
 - The results provide insights into the weekly session and order volumes for 2012.
 
 **Answer Table:**
+
 | # week_start_date | sessions | orders |
 |-------------------|----------|--------|
 | 2012-03-19        | 896      | 25     |
