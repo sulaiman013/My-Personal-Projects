@@ -1989,3 +1989,412 @@ The analysis reveals the following insights:
 
 Cindy's comment expresses her satisfaction with the analysis results, particularly regarding the improvements in conversion rates and revenue per session over time. However, she raises a valid question about whether the growth observed since January is primarily due to the new product's launch or part of the company's ongoing business improvements. To address this question, she plans to connect with Tom to conduct a more detailed analysis.
 
+## Product Level Website Analysis:
+The concept presented here involves a product-level website analysis aimed at understanding how customers interact with specific products and how well each product converts customers. This analysis can provide insights into the performance of individual products on the company's website and their ability to attract and convert visitors into customers.
+
+**Request:**  
+Cindy has requested a product-level website analysis for two specific products: "the-original-mr-fuzzy" and "the-forever-love-bear." The analysis focuses on the time period between February 1, 2013, and March 1, 2013. Specifically, she wants to know the following key metrics for each of the two products:
+1. The number of website sessions (`sessions`).
+2. The number of orders placed for each product (`orders`).
+3. The conversion rate (`cvr`) calculated as the ratio of orders to sessions.
+
+**SQL Query:**  
+```sql
+select
+    a.pageview_url,
+    count(DISTINCT a.website_session_id) as sessions,
+    count(DISTINCT b.order_id) as orders, 
+    count(DISTINCT b.order_id)/count(DISTINCT a.website_session_id) as cvr
+from website_pageviews a
+left join orders b on b.website_session_id = a.website_session_id
+where a.created_at BETWEEN '2013-02-01' AND '2013-03-01'
+and a.pageview_url in ('/the-original-mr-fuzzy', '/the-forever-love-bear')
+GROUP BY 1;
+```
+
+**Explanation:**  
+- The SQL query selects data from the `website_pageviews` table, focusing on the specified time frame (February 1, 2013, to March 1, 2013).
+- The `pageview_url` column is used to filter and group data by the two specific product pages: "/the-original-mr-fuzzy" and "/the-forever-love-bear."
+- The query calculates the following metrics for each product:
+    - `sessions`: The number of distinct website sessions, indicating how many users visited the product pages.
+    - `orders`: The number of distinct orders placed for each product.
+    - `cvr` (Conversion Rate): Calculated by dividing the number of orders by the number of sessions, providing insight into how well each product converts website visitors into customers.
+
+**Answer Table:**  
+
+| # pageview_url         | sessions | orders | cvr    |
+|------------------------|----------|--------|--------|
+| /the-forever-love-bear | 815      | 162    | 0.1988 |
+| /the-original-mr-fuzzy | 1988     | 335    | 0.1685 |
+
+The answer table displays the results of the analysis for the two specified products: "the-original-mr-fuzzy" and "the-forever-love-bear." It includes columns for `pageview_url`, `sessions`, `orders`, and `cvr` (conversion rate).
+
+**Interpretation:**  
+The analysis reveals the following insights for the specified products during the given time period:
+- "the-forever-love-bear" had 815 website sessions and 162 orders, resulting in a conversion rate (cvr) of approximately 19.88%.
+- "the-original-mr-fuzzy" had 1988 website sessions and 335 orders, resulting in a conversion rate of approximately 16.85%.
+
+This information allows the company to evaluate how effectively each product's webpage converts visitors into customers. It also helps in identifying potential areas for improvement in the customer journey or product presentation.
+
+**Request (April 06, 2013):**  
+Morgan has requested an analysis of user paths and conversion funnels on the company's website. Specifically, she is interested in understanding the clickthrough rates from the "/products" page to other product pages, comparing data before and after the launch of a new product on January 6, 2013. The analysis should include a breakdown of clickthrough rates by product.
+
+**SQL Query:**  
+```sql
+-- assignment: product pathing analysis
+/*
+1: find the relevant /products pageviews with website_session_id
+2: find the next pageview id that occurs after the product overview 
+3: find the pageview_url associated with any applicable next pageview id
+4: summarize the data and analyze the pre vs post periods
+*/
+-- step 1: finding the /products pageviews we care about
+with
+cte1 as (
+    select website_session_id, 
+    website_pageview_id,
+    created_at,
+    case when created_at < '2013-01-06' then 'A. Pre_product_2'
+         when created_at >= '2013-01-06' then 'B. Post_product_2'
+         else 'error 404! not found'
+    end as time_period
+    from website_pageviews
+    where created_at < '2013-04-06'
+    and created_at > '2012-10-06' -- start date; of 3 months before product 2 launch
+    and pageview_url = '/products'
+),
+-- 2: find the next pageview id that occurs after the product overview 
+cte2 as (
+    select a.time_period, a.website_session_id, min(b.website_pageview_id) as min_next_pageview_id
+    from cte1 a
+    left join website_pageviews b
+    on b.website_session_id = a.website_session_id
+    and b.website_pageview_id > a.website_pageview_id
+    GROUP BY 1,2
+),
+-- 3: find the pageview_url associated with any applicable next pageview id
+cte3 as (
+    select a.time_period, a.website_session_id,
+    b.pageview_url as next_pageview_url
+    from cte2 a 
+    left join website_pageviews b 
+    on b.website_pageview_id = a.min_next_pageview_id
+)
+-- 4: summarize the data and analyze the pre vs post periods
+select
+    time_period, count(DISTINCT website_session_id) as sessions,
+    count(distinct case when next_pageview_url is not null then website_session_id else null end) as w_next_pg,
+    count(distinct case when next_pageview_url is not null then website_session_id else null end)/count(DISTINCT website_session_id) as pct_w_next_pg,
+    count(distinct case when next_pageview_url = '/the-original-mr-fuzzy' then website_session_id else null end) as w_mrfuzzy,
+    count(distinct case when next_pageview_url = '/the-original-mr-fuzzy' then website_session_id else null end)/count(DISTINCT website_session_id) as pct_w_mrfuzzy,
+    count(distinct case when next_pageview_url = '/the-forever-love-bear' then website_session_id else null end) as w_lovebear,
+    count(distinct case when next_pageview_url = '/the-forever-love-bear' then website_session_id else null end)/count(DISTINCT website_session_id) as pct_w_lovebear
+from cte3
+GROUP BY 1;
+```
+
+**Explanation:**  
+This SQL query performs the following steps:
+
+**Step 1:** It selects relevant pageviews from the "/products" page within specific time periods:
+- It assigns each record to a `time_period` category based on the date (pre or post product 2 launch).
+
+**Step 2:** It identifies the next pageview that occurs after the "/products" pageview for each session and associates it with the corresponding `time_period`.
+
+**Step 3:** It determines the pageview URL associated with the identified next pageview for each session and `time_period`.
+
+**Step 4:** It summarizes the data and calculates various metrics, including the number of sessions, clickthrough rates to the next page, and clickthrough rates for specific product pages. These metrics are analyzed for the pre and post product launch periods.
+
+**Answer Table:**  
+
+| # time_period     | sessions | w_next_pg | pct_w_next_pg | w_mrfuzzy | pct_w_mrfuzzy | w_lovebear | pct_w_lovebear |
+|-------------------|----------|-----------|---------------|-----------|---------------|------------|----------------|
+| A. Pre_product_2  | 15696    | 11347     | 0.7229        | 11347     | 0.7229        | 0          | 0.0000         |
+| B. Post_product_2 | 10709    | 8200      | 0.7657        | 6654      | 0.6213        | 1546       | 0.1444         |
+
+The answer table displays the results, showing the `time_period` (pre or post product 2 launch) and metrics such as the number of sessions, clickthrough rates to the next page, and clickthrough rates for specific product pages.
+
+**Interpretation:**  
+The analysis provides a comparison of user paths and clickthrough rates before and after the launch of the new product. Some key findings include:
+- In the "Pre_product_2" period, 72.29% of sessions that viewed the "/products" page proceeded to another page.
+- In the "Post_product_2" period, the clickthrough rate increased to 76.57%.
+- The clickthrough rate to the "/the-original-mr-fuzzy" product page decreased slightly in the "Post_product_2" period, while the clickthrough rate to the "/the-forever-love-bear" product page increased significantly.
+
+Morgan acknowledges the analysis and notes that while the percentage of sessions clicking through to "Mr. Fuzzy" has decreased, the overall clickthrough rate has improved, suggesting increased interest in the product lineup. Further analysis is suggested to examine the conversion funnels for each product individually.
+
+**Request (April 10, 2013):**  
+Morgan is interested in analyzing the conversion funnels for the company's two products since January 6th. He wants to compare the conversion funnels for both products, focusing on all website traffic. The analysis should provide insights into the clickthrough rates at various stages of the conversion funnel for each product.
+
+**SQL Query:**  
+```sql
+-- step 1: select all pageviews for relevant sessions
+-- step 2: figure out which pageview urls to look for
+-- step 3: pull all pageviews and identify the funnel steps
+-- step 4: create the session-level conversion funnel view
+-- step 5: aggregate the data to assess funnel performance
+
+-- step 1: select all pageviews for relevant sessions
+create temporary table funnel
+with
+cte1 as (
+    select website_session_id, 
+    website_pageview_id, pageview_url as product_page_seen
+    from website_pageviews
+    where created_at < '2013-04-10' -- date of assignment
+    and created_at > '2013-01-06' -- product 2 launch
+    and pageview_url in ('/the-original-mr-fuzzy', '/the-forever-love-bear')
+), 
+-- step 2: figure out which pageview urls to look for    
+cte2 as (
+    select distinct pageview_url
+    from cte1 a
+    left join website_pageviews b 
+    on b.website_session_id = a.website_session_id
+    and b.website_pageview_id > a.website_pageview_id
+),
+-- step 3: pull all pageviews and identify the funnel steps
+cte3 as (
+    select a.website_session_id, 
+    a.product_page_seen, 
+    case when b.pageview_url = '/cart' then 1 else 0 end as cart_page,
+    case when b.pageview_url = '/shipping' then 1 else 0 end as shipping_page,
+    case when b.pageview_url = '/billing-2' then 1 else 0 end as billing_page,
+    case when b.pageview_url = '/thank-you-for-your-order' then 1 else 0 end as thankyou_page
+    from cte1 a
+    left join website_pageviews b 
+    on b.website_session_id = a.website_session_id
+    and b.website_pageview_id > a.website_pageview_id
+    order by 1, b.created_at
+)
+-- step 4: create the session-level conversion funnel view
+select website_session_id, 
+case when product_page_seen = '/the-original-mr-fuzzy' then 'mrfuzzy'
+when product_page_seen = '/the-forever-love-bear' then 'lovebear'
+else 'error 404!'
+end as product_seen,
+max(cart_page) as cart_made_it,
+max(shipping_page) as shipping_made_it,
+max(billing_page) as billing_made_it,
+max(thankyou_page) as thankyou_made_it
+from cte3
+GROUP BY 1,2;
+
+-- step 5: aggregate the data to assess funnel performance
+-- overall sessions per products
+select product_seen, 
+count(DISTINCT case when cart_made_it = 1 then website_session_id else null end) as to_cart,
+count(DISTINCT case when shipping_made_it = 1 then website_session_id else null end) as to_shipping,
+count(DISTINCT case when billing_made_it = 1 then website_session_id else null end) as to_billing,
+count(DISTINCT case when thankyou_made_it = 1 then website_session_id else null end) as to_thankyou
+from funnel
+GROUP BY 1;
+```
+
+**Explanation:**  
+This SQL query is divided into several steps:
+
+**Step 1:** It creates a temporary table named "funnel" and selects relevant pageviews for sessions within a specific time frame. The focus is on pageviews of two products (/the-original-mr-fuzzy and /the-forever-love-bear) after the launch of the second product on January 6th, 2013.
+
+**Step 2:** It identifies the distinct pageview URLs to look for within the selected data.
+
+**Step 3:** It pulls all pageviews and assigns funnel steps for each session. The funnel steps are identified based on specific pageview URLs (e.g., /cart, /shipping, /billing-2, /thank-you-for-your-order).
+
+**Step 4:** It creates a session-level conversion funnel view, associating sessions with the products seen and recording whether each funnel step was completed.
+
+**Step 5:** It aggregates the data to assess funnel performance. The query calculates various metrics related to conversion funnels for both products, including the number of sessions that reached different funnel steps.
+
+**Answer Tables:**  
+
+| # product_seen | to_cart | to_shipping | to_billing | to_thankyou |
+|----------------|---------|-------------|------------|-------------|
+| lovebear       | 877     | 603         | 488        | 301         |
+| mrfuzzy        | 3038    | 2084        | 1710       | 1088        |
+
+
+| # product_seen | sessions | product_page_rt | cart_page_rt | shipping_page_rt | billing_page_rt |
+|----------------|----------|-----------------|--------------|------------------|-----------------|
+| lovebear       | 1599     | 0.5485          | 0.6876       | 0.8093           | 0.6168          |
+| mrfuzzy        | 6985     | 0.4349          | 0.6860       | 0.8205           | 0.6363          |
+
+The query provides two answer tables:
+
+1. The first table shows the number of sessions that progressed through different funnel steps for both products, such as moving to the cart,
+
+ shipping, billing, and the thank-you page.
+
+2. The second table displays metrics, including product page clickthrough rates and clickthrough rates between funnel steps, for each product.
+
+**Interpretation:**  
+The analysis indicates the performance of conversion funnels for the two products, "Mr. Fuzzy" and "Love Bear," since the launch of the second product on January 6th, 2013.
+
+- The "Love Bear" product had 877 sessions that progressed to the cart, while "Mr. Fuzzy" had 3,038 sessions.
+- The clickthrough rate (CTR) from the product page to the cart page is higher for "Love Bear" (54.85%) compared to "Mr. Fuzzy" (43.49%).
+- The CTR for subsequent funnel steps, including shipping, billing, and the thank-you page, is also provided for both products.
+
+Morgan acknowledges the analysis and notes that the addition of the second product has positively impacted the overall clickthrough rate, especially in the context of the cart page. He raises the question of whether the company should consider adding a third product, suggesting that the second product has been a valuable addition to the business.
+
+
+## Cross-Selling Products:
+Cross-selling analysis involves understanding which products are frequently purchased together, enabling businesses to offer intelligent product recommendations. By identifying product pairs that have a high correlation in customer orders, companies can enhance their marketing and sales strategies to boost revenue.
+
+**Request:**
+In this analysis, the goal is to identify products that are often purchased together. The SQL query retrieves data related to cross-selling products and calculates the number of orders for each product pair. It looks for orders falling within a specific range (order_id between 10000 and 11000). The query also computes the percentage of each product's contribution to the total orders for its primary product.
+
+**SQL Query:**
+```sql
+select 
+a.primary_product_id,
+b.product_id as cross_sell_product,
+count(distinct a.order_id) as orders
+from orders a
+left join order_items b
+on b.order_id = a.order_id
+and b.is_primary_item = 0
+where a.order_id between 10000 and 11000
+group by 1,2;
+```
+
+**Explanation:**  
+The SQL query consists of a `SELECT` statement that retrieves data from the `orders` and `order_items` tables. It joins these tables using the `order_id` and filters the data to include only orders within the specified order_id range (between 10000 and 11000). The query groups the results by the primary product's ID and the cross-sell product's ID.
+
+**Answer Table:**
+
+| # primary_product_id | cross_sell_product | orders |
+|----------------------|--------------------|--------|
+| 1                    | null               | 624    |
+| 1                    | 2                  | 39     |
+| 1                    | 3                  | 68     |
+| 2                    | null               | 134    |
+| 2                    | 1                  | 5      |
+| 2                    | 3                  | 5      |
+| 3                    | null               | 113    |
+| 3                    | 1                  | 10     |
+| 3                    | 2                  | 3      |
+
+The answer table shows the primary product's ID, the cross-sell product's ID, and the number of orders where these products were purchased together.
+
+**Interpretation:**  
+The interpretation of the answer table reveals the number of orders in which specific products were cross-sold together. For example, product 1 was purchased together with product 2 in 39 orders and with product 3 in 68 orders. Similar cross-selling patterns are observed for products 2 and 3.
+
+A subsequent SQL query builds on this analysis and calculates the percentage contribution of each cross-sell product to the total orders for its primary product. The answer table presents these percentages.
+
+**SQL Query (Part 2):**
+```sql
+select 
+a.primary_product_id,
+count(distinct a.order_id) as orders,
+count(DISTINCT case when b.product_id = 1 then a.order_id else null end) as x_sell_prod1,
+count(DISTINCT case when b.product_id = 2 then a.order_id else null end) as x_sell_prod2,
+count(DISTINCT case when b.product_id = 3 then a.order_id else null end) as x_sell_prod3,
+round(count(DISTINCT case when b.product_id = 1 then a.order_id else null end)/count(distinct a.order_id)*100,2) as x_sell_prod1_rt,
+round(count(DISTINCT case when b.product_id = 2 then a.order_id else null end)/count(distinct a.order_id)*100,2) as x_sell_prod2_rt,
+round(count(DISTINCT case when b.product_id = 3 then a.order_id else null end)/count(distinct a.order_id)*100,2) as x_sell_prod3_rt
+from orders a
+left join order_items b
+on b.order_id = a.order_id
+and b.is_primary_item = 0
+where a.order_id between 10000 and 11000
+group by 1;
+```
+
+**Explanation (Part 2):**  
+This SQL query extends the analysis by calculating the cross-sell percentages. It calculates the number of orders in which each cross-sell product was purchased with its primary product and the percentage that each cross-sell product contributes to the total orders for its primary product.
+
+**Answer Table (Part 2):**
+
+| # primary_product_id | orders | x_sell_prod1 | x_sell_prod2 | x_sell_prod3 | x_sell_prod1_rt | x_sell_prod2_rt | x_sell_prod3_rt |
+|----------------------|--------|--------------|--------------|--------------|-----------------|-----------------|-----------------|
+| 1                    | 731    | 0            | 39           | 68           | 0.00            | 5.34            | 9.30            |
+| 2                    | 144    | 5            | 0            | 5            | 3.47            | 0.00            | 3.47            |
+| 3                    | 126    | 10           | 3            | 0            | 7.94            | 2.38            | 0.00            |
+
+The answer table includes the primary product's ID, the total number of orders for the primary product, and the counts and percentages of orders in which each cross-sell product was purchased with the primary product.
+
+**Interpretation (Part 2):**  
+The second answer table provides insights into the cross-selling patterns for each primary product. It shows the number of orders and the cross-sell rates for each cross-sell product associated with the primary product.
+
+In this specific example, product 1 has a cross-sell rate of 5.34% for product 2 and 9.30% for product 3, indicating that these products are frequently purchased together with product 1. Similar cross-sell rates are calculated for products 2 and 3.
+
+The analysis aids in understanding which products are often bought together, enabling businesses to make informed decisions about product bundling and recommendations to boost sales.
+
+
+**Request (November 22, 2013):**
+Cindy requested an analysis of the impact of a recent change introduced on September 25th. The change allowed customers to add a second product while on the /cart page. Cindy wanted to compare the month before and the month after the change. The specific metrics of interest were Click-Through Rate (CTR) from the /cart page, Average Products per Order, Average Order Value (AOV), and overall revenue per /cart page view.
+
+**SQL Query:**
+```sql
+-- assignment cross-sell analysis
+/*
+1: Identify the relevant /cart page views and their sessions
+2: See which of those /cart sessions clicked through to the shipping page
+3: Find the orders associated with the /cart sessions. Analyze products purchased, AOV
+4: Aggregate and analyze a summary of our findings
+*/
+
+-- Identify the relevant /cart page views and their sessions
+with
+cte1 as (select case when created_at < '2013-09-25' then 'pre_cross_sell'
+		when created_at >= '2013-09-25' then 'post_cross_sell'
+        else 'others' end as time_period,
+website_session_id as cart_session_id,
+website_pageview_id as cart_pageview_id
+from website_pageviews
+where created_at between '2013-08-25' AND '2013-10-25'
+	and pageview_url = '/cart'),
+
+-- See which of those /cart sessions clicked through to the shipping page
+cte2 as (select time_period, cart_session_id, min(b.website_pageview_id) as pv_id_after_cart
+    from cte1 a 
+    left join website_pageviews b 
+    on b.website_session_id = a.cart_session_id
+    and b.website_pageview_id > a.cart_pageview_id
+group by 1,2
+having min(b.website_pageview_id) is not null),
+
+-- Find the orders associated with the /cart sessions. Analyze products purchased, AOV
+cte3 as (select time_period, cart_session_id, order_id, items_purchased, price_usd
+from cte1 a 
+inner join orders b 
+	on a.cart_session_id = b.website_session_id),
+
+cte4 as (select a.time_period, a.cart_session_id, 
+case when b.cart_session_id is null then 0 else 1 end as clicked_to_another_page,
+case when c.order_id is null then 0 else 1 end as placed_order,
+c.items_purchased,
+c.price_usd
+from cte1 a
+	left join cte2 b
+    on a.cart_session_id = b.cart_session_id
+    left join cte3 c
+    on a.cart_session_id = c.cart_session_id
+ORDER BY 2),
+
+-- Aggregate and analyze a summary of our findings
+select time_period, 
+count(DISTINCT cart_session_id) as cart_sessions,
+sum(clicked_to_another_page) as clickthroughs,
+sum(clicked_to_another_page)/count(DISTINCT cart_session_id) as cart_ctr,
+sum(items_purchased)/sum(placed_order) as products_per_order,
+sum(price_usd)/sum(placed_order) as aov,
+sum(price_usd)/count(DISTINCT cart_session_id) as rev_per_cart_session
+from cte4
+group by 1;
+```
+
+**Explanation:**
+This SQL query follows a multi-step process to analyze the effect of the cross-sell feature introduced in September. The steps include identifying relevant /cart page views, determining which of those sessions clicked through to another page (shipping page), finding the associated orders, and then aggregating and summarizing the findings.
+
+**Answer Table:**
+
+| # time_period   | cart_sessions | clickthroughs | cart_ctr | products_per_order | aov       | rev_per_cart_session |
+|-----------------|---------------|---------------|----------|--------------------|-----------|----------------------|
+| post_cross_sell | 1975          | 1351          | 0.6841   | 1.0447             | 54.251848 | 18.431894            |
+| pre_cross_sell  | 1830          | 1229          | 0.6716   | 1.0000             | 51.416380 | 18.318842            |
+
+The answer table displays data divided into two time periods: 'pre_cross_sell' and 'post_cross_sell'. It includes metrics such as the number of /cart sessions, clickthroughs, CTR from the /cart page, products per order, AOV, and revenue per /cart session for both time periods.
+
+**Interpretation:**
+The analysis compares the month before and the month after the cross-sell feature was implemented. The CTR from the /cart page didn't decrease, which was a concern. Instead, it remained consistent, and there were slight improvements in the number of products per order, AOV, and revenue per /cart session after the feature was introduced. While not a game changer, these positive trends suggest that the cross-sell feature has had a favorable impact on user behavior and revenue.
+
+
+
