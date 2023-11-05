@@ -263,3 +263,114 @@ The answer table presents the week's starting date and the corresponding number 
 **Comment by the Requester (Tom - May 10, 2012):**
 The requester acknowledges the analysis and expresses that it appears that bid changes have a significant impact on the sensitivity of "gsearch nonbrand" traffic. While the goal is to maximize volume, it's crucial not to overspend on ads, and they plan to contemplate potential strategies based on this insight.
 
+**Request (May 11, 2012):**
+The request is to calculate conversion rates from website session to order, categorized by device type (desktop and mobile). This analysis aims to compare the performance of desktop and mobile devices. The goal is to identify whether desktop performance is superior to mobile performance, as this insight could inform bid adjustments for desktop to potentially increase sales volume.
+
+**Query:**
+This SQL query retrieves data related to website sessions and orders. It calculates the number of sessions, orders, and the conversion rate (CVR) for each device type. The data is filtered based on various conditions, including the created date and specific UTM source and campaign criteria.
+
+```sql
+SELECT a.device_type,
+       Count(DISTINCT a.website_session_id)    AS sessions,
+       Count(DISTINCT b.order_id)              AS orders,
+       Round(( Count(DISTINCT b.order_id) / Count(DISTINCT a.website_session_id) ) * 100, 2) AS CVR
+FROM   website_sessions a
+       LEFT JOIN orders b
+              ON b.website_session_id = a.website_session_id
+WHERE  a.created_at < '2012-05-11' 
+       AND utm_source = "gsearch"
+       AND utm_campaign = "nonbrand"
+GROUP BY 1
+ORDER  BY 3 DESC; 
+```
+
+**Explanation:**
+The query fetches data related to the number of website sessions and orders, and it calculates the conversion rate (CVR) for both desktop and mobile devices. It joins data from the "website_sessions" and "orders" tables based on the website session ID. The data is filtered by specific conditions, including the created date, UTM source, and campaign criteria. The result is grouped by device type and sorted by the order count in descending order.
+
+**Answer:**
+
+| # device_type | sessions | orders | CVR  |
+|---------------|----------|--------|------|
+| desktop       | 3911     | 146    | 3.73 |
+| mobile        | 2492     | 24     | 0.96 |
+
+The answer table presents the device types (desktop and mobile), along with the number of sessions, orders, and the corresponding conversion rates (CVR). This data provides insights into the performance of each device type, with desktop showing a significantly higher CVR compared to mobile.
+
+**Comment by the Requester (Tom - May 11, 2012):**
+The requester acknowledges the results and confirms their decision to increase bids specifically for desktop devices. By bidding higher, they aim to improve their ranking in auctions, which, based on the provided insights, is expected to boost sales. The requester praises the analysis and expresses gratitude for the insights.
+
+**Request (June 09, 2012):**
+In this request, the requester asks for an analysis of weekly trends for both desktop and mobile devices following recent bid changes for "gsearch nonbrand" campaigns. The analysis aims to understand the impact on website session volumes for desktop and mobile devices after the bid changes. The specified date range for the analysis is from April 15, 2012, to June 9, 2012. This period is considered the baseline for comparison.
+
+**Query:**
+This SQL query is designed to retrieve data related to website sessions. It calculates the count of sessions for both desktop and mobile devices and categorizes them by week. The data is filtered based on specific conditions, including the created date and UTM source and campaign criteria.
+
+```sql
+SELECT 
+min(date(created_at)) as week_start,
+Count(DISTINCT case when device_type = "desktop" then website_session_id else null end) AS dtop_sessions,
+Count(DISTINCT case when device_type = "mobile" then website_session_id else null end) AS mob_sessions
+FROM   website_sessions 
+WHERE  created_at >= '2012-04-15' AND created_at < '2012-06-9' 
+and utm_source = "gsearch"
+and utm_campaign = "nonbrand"
+GROUP BY yearweek(created_at);
+```
+
+**Explanation:**
+The query retrieves website session data for both desktop and mobile devices, categorizing sessions by week. It uses conditional statements to count sessions specifically for each device type. The data is filtered based on specific date ranges, UTM source, and campaign criteria, allowing the comparison of trends for desktop and mobile devices.
+
+**Answer:**
+| # week_start | dtop_sessions | mob_sessions |
+|--------------|---------------|--------------|
+| 2012-04-15   | 383           | 238          |
+| 2012-04-22   | 360           | 234          |
+| 2012-04-29   | 425           | 256          |
+| 2012-05-06   | 430           | 282          |
+| 2012-05-13   | 403           | 214          |
+| 2012-05-20   | 661           | 190          |
+| 2012-05-27   | 585           | 183          |
+| 2012-06-03   | 582           | 157          |
+
+The answer table presents the week start date, along with the number of sessions for desktop and mobile devices in each corresponding week. The data shows how session volumes have changed during the specified period, following the bid changes. This information provides insights into the impact of bid adjustments on website session volumes for different devices.
+
+**Extra Analysis:**
+An additional SQL query is provided, showing the device type, week start date, session count, order count, and conversion rate (CVR) for both desktop and mobile devices during the same date range. This extra analysis allows for a more detailed understanding of the performance of each device type.
+```sql
+SELECT a.device_type,
+min(date(a.created_at)) as week_start,
+Count(DISTINCT a.website_session_id)    AS sessions,
+       Count(DISTINCT b.order_id)              AS orders,
+       Round(( Count(DISTINCT b.order_id) / Count(DISTINCT
+             a.website_session_id) ) * 100, 2) AS CVR
+FROM   website_sessions a
+       LEFT JOIN orders b
+              ON b.website_session_id = a.website_session_id
+WHERE  a.created_at>='2012-04-15' AND a.created_at < '2012-06-9' 
+and utm_source = "gsearch"
+and utm_campaign = "nonbrand"
+GROUP BY 1, yearweek(a.created_at);
+```
+**ANSWER:**
+| # device_type | week_start | sessions | orders | CVR  |
+|---------------|------------|----------|--------|------|
+| desktop       | 2012-04-15 | 383      | 11     | 2.87 |
+| desktop       | 2012-04-22 | 360      | 13     | 3.61 |
+| desktop       | 2012-04-29 | 425      | 12     | 2.82 |
+| desktop       | 2012-05-06 | 430      | 14     | 3.26 |
+| desktop       | 2012-05-13 | 403      | 15     | 3.72 |
+| desktop       | 2012-05-20 | 661      | 25     | 3.78 |
+| desktop       | 2012-05-27 | 585      | 27     | 4.62 |
+| desktop       | 2012-06-03 | 582      | 25     | 4.30 |
+| mobile        | 2012-04-15 | 238      | 6      | 2.52 |
+| mobile        | 2012-04-22 | 234      | 1      | 0.43 |
+| mobile        | 2012-04-29 | 256      | 2      | 0.78 |
+| mobile        | 2012-05-06 | 282      | 1      | 0.35 |
+| mobile        | 2012-05-13 | 214      | 3      | 1.40 |
+| mobile        | 2012-05-20 | 190      | 0      | 0.00 |
+| mobile        | 2012-05-27 | 183      | 2      | 1.09 |
+| mobile        | 2012-06-03 | 157      | 2      | 1.27 |
+
+**Comment by the Requester (Tom - June 09, 2012):**
+The requester acknowledges the analysis results and expresses satisfaction with the insights. They note that the mobile performance appears to have been relatively flat or slightly declining, while desktop performance has improved due to the bid changes made based on the previous conversion rate analysis. The requester appreciates the positive direction in which things are moving.
+
