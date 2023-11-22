@@ -1,3 +1,5 @@
+Live Dashboard: https://app.powerbi.com/view?r=eyJrIjoiOGY4ZTgwYmItYmMwNS00ZWY0LWEyMDQtZGZmMzJmN2VjY2YzIiwidCI6ImM2ZTU0OWIzLTVmNDUtNDAzMi1hYWU5LWQ0MjQ0ZGM1YjJjNCJ9
+
 # Financial Report Analysis in Power BI
 
 ## Executive Summary
