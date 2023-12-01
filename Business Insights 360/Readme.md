@@ -1,10 +1,6 @@
-Excited to share the presentation of my latest project with #PowerBI! Presenting the "Business Insight 360 Dashboard" project, where I tried to cover almost all the information regarding the PowerBI project. 🌟
-
-🙏 A big shoutout to Dhaval Patel Sir, Hemanand Vadivel Sir, and the entire codebasics team for their unwavering support throughout this incredible journey. 🙌
-
-Presentation Video (Youtube): https://lnkd.in/gYXwkfRx
-Live interactive Power BI dashboard: https://lnkd.in/geMyMciJ
-Presentation Slides: https://lnkd.in/giVN4BTr
+Presentation Video (Youtube): https://lnkd.in/gYXwkfRx  
+Live interactive Power BI dashboard: https://lnkd.in/geMyMciJ  
+Presentation Slides: https://lnkd.in/giVN4BTr  
 
 📊 In this project, I've built a series of dashboards that offer invaluable perspectives on finance, sales, marketing, supply chain, and executive performance. The key takeaway? Data transparency leads to informed decisions, setting the stage for long-term success.
 
