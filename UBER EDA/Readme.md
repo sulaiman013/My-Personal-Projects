@@ -1,3 +1,11 @@
+Download the data here: https://drive.google.com/drive/folders/1qLiwOo9VyW3AhrG-BvUG9kr6YxJpXICj?usp=sharing
+
+***Lecture content created by: Sulaiman Ahmed.
+Sharing the content without proper credit is prohibited.
+email: sulaimanahmed013@gmail.com
+LinkedIn: www.linkedin.com/in/sulaimanahmed
+Website: www.sulaimanahmed013.wixsite.com/my-site***
+
 ## Mastering Data Analysis with Python: A Beginner's Guide to Data Collection and Visualization
 
 This comprehensive guide will walk you through the fundamental concepts of data analysis using Python, focusing on data collection, manipulation, and visualization. We'll be using popular Python libraries like Pandas, NumPy, Matplotlib, and Seaborn to illustrate these concepts with practical examples using the provided Uber ride data.
@@ -656,3 +664,10 @@ display(pivot_weekday_hour)
 ```
 
 By simply calling the `generate_pivot_table` function with different column names, we automate the process of creating and styling pivot tables, significantly reducing code duplication and improving analysis efficiency.
+
+
+***Lecture content created by: Sulaiman Ahmed.
+Sharing the content without proper credit is prohibited.
+email: sulaimanahmed013@gmail.com
+LinkedIn: www.linkedin.com/in/sulaimanahmed
+Website: www.sulaimanahmed013.wixsite.com/my-site***
