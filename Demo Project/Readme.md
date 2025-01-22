@@ -1,38 +1,43 @@
-Generate a report which contains the top 5 customers who received an
-average high pre_invoice_discount_pct for the fiscal year 2021 and in the
-Indian market. The final output contains these fields,
-customer_code
-customer
-average_discount_percentage
+### Report: Top 5 Customers with Highest Average Pre-Invoice Discount Percentage (India, FY 2021)
 
-Query:
-with indian_customer as (
-        select customer_code, customer
-        from dim_customer
-        where market = "India"
+The following table lists the top 5 customers in the Indian market who received the highest average **pre-invoice discount percentage** during the fiscal year 2021.
+
+| **Customer Code** | **Customer** | **Average Discount Percentage** |
+|--------------------|--------------|----------------------------------|
+| 90002009          | Flipkart     | 30.83%                          |
+| 90002006          | Viveks       | 30.38%                          |
+| 90002003          | Ezone        | 30.28%                          |
+| 90002002          | Croma        | 30.25%                          |
+| 90002016          | Amazon       | 29.33%                          |
+
+### Query Used
+
+```sql
+WITH indian_customer AS (
+    SELECT customer_code, customer
+    FROM dim_customer
+    WHERE market = "India"
 ),
-tbl_discount_2021 as (		
-        select customer_code, pre_invoice_discount_pct
-        from fact_pre_invoice_deductions
-        where fiscal_year = 2021
+tbl_discount_2021 AS (		
+    SELECT customer_code, pre_invoice_discount_pct
+    FROM fact_pre_invoice_deductions
+    WHERE fiscal_year = 2021
 ),
-tbl_cleaned as (
-		select a.customer_code, a.customer, b.pre_invoice_discount_pct
-        from indian_customer as a
-        join tbl_discount_2021 as b on a.customer_code = b.customer_code
+tbl_cleaned AS (
+    SELECT a.customer_code, a.customer, b.pre_invoice_discount_pct
+    FROM indian_customer AS a
+    JOIN tbl_discount_2021 AS b ON a.customer_code = b.customer_code
 ), 
-tbl_avg_discount as (
-		select customer_code, customer, pre_invoice_discount_pct
-		from tbl_cleaned
-        order by pre_invoice_discount_pct desc
-        limit 5
+tbl_avg_discount AS (
+    SELECT customer_code, customer, pre_invoice_discount_pct
+    FROM tbl_cleaned
+    ORDER BY pre_invoice_discount_pct DESC
+    LIMIT 5
 )
-select * from tbl_avg_discount;
+SELECT * FROM tbl_avg_discount;
+```
 
-| # customer_code | customer | pre_invoice_discount_pct |
-|-----------------|----------|--------------------------|
-| 90002009        | Flipkart | 0.3083                   |
-| 90002006        | Viveks   | 0.3038                   |
-| 90002003        | Ezone    | 0.3028                   |
-| 90002002        | Croma    | 0.3025                   |
-| 90002016        | Amazon   | 0.2933                   |
+### Key Observations
+
+- **Flipkart** topped the list with an average discount percentage of **30.83%**.
+- The range of discounts among the top 5 customers is fairly close, with **Amazon** at **29.33%**, just slightly behind **Croma**.
