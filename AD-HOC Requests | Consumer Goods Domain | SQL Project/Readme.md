@@ -1,35 +1,3 @@
-### Medallion Architecture in Microsoft Fabric
-
-![Lakehouse](https://yourpath/lakehouse.png) Raw Lakehouse → ![Warehouse](https://yourpath/warehouse.png) Warehouse → ![Power BI](https://yourpath/powerbi.png) Power BI
-
-```mermaid
-graph LR
-Data_Sources -->|Data Pipeline| Raw_LH[Raw Lakehouse]
-Raw_LH -->|Dataflows Gen2| Transformed_LH[Transformed Lakehouse]
-Transformed_LH -->|Dataflows Gen2| Curated_EDW[Curated Warehouse]
-Curated_EDW -->|Direct Lake| PowerBI[Power BI Reports]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Download Data from here: https://codebasics.io/challenge/codebasics-resume-project-challenge/7
 
 ## Introduction
