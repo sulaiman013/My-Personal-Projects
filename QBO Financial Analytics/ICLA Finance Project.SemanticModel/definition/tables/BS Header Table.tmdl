@@ -1,0 +1,105 @@
+/// Balance Sheet structure table - defines row layout for Balance Sheet report
+table 'BS Header Table'
+	lineageTag: 0f491a5e-c0ed-4d6b-9354-945b652bfa93
+
+	column LineItemNumber
+		dataType: int64
+		lineageTag: d4d85d4e-8c65-46e9-a96b-c4929b8a9bcc
+		sourceColumn: LineItemNumber
+
+	column LineItemDescription
+		dataType: string
+		lineageTag: e5789720-96c2-429c-bfe5-9d663ca8b22c
+		sourceColumn: LineItemDescription
+		sortByColumn: LineItemNumber
+
+		changedProperty = SortByColumn
+
+	column LineItemID
+		dataType: string
+		lineageTag: 8b8747d2-20c4-40de-9ff6-4af573704cab
+		sourceColumn: LineItemID
+
+	column Section
+		dataType: string
+		lineageTag: b9a21c72-62aa-46b6-9a30-f7dd9622417e
+		sourceColumn: Section
+
+	column Highlight
+		dataType: int64
+		lineageTag: 0257cfd4-423f-4b19-a100-99b2ce543735
+		sourceColumn: Highlight
+
+	column Level
+		dataType: int64
+		lineageTag: bd31f1ce-56e8-4595-a3b1-9cf9f38b59db
+		sourceColumn: Level
+
+	column Indent
+		dataType: int64
+		lineageTag: becf6a7b-c045-47c3-bcc3-bd13e1c5135d
+		sourceColumn: Indent
+
+	partition 'BS Header Table' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRecords({
+				        [LineItemNumber=1, LineItemDescription="Assets", LineItemID="Assets", Section="Assets", Highlight=0, Level=1, Indent=0],
+				        [LineItemNumber=2, LineItemDescription="Current Assets", LineItemID="CurrentAssets", Section="Assets", Highlight=0, Level=2, Indent=1],
+				        [LineItemNumber=3, LineItemDescription="Bank Accounts", LineItemID="BankAccounts", Section="Assets", Highlight=0, Level=3, Indent=2],
+				        [LineItemNumber=4, LineItemDescription="    Checking", LineItemID="Checking", Section="Assets", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=5, LineItemDescription="    Savings", LineItemID="Savings", Section="Assets", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=6, LineItemDescription="Total for Bank Accounts", LineItemID="TotalBankAccounts", Section="Assets", Highlight=1, Level=3, Indent=2],
+				        [LineItemNumber=7, LineItemDescription="Accounts Receivable", LineItemID="AccountsReceivable", Section="Assets", Highlight=0, Level=3, Indent=2],
+				        [LineItemNumber=8, LineItemDescription="    Accounts Receivable (A/R)", LineItemID="AR", Section="Assets", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=9, LineItemDescription="Total for Accounts Receivable", LineItemID="TotalAR", Section="Assets", Highlight=1, Level=3, Indent=2],
+				        [LineItemNumber=10, LineItemDescription="Other Current Assets", LineItemID="OtherCurrentAssets", Section="Assets", Highlight=0, Level=3, Indent=2],
+				        [LineItemNumber=11, LineItemDescription="    Inventory Asset", LineItemID="InventoryAsset", Section="Assets", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=12, LineItemDescription="    Undeposited Funds", LineItemID="UndepositedFunds", Section="Assets", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=13, LineItemDescription="Total for Other Current Assets", LineItemID="TotalOtherCurrentAssets", Section="Assets", Highlight=1, Level=3, Indent=2],
+				        [LineItemNumber=14, LineItemDescription="Total for Current Assets", LineItemID="TotalCurrentAssets", Section="Assets", Highlight=1, Level=2, Indent=1],
+				        [LineItemNumber=15, LineItemDescription="Fixed Assets", LineItemID="FixedAssets", Section="Assets", Highlight=0, Level=2, Indent=1],
+				        [LineItemNumber=16, LineItemDescription="Truck", LineItemID="Truck", Section="Assets", Highlight=0, Level=3, Indent=2],
+				        [LineItemNumber=17, LineItemDescription="    Original Cost", LineItemID="TruckOriginalCost", Section="Assets", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=18, LineItemDescription="Total for Truck", LineItemID="TotalTruck", Section="Assets", Highlight=1, Level=3, Indent=2],
+				        [LineItemNumber=19, LineItemDescription="Total for Fixed Assets", LineItemID="TotalFixedAssets", Section="Assets", Highlight=1, Level=2, Indent=1],
+				        [LineItemNumber=20, LineItemDescription="Total for Assets", LineItemID="TotalAssets", Section="Assets", Highlight=1, Level=1, Indent=0],
+				        [LineItemNumber=21, LineItemDescription="Liabilities and Equity", LineItemID="LiabilitiesAndEquity", Section="Liabilities and Equity", Highlight=0, Level=1, Indent=0],
+				        [LineItemNumber=22, LineItemDescription="Liabilities", LineItemID="Liabilities", Section="Liabilities and Equity", Highlight=0, Level=2, Indent=1],
+				        [LineItemNumber=23, LineItemDescription="Current Liabilities", LineItemID="CurrentLiabilities", Section="Liabilities and Equity", Highlight=0, Level=3, Indent=2],
+				        [LineItemNumber=24, LineItemDescription="Accounts Payable", LineItemID="AccountsPayable", Section="Liabilities and Equity", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=25, LineItemDescription="    Accounts Payable (A/P)", LineItemID="AP", Section="Liabilities and Equity", Highlight=0, Level=5, Indent=4],
+				        [LineItemNumber=26, LineItemDescription="Total for Accounts Payable", LineItemID="TotalAP", Section="Liabilities and Equity", Highlight=1, Level=4, Indent=3],
+				        [LineItemNumber=27, LineItemDescription="Credit Cards", LineItemID="CreditCards", Section="Liabilities and Equity", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=28, LineItemDescription="    Mastercard", LineItemID="Mastercard", Section="Liabilities and Equity", Highlight=0, Level=5, Indent=4],
+				        [LineItemNumber=29, LineItemDescription="Total for Credit Cards", LineItemID="TotalCreditCards", Section="Liabilities and Equity", Highlight=1, Level=4, Indent=3],
+				        [LineItemNumber=30, LineItemDescription="Other Current Liabilities", LineItemID="OtherCurrentLiabilities", Section="Liabilities and Equity", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=31, LineItemDescription="    Arizona Dept. of Revenue Payable", LineItemID="ArizonaDeptRevenue", Section="Liabilities and Equity", Highlight=0, Level=5, Indent=4],
+				        [LineItemNumber=32, LineItemDescription="    Board of Equalization Payable", LineItemID="BoardOfEqualization", Section="Liabilities and Equity", Highlight=0, Level=5, Indent=4],
+				        [LineItemNumber=33, LineItemDescription="    Loan Payable", LineItemID="LoanPayable", Section="Liabilities and Equity", Highlight=0, Level=5, Indent=4],
+				        [LineItemNumber=34, LineItemDescription="Total for Other Current Liabilities", LineItemID="TotalOtherCurrentLiabilities", Section="Liabilities and Equity", Highlight=1, Level=4, Indent=3],
+				        [LineItemNumber=35, LineItemDescription="Total for Current Liabilities", LineItemID="TotalCurrentLiabilities", Section="Liabilities and Equity", Highlight=1, Level=3, Indent=2],
+				        [LineItemNumber=36, LineItemDescription="Long-term Liabilities", LineItemID="LongTermLiabilities", Section="Liabilities and Equity", Highlight=0, Level=3, Indent=2],
+				        [LineItemNumber=37, LineItemDescription="    Notes Payable", LineItemID="NotesPayable", Section="Liabilities and Equity", Highlight=0, Level=4, Indent=3],
+				        [LineItemNumber=38, LineItemDescription="Total for Long-term Liabilities", LineItemID="TotalLongTermLiabilities", Section="Liabilities and Equity", Highlight=1, Level=3, Indent=2],
+				        [LineItemNumber=39, LineItemDescription="Total for Liabilities", LineItemID="TotalLiabilities", Section="Liabilities and Equity", Highlight=1, Level=2, Indent=1],
+				        [LineItemNumber=40, LineItemDescription="Equity", LineItemID="Equity", Section="Liabilities and Equity", Highlight=0, Level=2, Indent=1],
+				        [LineItemNumber=41, LineItemDescription="    Opening Balance Equity", LineItemID="OpeningBalanceEquity", Section="Liabilities and Equity", Highlight=0, Level=3, Indent=2],
+				        [LineItemNumber=42, LineItemDescription="    Retained Earnings", LineItemID="RetainedEarnings", Section="Liabilities and Equity", Highlight=0, Level=3, Indent=2],
+				        [LineItemNumber=43, LineItemDescription="    Net Income", LineItemID="NetIncomeBS", Section="Liabilities and Equity", Highlight=0, Level=3, Indent=2],
+				        [LineItemNumber=44, LineItemDescription="Total for Equity", LineItemID="TotalEquity", Section="Liabilities and Equity", Highlight=1, Level=2, Indent=1],
+				        [LineItemNumber=45, LineItemDescription="Total for Liabilities and Equity", LineItemID="TotalLiabilitiesAndEquity", Section="Liabilities and Equity", Highlight=1, Level=1, Indent=0]
+				    }),
+				    TypedTable = Table.TransformColumnTypes(Source, {
+				        {"LineItemNumber", Int64.Type},
+				        {"LineItemDescription", type text},
+				        {"LineItemID", type text},
+				        {"Section", type text},
+				        {"Highlight", Int64.Type},
+				        {"Level", Int64.Type},
+				        {"Indent", Int64.Type}
+				    })
+				in
+				    TypedTable
+

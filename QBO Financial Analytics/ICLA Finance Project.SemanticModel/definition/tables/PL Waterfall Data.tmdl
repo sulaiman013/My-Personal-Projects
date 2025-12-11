@@ -1,0 +1,49 @@
+table 'PL Waterfall Data'
+	lineageTag: 36aa9dab-a964-4522-8f36-771bff10cbb5
+
+	column Order
+		formatString: 0
+		lineageTag: 2e59d8aa-4348-4f4b-bbfb-a29ad44bdcb3
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Order]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		lineageTag: cece8796-36ae-4c85-a5f2-c220b87a8024
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Category]
+		sortByColumn: Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type
+		lineageTag: 74cf96fe-2555-45c1-9c08-6c77815a0317
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Type]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PL Waterfall Data' = calculated
+		mode: import
+		source = ```
+				
+				DATATABLE(
+				    "Order", INTEGER,
+				    "Category", STRING,
+				    "Type", STRING,
+				    {
+				        {1, "Total Income", "Start"},
+				        {2, "Cost of Sales", "Decrease"},
+				        {3, "Overall Expenses", "Decrease"},
+				        {4, "Net Income", "End"}
+				        
+				    }
+				)
+				```
+
+	annotation PBI_Id = 0ce53044f3a7448c8879392e5aece57a
+

@@ -1,0 +1,141 @@
+table 'Dim Account'
+	lineageTag: 52a282eb-24b2-423b-91a9-aab960a478b6
+
+	column account_key
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: 00d51dda-af7b-4542-82be-a33a6589c349
+		summarizeBy: none
+		sourceColumn: account_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_id
+		dataType: string
+		lineageTag: e4b828ab-4aad-4085-b8c0-fdc74ec5648c
+		summarizeBy: none
+		sourceColumn: account_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_name
+		dataType: string
+		lineageTag: 94194bec-2f5d-4d35-afd6-198fab6b8bc0
+		summarizeBy: none
+		sourceColumn: account_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_type
+		dataType: string
+		lineageTag: 369f5cf6-777d-4a1d-adc1-deca3f7cfe36
+		summarizeBy: none
+		sourceColumn: account_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_sub_type
+		dataType: string
+		lineageTag: c8f4b0a4-d592-463b-8e34-7762ff7648fb
+		summarizeBy: none
+		sourceColumn: account_sub_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column classification
+		dataType: string
+		lineageTag: f284e679-c213-49df-8203-e85688f23779
+		summarizeBy: none
+		sourceColumn: classification
+
+		annotation SummarizationSetBy = Automatic
+
+	column report_category
+		dataType: string
+		lineageTag: 6d3170b2-250a-4638-823d-b6824097ee3f
+		summarizeBy: none
+		sourceColumn: report_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column pl_category
+		dataType: string
+		lineageTag: d1e28fa4-a805-400f-a33f-fdc339020c84
+		summarizeBy: none
+		sourceColumn: pl_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column bs_category
+		dataType: string
+		lineageTag: d781092d-b1d0-41d9-aef1-104fd1338003
+		summarizeBy: none
+		sourceColumn: bs_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column cf_category
+		dataType: string
+		lineageTag: 9057b1da-66ae-4531-919f-63f54d6b64db
+		summarizeBy: none
+		sourceColumn: cf_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column display_order
+		dataType: int64
+		formatString: 0
+		lineageTag: a5441649-cbfe-4c5a-955a-98185253b3b8
+		summarizeBy: sum
+		sourceColumn: display_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 525786c4-6298-4c6f-9a24-69ff071c78a1
+		summarizeBy: none
+		sourceColumn: is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column fully_qualified_name
+		dataType: string
+		lineageTag: 339b19e7-441b-478d-a394-bbf66e8ef9ad
+		summarizeBy: none
+		sourceColumn: fully_qualified_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column parent_account_id
+		dataType: string
+		lineageTag: e88d5ce9-cabd-43a8-8b87-1d75ee6f9ca3
+		summarizeBy: none
+		sourceColumn: parent_account_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_level
+		dataType: int64
+		formatString: 0
+		lineageTag: e3f2c939-9df5-41f5-8ebb-2e28d8740d45
+		summarizeBy: sum
+		sourceColumn: account_level
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim Account' = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database("localhost", "icla_finance_gold", [ReturnSingleDatabase=true]),
+				    icla_finance_gold_dim_account = Source{[Schema="icla_finance_gold",Item="dim_account"]}[Data]
+				in
+				    icla_finance_gold_dim_account
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

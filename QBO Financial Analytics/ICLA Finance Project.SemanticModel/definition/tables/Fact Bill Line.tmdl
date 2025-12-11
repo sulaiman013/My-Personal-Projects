@@ -1,0 +1,137 @@
+table 'Fact Bill Line'
+	lineageTag: a41bbcd9-0bb3-4170-a9e8-9685ce621627
+
+	column line_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 15f5dc73-1e95-4381-8d2b-f99c66ecc39b
+		summarizeBy: none
+		sourceColumn: line_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column bill_id
+		dataType: string
+		lineageTag: 393232a9-cd92-4164-84e9-95f127ec94d4
+		summarizeBy: none
+		sourceColumn: bill_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column line_number
+		dataType: int64
+		formatString: 0
+		lineageTag: c1f4fb1b-fd88-4157-a933-dea0bff9bf18
+		summarizeBy: none
+		sourceColumn: line_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column bill_date_key
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c2d09f83-f384-4be9-adda-c6382ee18bc0
+		summarizeBy: none
+		sourceColumn: bill_date_key
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column vendor_key
+		dataType: int64
+		formatString: 0
+		lineageTag: e81a11a2-ecea-42a1-a90d-b2c9d13b7c56
+		summarizeBy: none
+		sourceColumn: vendor_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 247f111f-293f-4cd6-a919-c0dbbaf80aaa
+		summarizeBy: none
+		sourceColumn: account_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 85184eec-3298-4dc2-b7cd-41e91759ed7f
+		summarizeBy: none
+		sourceColumn: item_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: double
+		lineageTag: e395dbf9-8758-4381-b124-cb810c5110e5
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column unit_price
+		dataType: double
+		lineageTag: d434ce97-f669-4d05-a891-5d6a79aae0f8
+		summarizeBy: sum
+		sourceColumn: unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column amount
+		dataType: double
+		lineageTag: 3a05b829-70fb-42de-a15d-47f2b0d943bc
+		summarizeBy: sum
+		sourceColumn: amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fiscal_year
+		dataType: int64
+		formatString: 0
+		lineageTag: f73f2f72-9750-44e3-8b70-d086946edb28
+		summarizeBy: sum
+		sourceColumn: fiscal_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_month
+		dataType: int64
+		formatString: 0
+		lineageTag: e3090bd0-0cf4-4572-aee9-67c0cd3a98ed
+		summarizeBy: sum
+		sourceColumn: fiscal_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: b3653a7c-42f1-46a8-8285-419108309281
+		summarizeBy: sum
+		sourceColumn: fiscal_quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Fact Bill Line' = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database("localhost", "icla_finance_gold", [ReturnSingleDatabase=true]),
+				    icla_finance_gold_fact_bill_line = Source{[Schema="icla_finance_gold",Item="fact_bill_line"]}[Data]
+				in
+				    icla_finance_gold_fact_bill_line
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

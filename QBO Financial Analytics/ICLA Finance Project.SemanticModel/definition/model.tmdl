@@ -1,0 +1,41 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Dim Account","Dim Aging Bucket","Dim Customer","Dim Date","Dim Item","Dim Vendor","Fact AP Aging","Fact AR Aging","Fact Bill","Fact Bill Line","Fact Invoice","Fact Invoice Line","Fact Payment","_Measures","Fact PL Line","PL Header Table","BS Header Table","Fact BS Balance"]
+
+annotation PBI_ProTooling = ["DevMode","TMDLView_Desktop","MCP-PBIModeling"]
+
+ref table 'Dim Account'
+ref table 'Dim Aging Bucket'
+ref table 'Dim Customer'
+ref table 'Dim Date'
+ref table DateTableTemplate_d5c43ebc-6734-413b-9035-bf461fb7ecd6
+ref table 'Dim Item'
+ref table 'Dim Vendor'
+ref table 'Fact AP Aging'
+ref table LocalDateTable_eecccaab-b722-4c81-a994-fd03442cf510
+ref table 'Fact AR Aging'
+ref table LocalDateTable_360ab994-877a-4250-9d42-0e8e853159fa
+ref table 'Fact Bill'
+ref table LocalDateTable_be78c1c2-ab72-4c1b-a7d1-7f946ca52066
+ref table 'Fact Bill Line'
+ref table 'Fact Invoice'
+ref table LocalDateTable_fc7b76de-a87b-4e14-9bc2-b5b2b29db8e0
+ref table 'Fact Invoice Line'
+ref table 'Fact Payment'
+ref table _Measures
+ref table 'Fact PL Line'
+ref table 'PL Header Table'
+ref table 'BS Header Table'
+ref table 'Fact BS Balance'
+ref table 'PL Waterfall Data'
+
+ref cultureInfo en-US
+

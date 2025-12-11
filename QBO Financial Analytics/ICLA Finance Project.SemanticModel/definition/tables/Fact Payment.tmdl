@@ -1,0 +1,107 @@
+table 'Fact Payment'
+	lineageTag: dbc300ba-3318-4131-973f-7a424d4847a0
+
+	column payment_key
+		dataType: int64
+		formatString: 0
+		lineageTag: d4cb1d90-fdcd-4bec-a96c-ebb0e9d8615e
+		summarizeBy: none
+		sourceColumn: payment_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_id
+		dataType: string
+		lineageTag: 59afdec2-b4d3-45d7-959e-78df8b0162eb
+		summarizeBy: none
+		sourceColumn: payment_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_type
+		dataType: string
+		lineageTag: 260d4e39-8d37-4249-bf59-99abc03d9a17
+		summarizeBy: none
+		sourceColumn: payment_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_date_key
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3e62fa0c-f1bd-4481-9dd6-f8c55ab0b854
+		summarizeBy: none
+		sourceColumn: payment_date_key
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column customer_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 6b29ce42-5d7b-4280-a841-9d2a8b372191
+		summarizeBy: none
+		sourceColumn: customer_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column vendor_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 89023bba-c3fd-46e1-9221-16d587fda07a
+		summarizeBy: none
+		sourceColumn: vendor_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount
+		dataType: double
+		lineageTag: fe85334f-5c2e-48fa-8e4e-0101dac29480
+		summarizeBy: sum
+		sourceColumn: amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fiscal_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 5821ab41-47e0-45c1-a21c-d1e27bd4ba6a
+		summarizeBy: sum
+		sourceColumn: fiscal_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_month
+		dataType: int64
+		formatString: 0
+		lineageTag: 4eb6189f-9af0-4841-8b70-0623c752a527
+		summarizeBy: sum
+		sourceColumn: fiscal_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: 7bbf26bc-adc7-45f8-aff6-297a1c79a164
+		summarizeBy: sum
+		sourceColumn: fiscal_quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Fact Payment' = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database("localhost", "icla_finance_gold", [ReturnSingleDatabase=true]),
+				    icla_finance_gold_fact_payment = Source{[Schema="icla_finance_gold",Item="fact_payment"]}[Data]
+				in
+				    icla_finance_gold_fact_payment
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

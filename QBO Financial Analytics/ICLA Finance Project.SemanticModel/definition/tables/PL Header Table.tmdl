@@ -1,0 +1,147 @@
+table 'PL Header Table'
+	lineageTag: f827bced-5c55-4618-96be-635aae80f95e
+
+	column LineItemNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: 11f6b68f-ad56-474d-a32e-f92575a20023
+		summarizeBy: none
+		sourceColumn: LineItemNumber
+
+		annotation SummarizationSetBy = User
+
+	column LineItemDescription
+		dataType: string
+		lineageTag: 08d33e53-4a32-4af1-b358-d5881c5ebcca
+		summarizeBy: none
+		sourceColumn: LineItemDescription
+		sortByColumn: LineItemNumber
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column LineItemID
+		dataType: string
+		lineageTag: 8e67c5d2-c6b2-407c-a8b1-62dd62985237
+		summarizeBy: none
+		sourceColumn: LineItemID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExpenseIncome
+		dataType: int64
+		formatString: 0
+		lineageTag: dc90ec67-f484-428e-88c0-5aafc11e2bd1
+		summarizeBy: sum
+		sourceColumn: ExpenseIncome
+
+		annotation SummarizationSetBy = Automatic
+
+	column Highlight
+		dataType: int64
+		formatString: 0
+		lineageTag: f14d7a1c-db44-4306-ab99-838bd4c73c3d
+		summarizeBy: sum
+		sourceColumn: Highlight
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level1Item
+		dataType: string
+		lineageTag: 6eb84779-94de-438b-9516-b62b15323243
+		summarizeBy: none
+		sourceColumn: Level1Item
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level2Item
+		dataType: string
+		lineageTag: 2ddac93b-e135-44a0-a4fa-008420780fb6
+		summarizeBy: none
+		sourceColumn: Level2Item
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level1Sort
+		dataType: int64
+		formatString: 0
+		lineageTag: ad31935e-b2b6-426d-a411-71f85fc1f6c2
+		summarizeBy: sum
+		sourceColumn: Level1Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PL Header Table' = m
+		mode: import
+		source = ```
+				let
+				    Source = Table.FromRecords({
+				        // INCOME SECTION
+				        [LineItemNumber=1, LineItemDescription="Income", LineItemID="Income", ExpenseIncome=1, Highlight=1, Level1Item="Income", Level2Item=null, Level1Sort=1],
+				        [LineItemNumber=2, LineItemDescription="    Billable Expense Income", LineItemID="BillableExpenseIncome", ExpenseIncome=1, Highlight=0, Level1Item="Income", Level2Item="Billable Expense Income", Level1Sort=1],
+				        [LineItemNumber=3, LineItemDescription="    Design income", LineItemID="Designincome", ExpenseIncome=1, Highlight=0, Level1Item="Income", Level2Item="Design income", Level1Sort=1],
+				        [LineItemNumber=4, LineItemDescription="    Discounts given", LineItemID="Discountsgiven", ExpenseIncome=1, Highlight=0, Level1Item="Income", Level2Item="Discounts given", Level1Sort=1],
+				        [LineItemNumber=5, LineItemDescription="    Landscaping Services", LineItemID="LandscapingServices", ExpenseIncome=1, Highlight=0, Level1Item="Income", Level2Item="Landscaping Services", Level1Sort=1],
+				        [LineItemNumber=6, LineItemDescription="    Pest Control Services", LineItemID="PestControlServices", ExpenseIncome=1, Highlight=0, Level1Item="Income", Level2Item="Pest Control Services", Level1Sort=1],
+				        [LineItemNumber=7, LineItemDescription="    Sales of Product Income", LineItemID="SalesofProductIncome", ExpenseIncome=1, Highlight=0, Level1Item="Income", Level2Item="Sales of Product Income", Level1Sort=1],
+				        [LineItemNumber=8, LineItemDescription="    Services", LineItemID="Services", ExpenseIncome=1, Highlight=0, Level1Item="Income", Level2Item="Services", Level1Sort=1],
+				        [LineItemNumber=9, LineItemDescription="Total Income", LineItemID="TotalIncome", ExpenseIncome=1, Highlight=1, Level1Item="Total Income", Level2Item=null, Level1Sort=2],
+				        
+				        // COST OF SALES SECTION
+				        [LineItemNumber=10, LineItemDescription="Cost of Sales", LineItemID="CostofSales", ExpenseIncome=-1, Highlight=1, Level1Item="Cost of Sales", Level2Item=null, Level1Sort=3],
+				        [LineItemNumber=11, LineItemDescription="    Cost of Goods Sold", LineItemID="CostofGoodsSold", ExpenseIncome=-1, Highlight=0, Level1Item="Cost of Sales", Level2Item="Cost of Goods Sold", Level1Sort=3],
+				        [LineItemNumber=12, LineItemDescription="Total Cost of Sales", LineItemID="TotalCostofSales", ExpenseIncome=-1, Highlight=1, Level1Item="Total Cost of Sales", Level2Item=null, Level1Sort=4],
+				        
+				        // GROSS PROFIT
+				        [LineItemNumber=13, LineItemDescription="Gross Profit", LineItemID="GrossProfit", ExpenseIncome=1, Highlight=1, Level1Item="Gross Profit", Level2Item=null, Level1Sort=5],
+				        
+				        // EXPENSES SECTION
+				        [LineItemNumber=14, LineItemDescription="Expenses", LineItemID="Expenses", ExpenseIncome=-1, Highlight=1, Level1Item="Expenses", Level2Item=null, Level1Sort=6],
+				        [LineItemNumber=15, LineItemDescription="    Advertising", LineItemID="Advertising", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Advertising", Level1Sort=6],
+				        [LineItemNumber=16, LineItemDescription="    Automobile", LineItemID="Automobile", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Automobile", Level1Sort=6],
+				        [LineItemNumber=17, LineItemDescription="    Equipment Rental", LineItemID="EquipmentRental", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Equipment Rental", Level1Sort=6],
+				        [LineItemNumber=18, LineItemDescription="    Insurance", LineItemID="Insurance", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Insurance", Level1Sort=6],
+				        [LineItemNumber=19, LineItemDescription="    Job Expenses", LineItemID="JobExpenses", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Job Expenses", Level1Sort=6],
+				        [LineItemNumber=20, LineItemDescription="    Legal & Professional Fees", LineItemID="LegalProfessionalFees", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Legal & Professional Fees", Level1Sort=6],
+				        [LineItemNumber=21, LineItemDescription="    Maintenance and Repair", LineItemID="MaintenanceandRepair", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Maintenance and Repair", Level1Sort=6],
+				        [LineItemNumber=22, LineItemDescription="    Meals and Entertainment", LineItemID="MealsandEntertainment", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Meals and Entertainment", Level1Sort=6],
+				        [LineItemNumber=23, LineItemDescription="    Office Expenses", LineItemID="OfficeExpenses", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Office Expenses", Level1Sort=6],
+				        [LineItemNumber=24, LineItemDescription="    Rent or Lease", LineItemID="RentorLease", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Rent or Lease", Level1Sort=6],
+				        [LineItemNumber=25, LineItemDescription="    Utilities", LineItemID="Utilities", ExpenseIncome=-1, Highlight=0, Level1Item="Expenses", Level2Item="Utilities", Level1Sort=6],
+				        [LineItemNumber=26, LineItemDescription="Total Expenses", LineItemID="TotalExpenses", ExpenseIncome=-1, Highlight=1, Level1Item="Total Expenses", Level2Item=null, Level1Sort=7],
+				        
+				        // NET OPERATING INCOME
+				        [LineItemNumber=27, LineItemDescription="Net Operating Income", LineItemID="NetOperatingIncome", ExpenseIncome=1, Highlight=1, Level1Item="Net Operating Income", Level2Item=null, Level1Sort=8],
+				        
+				        // OTHER EXPENSES SECTION
+				        [LineItemNumber=28, LineItemDescription="Other Expenses", LineItemID="OtherExpenses", ExpenseIncome=-1, Highlight=1, Level1Item="Other Expenses", Level2Item=null, Level1Sort=9],
+				        [LineItemNumber=29, LineItemDescription="    Miscellaneous", LineItemID="Miscellaneous", ExpenseIncome=-1, Highlight=0, Level1Item="Other Expenses", Level2Item="Miscellaneous", Level1Sort=9],
+				        [LineItemNumber=30, LineItemDescription="Total Other Expenses", LineItemID="TotalOtherExpenses", ExpenseIncome=-1, Highlight=1, Level1Item="Total Other Expenses", Level2Item=null, Level1Sort=10],
+				        
+				        // NET OTHER INCOME
+				        [LineItemNumber=31, LineItemDescription="Net Other Income", LineItemID="NetOtherIncome", ExpenseIncome=1, Highlight=1, Level1Item="Net Other Income", Level2Item=null, Level1Sort=11],
+				        
+				        // NET INCOME
+				        [LineItemNumber=32, LineItemDescription="Net Income", LineItemID="NetIncome", ExpenseIncome=1, Highlight=1, Level1Item="Net Income", Level2Item=null, Level1Sort=12]
+				    }),
+				    
+				    // Set column types
+				    TypedTable = Table.TransformColumnTypes(Source, {
+				        {"LineItemNumber", Int64.Type},
+				        {"LineItemDescription", type text},
+				        {"LineItemID", type text},
+				        {"ExpenseIncome", Int64.Type},
+				        {"Highlight", Int64.Type},
+				        {"Level1Item", type text},
+				        {"Level2Item", type text},
+				        {"Level1Sort", Int64.Type}
+				    })
+				in
+				    TypedTable
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

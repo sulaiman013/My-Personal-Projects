@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "ICLA Finance Project"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "df7d2934-0e79-4095-be81-0e3a095b3a7a"
+  }
+}

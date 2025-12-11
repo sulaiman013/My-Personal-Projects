@@ -1,0 +1,268 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 885.78579848228185,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 49.999999999999986,
+            "y": -9.25059927842426
+          },
+          "nodeIndex": "Dim Account",
+          "nodeLineageTag": "52a282eb-24b2-423b-91a9-aab960a478b6",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 2014.1962803466108,
+            "y": 32.362421727079642
+          },
+          "nodeIndex": "Dim Aging Bucket",
+          "nodeLineageTag": "d49fc3df-7f48-47ca-a707-28d724da39b4",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 1646.8672850760754,
+            "y": 0
+          },
+          "nodeIndex": "Dim Customer",
+          "nodeLineageTag": "4232ec1b-86d1-4266-b99e-eca0b0aee56f",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 13
+        },
+        {
+          "location": {
+            "x": 907.55476736528908,
+            "y": 0
+          },
+          "nodeIndex": "Dim Date",
+          "nodeLineageTag": "6f0d2118-1f04-43ac-af19-70c2b0876b3f",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 1315.1807948535482,
+            "y": 18.190571519551021
+          },
+          "nodeIndex": "Dim Item",
+          "nodeLineageTag": "54d49756-8048-4811-9b5f-c68edbcfaf04",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 476.14516187388585,
+            "y": 16.980251289445846
+          },
+          "nodeIndex": "Dim Vendor",
+          "nodeLineageTag": "4810d1ee-0e3c-4c47-810e-6ffc20811dbb",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 57.425340524737749,
+            "y": 381.83940310102793
+          },
+          "nodeIndex": "Fact AP Aging",
+          "nodeLineageTag": "76c6b27f-4ff7-47ac-9d08-c501e2ebfd59",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 11
+        },
+        {
+          "location": {
+            "x": 62.253179532633453,
+            "y": 743.66954180738753
+          },
+          "nodeIndex": "Fact AR Aging",
+          "nodeLineageTag": "fb9b1726-9293-47dc-811d-7516c9186a29",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 1961.0626968086253,
+            "y": 1048.7146250810154
+          },
+          "nodeIndex": "Fact Bill",
+          "nodeLineageTag": "089e2823-a5c7-4a8c-99a0-b558fd5f22b2",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 14
+        },
+        {
+          "location": {
+            "x": 1584.5510000494983,
+            "y": 1042.7178997509498
+          },
+          "nodeIndex": "Fact Bill Line",
+          "nodeLineageTag": "a41bbcd9-0bb3-4170-a9e8-9685ce621627",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 1069.8188289670347,
+            "y": 1032.4594335354464
+          },
+          "nodeIndex": "Fact Invoice",
+          "nodeLineageTag": "fba71eb3-1a47-49a5-b34e-d82577320289",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 65.405383186372376,
+            "y": 1143.6777936474484
+          },
+          "nodeIndex": "Fact Invoice Line",
+          "nodeLineageTag": "710c130f-91f2-4601-96ab-00ce88a8bb00",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 9
+        },
+        {
+          "location": {
+            "x": 571.50496628934536,
+            "y": 1031.3262503744957
+          },
+          "nodeIndex": "Fact Payment",
+          "nodeLineageTag": "dbc300ba-3318-4131-973f-7a424d4847a0",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 10
+        },
+        {
+          "location": {
+            "x": 2500.357802110771,
+            "y": 38.696146039976611
+          },
+          "nodeIndex": "_Measures",
+          "nodeLineageTag": "b428b961-c068-403d-8339-0ce1fdf973ed",
+          "size": {
+            "height": 1000,
+            "width": 234
+          },
+          "zIndex": 12
+        },
+        {
+          "location": {
+            "x": 2211.9161782486485,
+            "y": 574.31423093263959
+          },
+          "nodeIndex": "Fact PL Line",
+          "nodeLineageTag": "f1a2b3c4-d5e6-7890-abcd-ef1234500001",
+          "size": {
+            "height": 381.69869015127836,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3018.357802110771,
+            "y": 590.46419646293634
+          },
+          "nodeIndex": "PL Header Table",
+          "nodeLineageTag": "f827bced-5c55-4618-96be-635aae80f95e",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3252.357802110771,
+            "y": 602.46419646293634
+          },
+          "nodeIndex": "BS Header Table",
+          "nodeLineageTag": "0f491a5e-c0ed-4d6b-9354-945b652bfa93",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1332.64313355655,
+            "y": 944.10830214368912
+          },
+          "nodeIndex": "Fact BS Balance",
+          "nodeLineageTag": "f8c21d3e-5b47-4a9c-b123-456789abcdef",
+          "size": {
+            "height": 491.34693219641531,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3486.357802110771,
+            "y": 626.46419646293634
+          },
+          "nodeIndex": "PL Waterfall Data",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 46.512373612890016,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

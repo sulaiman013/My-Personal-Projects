@@ -1,0 +1,1873 @@
+table _Measures
+	lineageTag: b428b961-c068-403d-8339-0ce1fdf973ed
+
+	measure 'Total Revenue' = SUM('Fact Invoice'[total_amount])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 10000001-0000-0000-0000-000000000001
+
+	measure 'Total Expenses' = SUM('Fact Bill'[total_amount])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 10000001-0000-0000-0000-000000000002
+
+	measure 'Net Income' = [Total Revenue] - [Total Expenses]
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 10000001-0000-0000-0000-000000000003
+
+	measure 'Gross Margin %' = DIVIDE([Net Income], [Total Revenue], 0)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 10000001-0000-0000-0000-000000000004
+
+	measure 'Revenue PY' = CALCULATE([Total Revenue], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 10000001-0000-0000-0000-000000000039
+
+	measure 'Expense Amount' = SUM('Fact Bill Line'[amount])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 10000001-0000-0000-0000-000000000060
+
+	measure 'Revenue Amount' = SUM('Fact Invoice Line'[amount])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 10000001-0000-0000-0000-000000000061
+
+	measure 'Cost of Goods Sold' =
+			CALCULATE(
+				[Expense Amount],
+				'Dim Account'[account_type] = "Cost of Goods Sold"
+			)
+		lineageTag: 3e72cbb6-7c92-40fc-9953-a6f282fe929b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Gross Profit' = [Revenue Amount] - [Cost of Goods Sold]
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 10000001-0000-0000-0000-000000000066
+
+	/// ================================================================
+	/// P&L TEMPLATE MEASURES - Individual Line Items (Video Approach)
+	/// ================================================================
+	measure _BillableExpenseIncome =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Billable Expense Income"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000001
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Designincome =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Design income"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000002
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Discountsgiven =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Discounts given"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000003
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _LandscapingServices =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				LEFT('Dim Account'[fully_qualified_name], 20) = "Landscaping Services"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000004
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _PestControlServices =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Pest Control Services"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000005
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _SalesofProductIncome =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Sales of Product Income"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000006
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Services =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Services"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000007
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _TotalIncome =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[account_type] = "Income"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000008
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _CostofGoodsSold =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[account_type] = "Cost of Goods Sold"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000009
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _TotalCostofSales = [_CostofGoodsSold]
+		lineageTag: 20000001-0000-0000-0000-000000000010
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _GrossProfit = [_TotalIncome] - [_TotalCostofSales]
+		lineageTag: 20000001-0000-0000-0000-000000000011
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Advertising =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Advertising"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000012
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Automobile =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				LEFT('Dim Account'[fully_qualified_name], 10) = "Automobile"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000013
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _EquipmentRental =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Equipment Rental"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000014
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Insurance =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				LEFT('Dim Account'[fully_qualified_name], 9) = "Insurance"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000015
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _JobExpenses =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				LEFT('Dim Account'[fully_qualified_name], 12) = "Job Expenses"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000016
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _LegalProfessionalFees =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				LEFT('Dim Account'[fully_qualified_name], 24) = "Legal & Professional Fees"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000017
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _MaintenanceandRepair =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				LEFT('Dim Account'[fully_qualified_name], 22) = "Maintenance and Repair"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000018
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _MealsandEntertainment =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Meals and Entertainment"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000019
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _OfficeExpenses =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Office Expenses"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000020
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _RentorLease =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Rent or Lease"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000021
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Utilities =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				LEFT('Dim Account'[fully_qualified_name], 9) = "Utilities"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000022
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _TotalExpenses =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[account_type] = "Expense"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000023
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _NetOperatingIncome = [_GrossProfit] - [_TotalExpenses]
+		lineageTag: 20000001-0000-0000-0000-000000000024
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Miscellaneous =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[fully_qualified_name] = "Miscellaneous"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000025
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _TotalOtherExpenses =
+			CALCULATE(
+				SUM('Fact PL Line'[amount]),
+				'Dim Account'[account_type] = "Other Expense"
+			)
+		lineageTag: 20000001-0000-0000-0000-000000000026
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _NetOtherIncome = -[_TotalOtherExpenses]
+		lineageTag: 20000001-0000-0000-0000-000000000027
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _NetIncome = [_NetOperatingIncome] + [_NetOtherIncome]
+		lineageTag: 20000001-0000-0000-0000-000000000028
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'SVG KPI - Total Revenue' = ```
+			
+			// ============================================================
+			// 1. CONTEXT & METRICS
+			// ============================================================
+			VAR CurrentRevenue = [Revenue Amount]
+			VAR PriorYearRevenue = [Revenue PY]
+			VAR YoYChange = CurrentRevenue - PriorYearRevenue
+			VAR YoYPercent = DIVIDE(YoYChange, PriorYearRevenue, 0)
+			VAR IsPositive = YoYChange >= 0
+			
+			// Detect Scope
+			VAR IsFiscalYearSelected = ISINSCOPE('Dim Date'[fiscal_year])
+			VAR TimePeriodLevel = IF(IsFiscalYearSelected, "month", "year")
+			VAR PeriodLabel = IF(IsFiscalYearSelected, "Last 12 Months", "Last 5 Years")
+			
+			// ============================================================
+			// 2. FORMATTING
+			// ============================================================
+			VAR RevenueFormatted =
+			    IF(
+			        CurrentRevenue >= 1000000,
+			        FORMAT(CurrentRevenue / 1000000, "$#,##0.00") & "M",
+			        IF(
+			            CurrentRevenue >= 1000,
+			            FORMAT(CurrentRevenue / 1000, "$#,##0.0") & "K",
+			            FORMAT(CurrentRevenue, "$#,##0")
+			        )
+			    )
+			
+			VAR ChangeFormatted =
+			    IF(
+			        ABS(YoYChange) >= 1000000,
+			        IF(IsPositive, "+", "") & FORMAT(YoYChange / 1000000, "#,##0.00") & "M",
+			        IF(
+			            ABS(YoYChange) >= 1000,
+			            IF(IsPositive, "+", "") & FORMAT(YoYChange / 1000, "#,##0.0") & "K",
+			            IF(IsPositive, "+", "") & FORMAT(YoYChange, "#,##0")
+			        )
+			    )
+			
+			VAR PercentFormatted = IF(IsPositive, "+", "") & FORMAT(YoYPercent, "0.0%")
+			
+			// Colors
+			VAR PrimaryColor = "#00AEB9"
+			VAR PositiveColor = "#21A192"
+			VAR NegativeColor = "#D64444"
+			VAR TrendColor = IF(IsPositive, PositiveColor, NegativeColor)
+			VAR BackgroundColor = "#FFFFFF"
+			VAR BorderColor = "#E0E0E0"
+			VAR TextPrimary = "#333333"
+			VAR TextSecondary = "#666666"
+			VAR SparklineColor = "#00AEB9"
+			VAR SparklineFill = "#E8F6F7"
+			
+			// ============================================================
+			// 3. DYNAMIC SPARKLINE DATA
+			// ============================================================
+			VAR MaxDate = MAX('Dim Date'[date_key])
+			
+			// --- MONTHLY LOGIC (Uses Year & Month Number for strict sorting) ---
+			VAR MonthlySparklineTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            CALCULATETABLE(
+			                'Dim Date',
+			                DATESINPERIOD('Dim Date'[date_key], MaxDate, -12, MONTH),
+			                REMOVEFILTERS('Dim Date') // Clear slicers to get the full 12 month range
+			            ),
+			            'Dim Date'[fiscal_year],
+			            'Dim Date'[month_number]
+			        ),
+			        // Create an integer sort key: 202401, 202402, etc.
+			        "DateSort", 'Dim Date'[fiscal_year] * 100 + 'Dim Date'[month_number],
+			        "Rev", 
+			        VAR Cy = 'Dim Date'[fiscal_year]
+			        VAR Cm = 'Dim Date'[month_number]
+			        RETURN
+			        CALCULATE(
+			            [Total Revenue],
+			            REMOVEFILTERS('Dim Date'), // Clear the Year slicer
+			            'Dim Date'[fiscal_year] = Cy, // Re-apply specific Year
+			            'Dim Date'[month_number] = Cm   // Re-apply specific Month
+			        )
+			    )
+			
+			VAR MonthlySparkMin = MINX(MonthlySparklineTable, [Rev])
+			VAR MonthlySparkMax = MAXX(MonthlySparklineTable, [Rev])
+			VAR MonthlySparkRange = IF(MonthlySparkMax - MonthlySparkMin = 0, 1, MonthlySparkMax - MonthlySparkMin)
+			VAR MonthlySparkCount = COUNTROWS(MonthlySparklineTable)
+			
+			// --- YEARLY LOGIC (Uses Year Number) ---
+			VAR YearlySparklineTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            CALCULATETABLE(
+			                'Dim Date',
+			                DATESINPERIOD('Dim Date'[date_key], MaxDate, -5, YEAR),
+			                REMOVEFILTERS('Dim Date')
+			            ),
+			            'Dim Date'[fiscal_year]
+			        ),
+			        "DateSort", 'Dim Date'[fiscal_year],
+			        "Rev", 
+			        VAR Cy = 'Dim Date'[fiscal_year]
+			        RETURN 
+			        CALCULATE(
+			            [Total Revenue],
+			            REMOVEFILTERS('Dim Date'),
+			            'Dim Date'[fiscal_year] = Cy
+			        )
+			    )
+			
+			VAR YearlySparkMin = MINX(YearlySparklineTable, [Rev])
+			VAR YearlySparkMax = MAXX(YearlySparklineTable, [Rev])
+			VAR YearlySparkRange = IF(YearlySparkMax - YearlySparkMin = 0, 1, YearlySparkMax - YearlySparkMin)
+			VAR YearlySparkCount = COUNTROWS(YearlySparklineTable)
+			
+			// --- POINT GENERATION ---
+			
+			VAR MonthlyPoints = 
+			    IF(MonthlySparkCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                MonthlySparklineTable,
+			                // Strict Time Rank based on the DateSort integer
+			                "TimeRank", RANKX(MonthlySparklineTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (MonthlySparkCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Rev] - MonthlySparkMin) / MonthlySparkRange))
+			            RETURN X & "," & Y,
+			            " ",
+			            [DateSort], ASC // Ensure concatenation happens in chronological order
+			        )
+			    )
+			
+			VAR YearlyPoints = 
+			    IF(YearlySparkCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                YearlySparklineTable,
+			                "TimeRank", RANKX(YearlySparklineTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (YearlySparkCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Rev] - YearlySparkMin) / YearlySparkRange))
+			            RETURN X & "," & Y,
+			            " ",
+			            [DateSort], ASC
+			        )
+			    )
+			
+			VAR SparklinePoints = IF(IsFiscalYearSelected, MonthlyPoints, YearlyPoints)
+			VAR SafePoints = IF(LEN(SparklinePoints) > 0, SparklinePoints, "25,110 225,110")
+			VAR SparklineArea = "25,135 " & SafePoints & " 225,135"
+			
+			// ============================================================
+			// 4. SVG CONSTRUCTION
+			// ============================================================
+			VAR UpArrow = "<path d='M0,8 L6,0 L12,8 L8,8 L8,14 L4,14 L4,8 Z' fill='" & TrendColor & "'/>"
+			VAR DownArrow = "<path d='M0,6 L4,6 L4,0 L8,0 L8,6 L12,6 L6,14 Z' fill='" & TrendColor & "'/>"
+			VAR ArrowIcon = IF(IsPositive, UpArrow, DownArrow)
+			
+			VAR SvgPrefix = "data:image/svg+xml;utf8,"
+			VAR SvgContent = "
+			<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 160'>
+			    <defs>
+			        <linearGradient id='sparkGrad' x1='0%' y1='0%' x2='0%' y2='100%'>
+			            <stop offset='0%' stop-color='" & SparklineFill & "' stop-opacity='0.8'/>
+			            <stop offset='100%' stop-color='" & SparklineFill & "' stop-opacity='0.1'/>
+			        </linearGradient>
+			        <filter id='shadow' x='-20%' y='-20%' width='140%' height='140%'>
+			            <feDropShadow dx='0' dy='2' stdDeviation='3' flood-color='#000000' flood-opacity='0.1'/>
+			        </filter>
+			    </defs>
+			
+			    <rect x='5' y='5' width='250' height='150' rx='12' ry='12' fill='" & BackgroundColor & "' stroke='" & BorderColor & "' stroke-width='1' filter='url(#shadow)'/>
+			    <rect x='5' y='5' width='250' height='4' rx='12' ry='12' fill='" & PrimaryColor & "'/>
+			
+			    <text x='20' y='32' font-family='Segoe UI, Arial, sans-serif' font-size='11' font-weight='600' fill='" & TextSecondary & "' letter-spacing='1'>TOTAL REVENUE</text>
+			    <text x='20' y='62' font-family='Segoe UI, Arial, sans-serif' font-size='28' font-weight='700' fill='" & TextPrimary & "'>" & RevenueFormatted & "</text>
+			
+			    <g transform='translate(155, 35)'>
+			        <rect x='0' y='0' width='90' height='24' rx='12' ry='12' fill='" & IF(IsPositive, "#E8F5E9", "#FFEBEE") & "'/>
+			        <g transform='translate(8, 5)'>
+			            <g transform='scale(0.9)'>" & ArrowIcon & "</g>
+			        </g>
+			        <text x='28' y='16' font-family='Segoe UI, Arial, sans-serif' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & PercentFormatted & "</text>
+			    </g>
+			
+			    <polygon points='" & SparklineArea & "' fill='url(#sparkGrad)'/>
+			    <polyline points='" & SafePoints & "' fill='none' stroke='" & SparklineColor & "' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>
+			
+			    <text x='20' y='148' font-family='Segoe UI, Arial, sans-serif' font-size='9' fill='" & TextSecondary & "'>
+			        " & PeriodLabel & " | vs LY: " & ChangeFormatted & "
+			    </text>
+			
+			    <circle cx='220' cy='145' r='3' fill='" & PrimaryColor & "'/>
+			    <circle cx='230' cy='145' r='3' fill='" & BorderColor & "'/>
+			    <circle cx='240' cy='145' r='3' fill='" & BorderColor & "'/>
+			</svg>"
+			
+			RETURN
+			IF(
+			    NOT ISBLANK(CurrentRevenue),
+			    SvgPrefix & SvgContent,
+			    BLANK()
+			)
+			```
+		lineageTag: b569b138-02cf-4fba-a1d6-f9c7f52d492c
+
+	measure 'SVG KPI - Gross Profit' = ```
+			
+			// ============================================================
+			// 1. CONTEXT & METRICS
+			// ============================================================
+			VAR CurrentValue = [Gross Profit]
+			VAR PriorYearValue = CALCULATE([Gross Profit], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR YoYChange = CurrentValue - PriorYearValue
+			VAR YoYPercent = DIVIDE(YoYChange, PriorYearValue, 0)
+			VAR IsPositive = YoYChange >= 0
+			
+			VAR IsFiscalYearSelected = ISINSCOPE('Dim Date'[fiscal_year])
+			VAR PeriodLabel = IF(IsFiscalYearSelected, "Monthly Trend", "Annual Trend (Last 5 Years)")
+			
+			// ============================================================
+			// 2. FORMATTING
+			// ============================================================
+			VAR ValueFormatted =
+			    IF(ABS(CurrentValue) >= 1000000,
+			        FORMAT(CurrentValue / 1000000, "$#,##0.00") & "M",
+			        IF(ABS(CurrentValue) >= 1000,
+			            FORMAT(CurrentValue / 1000, "$#,##0.0") & "K",
+			            FORMAT(CurrentValue, "$#,##0")))
+			
+			VAR ChangeFormatted =
+			    IF(ABS(YoYChange) >= 1000000,
+			        IF(IsPositive, "+", "") & FORMAT(YoYChange / 1000000, "#,##0.00") & "M",
+			        IF(ABS(YoYChange) >= 1000,
+			            IF(IsPositive, "+", "") & FORMAT(YoYChange / 1000, "#,##0.0") & "K",
+			            IF(IsPositive, "+", "") & FORMAT(YoYChange, "#,##0")))
+			
+			VAR PercentFormatted = IF(IsPositive, "+", "") & FORMAT(YoYPercent, "0.0%")
+			
+			// Colors
+			VAR PrimaryColor = "rgb(33, 161, 146)"
+			VAR PositiveColor = "rgb(33, 161, 146)"
+			VAR NegativeColor = "rgb(214, 68, 68)"
+			VAR TrendColor = IF(IsPositive, PositiveColor, NegativeColor)
+			VAR BadgeBg = IF(IsPositive, "rgb(232, 245, 233)", "rgb(255, 235, 238)")
+			VAR SparklineColor = "rgb(33, 161, 146)"
+			VAR SparklineFill = "rgba(33, 161, 146, 0.15)"
+			
+			VAR ArrowPath = IF(IsPositive, 
+			    "M6,2 L10,8 L7,8 L7,12 L5,12 L5,8 L2,8 Z",
+			    "M6,12 L10,6 L7,6 L7,2 L5,2 L5,6 L2,6 Z")
+			
+			// ============================================================
+			// 3. SPARKLINE DATA GENERATION
+			// ============================================================
+			
+			// --- A. MONTHLY LOGIC (Drill Down) ---
+			// Uses current context (Selected Year) to show relevant months
+			VAR MonthlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            'Dim Date', 
+			            'Dim Date'[period_year_month] // Group by Month
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])), // Strict chronological sort
+			        "Val", CALCULATE([Gross Profit])
+			    )
+			
+			VAR MonthlyMin = MINX(MonthlyTable, [Val])
+			VAR MonthlyMax = MAXX(MonthlyTable, [Val])
+			VAR MonthlyRange = IF(MonthlyMax - MonthlyMin = 0, 1, MonthlyMax - MonthlyMin)
+			VAR MonthlyCount = COUNTROWS(MonthlyTable)
+			
+			VAR MonthlyPoints = 
+			    IF(MonthlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                MonthlyTable,
+			                "TimeRank", RANKX(MonthlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (MonthlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - MonthlyMin) / MonthlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- B. YEARLY LOGIC (High Level) ---
+			// Shows last 5 years trend when nothing is selected
+			VAR YearlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            CALCULATETABLE(
+			                'Dim Date',
+			                DATESINPERIOD('Dim Date'[date_key], MAX('Dim Date'[date_key]), -5, YEAR),
+			                REMOVEFILTERS('Dim Date') // Ignore filters to show broad trend
+			            ),
+			            'Dim Date'[fiscal_year]
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])),
+			        "Val", 
+			        VAR Cy = 'Dim Date'[fiscal_year]
+			        RETURN CALCULATE([Gross Profit], REMOVEFILTERS('Dim Date'), 'Dim Date'[fiscal_year] = Cy)
+			    )
+			
+			VAR YearlyMin = MINX(YearlyTable, [Val])
+			VAR YearlyMax = MAXX(YearlyTable, [Val])
+			VAR YearlyRange = IF(YearlyMax - YearlyMin = 0, 1, YearlyMax - YearlyMin)
+			VAR YearlyCount = COUNTROWS(YearlyTable)
+			
+			VAR YearlyPoints = 
+			    IF(YearlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                YearlyTable,
+			                "TimeRank", RANKX(YearlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (YearlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - YearlyMin) / YearlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- C. SWITCH CONTEXT ---
+			// Select the string points based on selection
+			VAR SelectedPoints = IF(IsFiscalYearSelected, MonthlyPoints, YearlyPoints)
+			VAR SparklineArea = "25,135 " & SelectedPoints & " 225,135"
+			
+			// ============================================================
+			// 4. SVG
+			// ============================================================
+			VAR SvgPrefix = "data:image/svg+xml;charset=utf-8,"
+			VAR Svg = 
+			"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 160'>" &
+			"<rect x='5' y='5' width='250' height='150' rx='12' fill='rgb(255,255,255)' stroke='rgb(224,224,224)'/>" &
+			"<rect x='5' y='5' width='250' height='4' rx='12' fill='" & PrimaryColor & "'/>" &
+			"<text x='20' y='32' font-family='Segoe UI' font-size='11' font-weight='600' fill='rgb(102,102,102)'>GROSS PROFIT</text>" &
+			"<text x='20' y='62' font-family='Segoe UI' font-size='28' font-weight='bold' fill='rgb(51,51,51)'>" & ValueFormatted & "</text>" &
+			"<rect x='155' y='35' width='90' height='24' rx='12' fill='" & BadgeBg & "'/>" &
+			"<svg x='163' y='40' width='14' height='14'><path d='" & ArrowPath & "' fill='" & TrendColor & "'/></svg>" &
+			"<text x='180' y='51' font-family='Segoe UI' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & PercentFormatted & "</text>" &
+			"<polygon points='" & SparklineArea & "' fill='" & SparklineFill & "'/>" &
+			"<polyline points='" & SelectedPoints & "' fill='none' stroke='" & SparklineColor & "' stroke-width='2' stroke-linecap='round'/>" &
+			"<text x='20' y='148' font-family='Segoe UI' font-size='9' fill='rgb(102,102,102)'>" & PeriodLabel & " | vs LY: " & ChangeFormatted & "</text>" &
+			"</svg>"
+			
+			RETURN IF(NOT ISBLANK(CurrentValue), SvgPrefix & Svg, BLANK())
+			```
+		lineageTag: 7395c98a-4c8e-483e-a79f-db8140390d0f
+
+	measure 'SVG KPI - Gross Margin' = ```
+			
+			// ============================================================
+			// 1. CONTEXT & METRICS
+			// ============================================================
+			VAR CurrentValue = [Gross Margin %]
+			VAR PriorYearValue = CALCULATE([Gross Margin %], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR YoYChange = CurrentValue - PriorYearValue  -- Percentage points difference
+			VAR IsPositive = YoYChange >= 0
+			
+			VAR IsFiscalYearSelected = ISINSCOPE('Dim Date'[fiscal_year])
+			VAR PeriodLabel = IF(IsFiscalYearSelected, "Monthly Trend", "Annual Trend (Last 5 Years)")
+			
+			// ============================================================
+			// 2. FORMATTING
+			// ============================================================
+			VAR ValueFormatted = FORMAT(CurrentValue, "0.0%")
+			VAR ChangeFormatted = IF(IsPositive, "+", "") & FORMAT(YoYChange * 100, "0.0") & " pp"
+			VAR PercentFormatted = IF(IsPositive, "+", "") & FORMAT(YoYChange * 100, "0.0") & "pp"
+			
+			// Colors - Blue theme for margins
+			VAR PrimaryColor = "rgb(0, 157, 222)"
+			VAR PositiveColor = "rgb(33, 161, 146)"
+			VAR NegativeColor = "rgb(214, 68, 68)"
+			VAR TrendColor = IF(IsPositive, PositiveColor, NegativeColor)
+			VAR BadgeBg = IF(IsPositive, "rgb(232, 245, 233)", "rgb(255, 235, 238)")
+			VAR SparklineColor = "rgb(0, 157, 222)"
+			VAR SparklineFill = "rgba(0, 157, 222, 0.15)"
+			
+			VAR ArrowPath = IF(IsPositive, 
+			    "M6,2 L10,8 L7,8 L7,12 L5,12 L5,8 L2,8 Z",
+			    "M6,12 L10,6 L7,6 L7,2 L5,2 L5,6 L2,6 Z")
+			
+			// ============================================================
+			// 3. SPARKLINE DATA GENERATION
+			// ============================================================
+			
+			// --- A. MONTHLY LOGIC (Drill Down) ---
+			// Uses current context to show relevant months for the selected year
+			VAR MonthlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            'Dim Date', 
+			            'Dim Date'[period_year_month] // Group by Month
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])), // Strict chronological sort
+			        "Val", CALCULATE([Gross Margin %])
+			    )
+			
+			VAR MonthlyMin = MINX(MonthlyTable, [Val])
+			VAR MonthlyMax = MAXX(MonthlyTable, [Val])
+			// Use 1% (0.01) as minimum range to avoid divide-by-zero on flat lines
+			VAR MonthlyRange = IF(MonthlyMax - MonthlyMin = 0, 0.01, MonthlyMax - MonthlyMin)
+			VAR MonthlyCount = COUNTROWS(MonthlyTable)
+			
+			VAR MonthlyPoints = 
+			    IF(MonthlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                MonthlyTable,
+			                "TimeRank", RANKX(MonthlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (MonthlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - MonthlyMin) / MonthlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- B. YEARLY LOGIC (High Level) ---
+			// Shows last 5 years trend when nothing is selected
+			VAR YearlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            CALCULATETABLE(
+			                'Dim Date',
+			                DATESINPERIOD('Dim Date'[date_key], MAX('Dim Date'[date_key]), -5, YEAR),
+			                REMOVEFILTERS('Dim Date') // Ignore filters to show broad trend
+			            ),
+			            'Dim Date'[fiscal_year]
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])),
+			        "Val", 
+			        VAR Cy = 'Dim Date'[fiscal_year]
+			        RETURN CALCULATE([Gross Margin %], REMOVEFILTERS('Dim Date'), 'Dim Date'[fiscal_year] = Cy)
+			    )
+			
+			VAR YearlyMin = MINX(YearlyTable, [Val])
+			VAR YearlyMax = MAXX(YearlyTable, [Val])
+			VAR YearlyRange = IF(YearlyMax - YearlyMin = 0, 0.01, YearlyMax - YearlyMin)
+			VAR YearlyCount = COUNTROWS(YearlyTable)
+			
+			VAR YearlyPoints = 
+			    IF(YearlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                YearlyTable,
+			                "TimeRank", RANKX(YearlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (YearlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - YearlyMin) / YearlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- C. SWITCH CONTEXT ---
+			// Select the string points based on selection
+			VAR SelectedPoints = IF(IsFiscalYearSelected, MonthlyPoints, YearlyPoints)
+			VAR SparklineArea = "25,135 " & SelectedPoints & " 225,135"
+			
+			// ============================================================
+			// 4. SVG
+			// ============================================================
+			VAR SvgPrefix = "data:image/svg+xml;charset=utf-8,"
+			VAR Svg = 
+			"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 160'>" &
+			"<rect x='5' y='5' width='250' height='150' rx='12' fill='rgb(255,255,255)' stroke='rgb(224,224,224)'/>" &
+			"<rect x='5' y='5' width='250' height='4' rx='12' fill='" & PrimaryColor & "'/>" &
+			"<text x='20' y='32' font-family='Segoe UI' font-size='11' font-weight='600' fill='rgb(102,102,102)'>GROSS MARGIN</text>" &
+			"<text x='20' y='62' font-family='Segoe UI' font-size='28' font-weight='bold' fill='rgb(51,51,51)'>" & ValueFormatted & "</text>" &
+			"<rect x='155' y='35' width='90' height='24' rx='12' fill='" & BadgeBg & "'/>" &
+			"<svg x='163' y='40' width='14' height='14'><path d='" & ArrowPath & "' fill='" & TrendColor & "'/></svg>" &
+			"<text x='180' y='51' font-family='Segoe UI' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & PercentFormatted & "</text>" &
+			"<polygon points='" & SparklineArea & "' fill='" & SparklineFill & "'/>" &
+			"<polyline points='" & SelectedPoints & "' fill='none' stroke='" & SparklineColor & "' stroke-width='2' stroke-linecap='round'/>" &
+			"<text x='20' y='148' font-family='Segoe UI' font-size='9' fill='rgb(102,102,102)'>" & PeriodLabel & " | vs LY: " & ChangeFormatted & "</text>" &
+			"</svg>"
+			
+			RETURN IF(NOT ISBLANK(CurrentValue), SvgPrefix & Svg, BLANK())
+			```
+		lineageTag: c4b18362-e6c2-4528-8a23-a62f1dbf5910
+
+	measure 'SVG KPI - Net Operating Income' = ```
+			
+			// ============================================================
+			// 1. CONTEXT & METRICS
+			// ============================================================
+			VAR CurrentValue = [_NetOperatingIncome]
+			VAR PriorYearValue = CALCULATE([_NetOperatingIncome], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR YoYChange = CurrentValue - PriorYearValue
+			VAR YoYPercent = DIVIDE(YoYChange, ABS(PriorYearValue), 0)
+			VAR IsPositive = YoYChange >= 0
+			
+			VAR IsFiscalYearSelected = ISINSCOPE('Dim Date'[fiscal_year])
+			VAR PeriodLabel = IF(IsFiscalYearSelected, "Monthly Trend", "Annual Trend (Last 5 Years)")
+			
+			// ============================================================
+			// 2. FORMATTING
+			// ============================================================
+			VAR ValueFormatted =
+			    IF(ABS(CurrentValue) >= 1000000, FORMAT(CurrentValue / 1000000, "$#,##0.00") & "M",
+			        IF(ABS(CurrentValue) >= 1000, FORMAT(CurrentValue / 1000, "$#,##0.0") & "K", FORMAT(CurrentValue, "$#,##0")))
+			
+			VAR ChangeFormatted =
+			    IF(ABS(YoYChange) >= 1000000, IF(IsPositive, "+", "") & FORMAT(YoYChange / 1000000, "#,##0.00") & "M",
+			        IF(ABS(YoYChange) >= 1000, IF(IsPositive, "+", "") & FORMAT(YoYChange / 1000, "#,##0.0") & "K",
+			            IF(IsPositive, "+", "") & FORMAT(YoYChange, "#,##0")))
+			
+			VAR PercentFormatted = IF(IsPositive, "+", "") & FORMAT(YoYPercent, "0.0%")
+			
+			// Colors
+			VAR PrimaryColor = "rgb(90, 186, 196)"
+			VAR PositiveColor = "rgb(33, 161, 146)"
+			VAR NegativeColor = "rgb(214, 68, 68)"
+			VAR TrendColor = IF(IsPositive, PositiveColor, NegativeColor)
+			VAR BadgeBg = IF(IsPositive, "rgb(232, 245, 233)", "rgb(255, 235, 238)")
+			VAR SparklineColor = "rgb(90, 186, 196)"
+			VAR SparklineFill = "rgba(90, 186, 196, 0.15)"
+			
+			VAR ArrowPath = IF(IsPositive, "M6,2 L10,8 L7,8 L7,12 L5,12 L5,8 L2,8 Z", "M6,12 L10,6 L7,6 L7,2 L5,2 L5,6 L2,6 Z")
+			
+			// ============================================================
+			// 3. SPARKLINE DATA GENERATION
+			// ============================================================
+			
+			// --- A. MONTHLY LOGIC (Drill Down) ---
+			// Uses current context to show relevant months for the selected year
+			VAR MonthlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            'Dim Date', 
+			            'Dim Date'[period_year_month] // Group by Month
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])), // Strict chronological sort
+			        "Val", CALCULATE([_NetOperatingIncome])
+			    )
+			
+			VAR MonthlyMin = MINX(MonthlyTable, [Val])
+			VAR MonthlyMax = MAXX(MonthlyTable, [Val])
+			VAR MonthlyRange = IF(MonthlyMax - MonthlyMin = 0, 1, MonthlyMax - MonthlyMin)
+			VAR MonthlyCount = COUNTROWS(MonthlyTable)
+			
+			VAR MonthlyPoints = 
+			    IF(MonthlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                MonthlyTable,
+			                "TimeRank", RANKX(MonthlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (MonthlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - MonthlyMin) / MonthlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- B. YEARLY LOGIC (High Level) ---
+			// Shows last 5 years trend when nothing is selected
+			VAR YearlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            CALCULATETABLE(
+			                'Dim Date',
+			                DATESINPERIOD('Dim Date'[date_key], MAX('Dim Date'[date_key]), -5, YEAR),
+			                REMOVEFILTERS('Dim Date') // Ignore filters to show broad trend
+			            ),
+			            'Dim Date'[fiscal_year]
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])),
+			        "Val", 
+			        VAR Cy = 'Dim Date'[fiscal_year]
+			        RETURN CALCULATE([_NetOperatingIncome], REMOVEFILTERS('Dim Date'), 'Dim Date'[fiscal_year] = Cy)
+			    )
+			
+			VAR YearlyMin = MINX(YearlyTable, [Val])
+			VAR YearlyMax = MAXX(YearlyTable, [Val])
+			VAR YearlyRange = IF(YearlyMax - YearlyMin = 0, 1, YearlyMax - YearlyMin)
+			VAR YearlyCount = COUNTROWS(YearlyTable)
+			
+			VAR YearlyPoints = 
+			    IF(YearlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                YearlyTable,
+			                "TimeRank", RANKX(YearlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (YearlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - YearlyMin) / YearlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- C. SWITCH CONTEXT ---
+			VAR SelectedPoints = IF(IsFiscalYearSelected, MonthlyPoints, YearlyPoints)
+			VAR SparklineArea = "25,135 " & SelectedPoints & " 225,135"
+			
+			// ============================================================
+			// 4. SVG CONSTRUCTION
+			// ============================================================
+			VAR SvgPrefix = "data:image/svg+xml;charset=utf-8,"
+			VAR Svg = 
+			"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 160'>" &
+			"<rect x='5' y='5' width='250' height='150' rx='12' fill='rgb(255,255,255)' stroke='rgb(224,224,224)'/>" &
+			"<rect x='5' y='5' width='250' height='4' rx='12' fill='" & PrimaryColor & "'/>" &
+			"<text x='20' y='32' font-family='Segoe UI' font-size='11' font-weight='600' fill='rgb(102,102,102)'>NET OPERATING INCOME</text>" &
+			"<text x='20' y='62' font-family='Segoe UI' font-size='28' font-weight='bold' fill='rgb(51,51,51)'>" & ValueFormatted & "</text>" &
+			"<rect x='155' y='35' width='90' height='24' rx='12' fill='" & BadgeBg & "'/>" &
+			"<svg x='163' y='40' width='14' height='14'><path d='" & ArrowPath & "' fill='" & TrendColor & "'/></svg>" &
+			"<text x='180' y='51' font-family='Segoe UI' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & PercentFormatted & "</text>" &
+			"<polygon points='" & SparklineArea & "' fill='" & SparklineFill & "'/>" &
+			"<polyline points='" & SelectedPoints & "' fill='none' stroke='" & SparklineColor & "' stroke-width='2' stroke-linecap='round'/>" &
+			"<text x='20' y='148' font-family='Segoe UI' font-size='9' fill='rgb(102,102,102)'>" & PeriodLabel & " | vs LY: " & ChangeFormatted & "</text>" &
+			"</svg>"
+			
+			RETURN IF(NOT ISBLANK(CurrentValue), SvgPrefix & Svg, BLANK())
+			```
+		lineageTag: fb70dc1d-c93b-4387-8989-03e0ad7e83be
+
+	measure 'SVG KPI - Net Income' = ```
+			
+			// ============================================================
+			// 1. CONTEXT & METRICS
+			// ============================================================
+			VAR CurrentValue = [Net Income]
+			VAR PriorYearValue = CALCULATE([Net Income], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR YoYChange = CurrentValue - PriorYearValue
+			VAR YoYPercent = DIVIDE(YoYChange, ABS(PriorYearValue), 0)
+			VAR IsPositive = YoYChange >= 0
+			
+			VAR IsFiscalYearSelected = ISINSCOPE('Dim Date'[fiscal_year])
+			VAR PeriodLabel = IF(IsFiscalYearSelected, "Monthly Trend", "Annual Trend (Last 5 Years)")
+			
+			// ============================================================
+			// 2. FORMATTING
+			// ============================================================
+			VAR ValueFormatted =
+			    IF(ABS(CurrentValue) >= 1000000, FORMAT(CurrentValue / 1000000, "$#,##0.00") & "M",
+			        IF(ABS(CurrentValue) >= 1000, FORMAT(CurrentValue / 1000, "$#,##0.0") & "K", FORMAT(CurrentValue, "$#,##0")))
+			
+			VAR ChangeFormatted =
+			    IF(ABS(YoYChange) >= 1000000, IF(IsPositive, "+", "") & FORMAT(YoYChange / 1000000, "#,##0.00") & "M",
+			        IF(ABS(YoYChange) >= 1000, IF(IsPositive, "+", "") & FORMAT(YoYChange / 1000, "#,##0.0") & "K",
+			            IF(IsPositive, "+", "") & FORMAT(YoYChange, "#,##0")))
+			
+			VAR PercentFormatted = IF(IsPositive, "+", "") & FORMAT(YoYPercent, "0.0%")
+			
+			// Colors - Dark teal for Net Income
+			VAR PrimaryColor = "rgb(0, 113, 132)"
+			VAR PositiveColor = "rgb(33, 161, 146)"
+			VAR NegativeColor = "rgb(214, 68, 68)"
+			VAR TrendColor = IF(IsPositive, PositiveColor, NegativeColor)
+			VAR BadgeBg = IF(IsPositive, "rgb(232, 245, 233)", "rgb(255, 235, 238)")
+			VAR SparklineColor = "rgb(0, 113, 132)"
+			VAR SparklineFill = "rgba(0, 113, 132, 0.15)"
+			
+			VAR ArrowPath = IF(IsPositive, "M6,2 L10,8 L7,8 L7,12 L5,12 L5,8 L2,8 Z", "M6,12 L10,6 L7,6 L7,2 L5,2 L5,6 L2,6 Z")
+			
+			// ============================================================
+			// 3. SPARKLINE DATA GENERATION
+			// ============================================================
+			
+			// --- A. MONTHLY LOGIC (Drill Down) ---
+			// Uses current context to show relevant months for the selected year
+			VAR MonthlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            'Dim Date', 
+			            'Dim Date'[period_year_month] // Group by Month
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])), // Strict chronological sort
+			        "Val", CALCULATE([Net Income])
+			    )
+			
+			VAR MonthlyMin = MINX(MonthlyTable, [Val])
+			VAR MonthlyMax = MAXX(MonthlyTable, [Val])
+			VAR MonthlyRange = IF(MonthlyMax - MonthlyMin = 0, 1, MonthlyMax - MonthlyMin)
+			VAR MonthlyCount = COUNTROWS(MonthlyTable)
+			
+			VAR MonthlyPoints = 
+			    IF(MonthlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                MonthlyTable,
+			                "TimeRank", RANKX(MonthlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (MonthlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - MonthlyMin) / MonthlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- B. YEARLY LOGIC (High Level) ---
+			// Shows last 5 years trend when nothing is selected
+			VAR YearlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            CALCULATETABLE(
+			                'Dim Date',
+			                DATESINPERIOD('Dim Date'[date_key], MAX('Dim Date'[date_key]), -5, YEAR),
+			                REMOVEFILTERS('Dim Date') // Ignore filters to show broad trend
+			            ),
+			            'Dim Date'[fiscal_year]
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])),
+			        "Val", 
+			        VAR Cy = 'Dim Date'[fiscal_year]
+			        RETURN CALCULATE([Net Income], REMOVEFILTERS('Dim Date'), 'Dim Date'[fiscal_year] = Cy)
+			    )
+			
+			VAR YearlyMin = MINX(YearlyTable, [Val])
+			VAR YearlyMax = MAXX(YearlyTable, [Val])
+			VAR YearlyRange = IF(YearlyMax - YearlyMin = 0, 1, YearlyMax - YearlyMin)
+			VAR YearlyCount = COUNTROWS(YearlyTable)
+			
+			VAR YearlyPoints = 
+			    IF(YearlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                YearlyTable,
+			                "TimeRank", RANKX(YearlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (YearlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - YearlyMin) / YearlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- C. SWITCH CONTEXT ---
+			VAR SelectedPoints = IF(IsFiscalYearSelected, MonthlyPoints, YearlyPoints)
+			VAR SparklineArea = "25,135 " & SelectedPoints & " 225,135"
+			
+			// ============================================================
+			// 4. SVG CONSTRUCTION
+			// ============================================================
+			VAR SvgPrefix = "data:image/svg+xml;charset=utf-8,"
+			VAR Svg = 
+			"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 160'>" &
+			"<rect x='5' y='5' width='250' height='150' rx='12' fill='rgb(255,255,255)' stroke='rgb(224,224,224)'/>" &
+			"<rect x='5' y='5' width='250' height='4' rx='12' fill='" & PrimaryColor & "'/>" &
+			"<text x='20' y='32' font-family='Segoe UI' font-size='11' font-weight='600' fill='rgb(102,102,102)'>NET INCOME</text>" &
+			"<text x='20' y='62' font-family='Segoe UI' font-size='28' font-weight='bold' fill='rgb(51,51,51)'>" & ValueFormatted & "</text>" &
+			"<rect x='155' y='35' width='90' height='24' rx='12' fill='" & BadgeBg & "'/>" &
+			"<svg x='163' y='40' width='14' height='14'><path d='" & ArrowPath & "' fill='" & TrendColor & "'/></svg>" &
+			"<text x='180' y='51' font-family='Segoe UI' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & PercentFormatted & "</text>" &
+			"<polygon points='" & SparklineArea & "' fill='" & SparklineFill & "'/>" &
+			"<polyline points='" & SelectedPoints & "' fill='none' stroke='" & SparklineColor & "' stroke-width='2' stroke-linecap='round'/>" &
+			"<text x='20' y='148' font-family='Segoe UI' font-size='9' fill='rgb(102,102,102)'>" & PeriodLabel & " | vs LY: " & ChangeFormatted & "</text>" &
+			"</svg>"
+			
+			RETURN IF(NOT ISBLANK(CurrentValue), SvgPrefix & Svg, BLANK())
+			```
+		lineageTag: 4f3fad2e-3b0b-4538-b1e3-ff3ca93f89f7
+
+	measure 'SVG KPI - Net Profit Margin' = ```
+			
+			// ============================================================
+			// 1. CONTEXT & METRICS
+			// ============================================================
+			VAR CurrentValue = DIVIDE([Net Income], [Revenue Amount], 0)
+			VAR PriorYearValue = CALCULATE(DIVIDE([Net Income], [Revenue Amount], 0), SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR YoYChange = CurrentValue - PriorYearValue
+			VAR IsPositive = YoYChange >= 0
+			
+			VAR IsFiscalYearSelected = ISINSCOPE('Dim Date'[fiscal_year])
+			VAR PeriodLabel = IF(IsFiscalYearSelected, "Monthly Trend", "Annual Trend (Last 5 Years)")
+			
+			// ============================================================
+			// 2. FORMATTING
+			// ============================================================
+			VAR ValueFormatted = FORMAT(CurrentValue, "0.0%")
+			VAR ChangeFormatted = IF(IsPositive, "+", "") & FORMAT(YoYChange * 100, "0.0") & " pp"
+			VAR PercentFormatted = IF(IsPositive, "+", "") & FORMAT(YoYChange * 100, "0.0") & "pp"
+			
+			// Colors - Purple theme for profitability ratio
+			VAR PrimaryColor = "rgb(0, 71, 106)"
+			VAR PositiveColor = "rgb(33, 161, 146)"
+			VAR NegativeColor = "rgb(214, 68, 68)"
+			VAR TrendColor = IF(IsPositive, PositiveColor, NegativeColor)
+			VAR BadgeBg = IF(IsPositive, "rgb(232, 245, 233)", "rgb(255, 235, 238)")
+			VAR SparklineColor = "rgb(0, 71, 106)"
+			VAR SparklineFill = "rgba(0, 71, 106, 0.15)"
+			
+			VAR ArrowPath = IF(IsPositive, "M6,2 L10,8 L7,8 L7,12 L5,12 L5,8 L2,8 Z", "M6,12 L10,6 L7,6 L7,2 L5,2 L5,6 L2,6 Z")
+			
+			// ============================================================
+			// 3. SPARKLINE DATA GENERATION
+			// ============================================================
+			
+			// --- A. MONTHLY LOGIC (Drill Down) ---
+			// Uses current context to show relevant months for the selected year
+			VAR MonthlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            'Dim Date', 
+			            'Dim Date'[period_year_month] // Group by Month
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])), // Strict chronological sort
+			        "Val", CALCULATE(DIVIDE([Net Income], [Revenue Amount], 0))
+			    )
+			
+			VAR MonthlyMin = MINX(MonthlyTable, [Val])
+			VAR MonthlyMax = MAXX(MonthlyTable, [Val])
+			// Use 0.01 (1%) min range to prevent divide-by-zero on flat lines
+			VAR MonthlyRange = IF(MonthlyMax - MonthlyMin = 0, 0.01, MonthlyMax - MonthlyMin)
+			VAR MonthlyCount = COUNTROWS(MonthlyTable)
+			
+			VAR MonthlyPoints = 
+			    IF(MonthlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                MonthlyTable,
+			                "TimeRank", RANKX(MonthlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (MonthlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - MonthlyMin) / MonthlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- B. YEARLY LOGIC (High Level) ---
+			// Shows last 5 years trend when nothing is selected
+			VAR YearlyTable = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            CALCULATETABLE(
+			                'Dim Date',
+			                DATESINPERIOD('Dim Date'[date_key], MAX('Dim Date'[date_key]), -5, YEAR),
+			                REMOVEFILTERS('Dim Date') // Ignore filters to show broad trend
+			            ),
+			            'Dim Date'[fiscal_year]
+			        ),
+			        "DateSort", CALCULATE(MIN('Dim Date'[date_key])),
+			        "Val", 
+			        VAR Cy = 'Dim Date'[fiscal_year]
+			        RETURN CALCULATE(DIVIDE([Net Income], [Revenue Amount], 0), REMOVEFILTERS('Dim Date'), 'Dim Date'[fiscal_year] = Cy)
+			    )
+			
+			VAR YearlyMin = MINX(YearlyTable, [Val])
+			VAR YearlyMax = MAXX(YearlyTable, [Val])
+			VAR YearlyRange = IF(YearlyMax - YearlyMin = 0, 0.01, YearlyMax - YearlyMin)
+			VAR YearlyCount = COUNTROWS(YearlyTable)
+			
+			VAR YearlyPoints = 
+			    IF(YearlyCount > 1,
+			        CONCATENATEX(
+			            ADDCOLUMNS(
+			                YearlyTable,
+			                "TimeRank", RANKX(YearlyTable, [DateSort], , ASC)
+			            ),
+			            VAR X = INT(25 + (200 * ([TimeRank] - 1) / (YearlyCount - 1)))
+			            VAR Y = INT(135 - (50 * ([Val] - YearlyMin) / YearlyRange))
+			            RETURN X & "," & Y, 
+			            " ", 
+			            [DateSort], ASC
+			        ),
+			        "25,110 225,110"
+			    )
+			
+			// --- C. SWITCH CONTEXT ---
+			VAR SelectedPoints = IF(IsFiscalYearSelected, MonthlyPoints, YearlyPoints)
+			VAR SparklineArea = "25,135 " & SelectedPoints & " 225,135"
+			
+			// ============================================================
+			// 4. SVG CONSTRUCTION
+			// ============================================================
+			VAR SvgPrefix = "data:image/svg+xml;charset=utf-8,"
+			VAR Svg = 
+			"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 160'>" &
+			"<rect x='5' y='5' width='250' height='150' rx='12' fill='rgb(255,255,255)' stroke='rgb(224,224,224)'/>" &
+			"<rect x='5' y='5' width='250' height='4' rx='12' fill='" & PrimaryColor & "'/>" &
+			"<text x='20' y='32' font-family='Segoe UI' font-size='11' font-weight='600' fill='rgb(102,102,102)'>NET PROFIT MARGIN</text>" &
+			"<text x='20' y='62' font-family='Segoe UI' font-size='28' font-weight='bold' fill='rgb(51,51,51)'>" & ValueFormatted & "</text>" &
+			"<rect x='155' y='35' width='90' height='24' rx='12' fill='" & BadgeBg & "'/>" &
+			"<svg x='163' y='40' width='14' height='14'><path d='" & ArrowPath & "' fill='" & TrendColor & "'/></svg>" &
+			"<text x='180' y='51' font-family='Segoe UI' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & PercentFormatted & "</text>" &
+			"<polygon points='" & SparklineArea & "' fill='" & SparklineFill & "'/>" &
+			"<polyline points='" & SelectedPoints & "' fill='none' stroke='" & SparklineColor & "' stroke-width='2' stroke-linecap='round'/>" &
+			"<text x='20' y='148' font-family='Segoe UI' font-size='9' fill='rgb(102,102,102)'>" & PeriodLabel & " | vs LY: " & ChangeFormatted & "</text>" &
+			"</svg>"
+			
+			RETURN IF(NOT ISBLANK(CurrentValue), SvgPrefix & Svg, BLANK())
+			```
+		lineageTag: ff05ab65-b9fd-408c-953d-bda647af1f44
+
+	/// BS: Checking account - from Balance Sheet balances
+	measure _BS_Checking =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Checking"
+			)
+		lineageTag: a308ad0f-4aae-4cbe-8c30-09647c61ef98
+
+	/// BS: Savings account - from Balance Sheet balances
+	measure _BS_Savings =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Savings"
+			)
+		lineageTag: 29de8e2b-76fb-44a4-9c74-3e9ce96294c7
+
+	/// BS: Total Bank Accounts
+	measure _BS_TotalBankAccounts = [_BS_Checking] + [_BS_Savings]
+		lineageTag: 196fb715-2da2-42cd-b3bd-2d5847697019
+
+	/// BS: Accounts Receivable from Balance Sheet balances
+	measure _BS_AR =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Accounts Receivable (A/R)"
+			)
+		lineageTag: 985f7867-b433-407c-8f01-fc28f54b2d87
+
+	/// BS: Total Accounts Receivable
+	measure _BS_TotalAR = [_BS_AR]
+		lineageTag: e6336997-235e-4e3e-a105-2377e33fd29b
+
+	/// BS: Inventory Asset
+	measure _BS_InventoryAsset =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Inventory Asset"
+			)
+		lineageTag: c2eabf17-d972-4144-ac51-1eafff3795d8
+
+	/// BS: Undeposited Funds
+	measure _BS_UndepositedFunds =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Undeposited Funds"
+			)
+		lineageTag: 83c40867-a635-4b21-9ff6-0f9e187f419b
+
+	/// BS: Total Other Current Assets
+	measure _BS_TotalOtherCurrentAssets = [_BS_InventoryAsset] + [_BS_UndepositedFunds]
+		lineageTag: ecf84e28-4969-463f-a0c9-3751d28a854b
+
+	/// BS: Total Current Assets
+	measure _BS_TotalCurrentAssets = [_BS_TotalBankAccounts] + [_BS_TotalAR] + [_BS_TotalOtherCurrentAssets]
+		lineageTag: 5685a183-9129-408b-908c-642aadd38884
+
+	/// BS: Truck Original Cost
+	measure _BS_TruckOriginalCost =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[fully_qualified_name] = "Truck:Original Cost"
+			)
+		lineageTag: 67d3d081-c388-4503-84ec-56b1d6922704
+
+	/// BS: Total for Truck
+	measure _BS_TotalTruck = COALESCE([_BS_TruckOriginalCost], 0) - COALESCE([_BS_TruckDepreciation], 0)
+		lineageTag: 50899b6d-2250-41c1-8145-18993841c62b
+
+	/// BS: Total Fixed Assets
+	measure _BS_TotalFixedAssets = [_BS_TotalTruck]
+		lineageTag: 4fed4ef0-3ce8-4d3e-98b6-2567a7a48efd
+
+	/// BS: Total Assets
+	measure _BS_TotalAssets = [_BS_TotalCurrentAssets] + [_BS_TotalFixedAssets]
+		lineageTag: 93f2040a-5693-4fcc-86af-38078b92b2d5
+
+	/// BS: Accounts Payable from Balance Sheet balances
+	measure _BS_AP =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Accounts Payable (A/P)"
+			)
+		lineageTag: 60f9ed1a-36e9-41f6-ba9a-a19cf34f7a33
+
+	/// BS: Total Accounts Payable
+	measure _BS_TotalAP = [_BS_AP]
+		lineageTag: 6905c756-7a3c-4ff1-92cf-fe3083b5f0f7
+
+	/// BS: Mastercard Credit Card
+	measure _BS_Mastercard =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Mastercard"
+			)
+		lineageTag: bf1f6962-f258-4697-889d-88e44f1583f1
+
+	/// BS: Total Credit Cards
+	measure _BS_TotalCreditCards = COALESCE([_BS_Mastercard], 0) + COALESCE([_BS_Visa], 0)
+		lineageTag: 9bdcfdaf-f46b-4320-9e2b-64e46355ee40
+
+	/// BS: Arizona Dept of Revenue Payable
+	measure _BS_ArizonaDeptRevenue =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Arizona Dept. of Revenue Payable"
+			)
+		lineageTag: c9a9e0fd-e26d-42cb-9051-013ee938ea99
+
+	/// BS: Board of Equalization Payable
+	measure _BS_BoardOfEqualization =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Board of Equalization Payable"
+			)
+		lineageTag: 33c91b31-6290-49c8-b5ed-3f7983f23f72
+
+	/// BS: Loan Payable
+	measure _BS_LoanPayable =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Loan Payable"
+			)
+		lineageTag: 8ecd3ba2-8a0f-4ab4-b6aa-901dd5133a2e
+
+	/// BS: Total Other Current Liabilities
+	measure _BS_TotalOtherCurrentLiabilities =
+			IF(
+			    ISBLANK([_BS_ArizonaDeptRevenue]) && ISBLANK([_BS_BoardOfEqualization]) && ISBLANK([_BS_LoanPayable]),
+			    BLANK(),
+			    COALESCE([_BS_ArizonaDeptRevenue], 0) + COALESCE([_BS_BoardOfEqualization], 0) + COALESCE([_BS_LoanPayable], 0)
+			)
+		lineageTag: 72ac6166-e35d-4e08-813b-ff8f02f3215b
+
+	/// BS: Total Current Liabilities
+	measure _BS_TotalCurrentLiabilities = COALESCE([_BS_TotalAP], 0) + COALESCE([_BS_TotalCreditCards], 0) + COALESCE([_BS_TotalOtherCurrentLiabilities], 0)
+		lineageTag: 09edbd9f-d9e9-4ae4-9be5-3b122e5cee54
+
+	/// BS: Notes Payable
+	measure _BS_NotesPayable =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Notes Payable"
+			)
+		lineageTag: ee930461-0cfd-4e11-be87-157dc3ad613f
+
+	/// BS: Total Long-term Liabilities
+	measure _BS_TotalLongTermLiabilities = COALESCE([_BS_NotesPayable], 0)
+		lineageTag: 6ae1eeb3-efff-42ff-ae18-99e979789fb6
+
+	/// BS: Total Liabilities
+	measure _BS_TotalLiabilities = [_BS_TotalCurrentLiabilities] + [_BS_TotalLongTermLiabilities]
+		lineageTag: d2c8f5d8-f001-4ca5-8332-511d5fdf7c97
+
+	/// BS: Opening Balance Equity
+	measure _BS_OpeningBalanceEquity =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Opening Balance Equity"
+			)
+		lineageTag: bb333165-6513-4910-a4e9-188568e326fc
+
+	/// BS: Retained Earnings
+	measure _BS_RetainedEarnings =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Retained Earnings"
+			)
+		lineageTag: 5bb24782-2e15-410e-a028-3ef57dc975bc
+
+	/// BS: Net Income from P&L
+	measure _BS_NetIncomeBS = [_NetIncome]
+		lineageTag: e74d282b-86af-42ab-bb01-3fc13c55fbfb
+
+	/// BS: Total Equity
+	measure _BS_TotalEquity = COALESCE([_BS_OpeningBalanceEquity], 0) + COALESCE([_BS_RetainedEarnings], 0) + COALESCE([_BS_NetIncomeBS], 0)
+		lineageTag: 7d6ac9fb-e6ec-4633-be0b-75a87e3bcfe3
+
+	/// BS: Total Liabilities and Equity
+	measure _BS_TotalLiabilitiesAndEquity = [_BS_TotalLiabilities] + [_BS_TotalEquity]
+		lineageTag: 7c5fb5c0-f411-439f-abae-1dfe5272fe32
+
+	/// BS: Truck Depreciation
+	measure _BS_TruckDepreciation =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[fully_qualified_name] = "Truck:Depreciation"
+			)
+		lineageTag: 67d3d082-c388-4503-84ec-56b1d6922705
+
+	/// BS: Visa Credit Card
+	measure _BS_Visa =
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[account_name] = "Visa"
+			)
+		lineageTag: bf1f6963-f258-4697-889d-88e44f1583f2
+
+	/// ================================================================
+	/// COMPLETE HTML BALANCE SHEET REPORT
+	/// Use with "HTML Content" visual from AppSource
+	/// ================================================================
+	measure 'BS HTML Report' = ```
+			
+			VAR Fmt = "$#,##0.00;($#,##0.00)"
+			
+			// ===== ASSETS =====
+			VAR vChecking = [_BS_Checking]
+			VAR vSavings = [_BS_Savings]
+			VAR vTotalBankAccounts = [_BS_TotalBankAccounts]
+			VAR vsar = [_BS_AR]
+			VAR vTotalAR = [_BS_TotalAR]
+			VAR vInventoryAsset = [_BS_InventoryAsset]
+			VAR vUndepositedFunds = [_BS_UndepositedFunds]
+			VAR vTotalOtherCurrentAssets = [_BS_TotalOtherCurrentAssets]
+			VAR vTotalCurrentAssets = [_BS_TotalCurrentAssets]
+			VAR vTruckOriginalCost = [_BS_TruckOriginalCost]
+			VAR vTotalTruck = [_BS_TotalTruck]
+			VAR vTotalFixedAssets = [_BS_TotalFixedAssets]
+			VAR vTotalAssets = [_BS_TotalAssets]
+			
+			// ===== LIABILITIES =====
+			VAR vAP = [_BS_AP]
+			VAR vTotalAP = [_BS_TotalAP]
+			VAR vMastercard = [_BS_Mastercard]
+			VAR vTotalCreditCards = [_BS_TotalCreditCards]
+			VAR vArizonaDept = [_BS_ArizonaDeptRevenue]
+			VAR vBoardOfEqualization = [_BS_BoardOfEqualization]
+			VAR vLoanPayable = [_BS_LoanPayable]
+			VAR vTotalOtherCurrentLiabilities = [_BS_TotalOtherCurrentLiabilities]
+			VAR vTotalCurrentLiabilities = [_BS_TotalCurrentLiabilities]
+			VAR vNotesPayable = [_BS_NotesPayable]
+			VAR vTotalLongTermLiabilities = [_BS_TotalLongTermLiabilities]
+			VAR vTotalLiabilities = [_BS_TotalLiabilities]
+			
+			// ===== EQUITY =====
+			VAR vOpeningBalanceEquity = [_BS_OpeningBalanceEquity]
+			VAR vRetainedEarnings = [_BS_RetainedEarnings]
+			VAR vNetIncome = [_BS_NetIncomeBS]
+			VAR vTotalEquity = [_BS_TotalEquity]
+			VAR vTotalLiabilitiesAndEquity = [_BS_TotalLiabilitiesAndEquity]
+			
+			// ===== FORMAT VALUES =====
+			// Using the Fmt string checks specifically for blanks, then formats (brackets handled by Fmt string)
+			VAR fChecking = IF(ISBLANK(vChecking), "", FORMAT(vChecking, Fmt))
+			VAR fSavings = IF(ISBLANK(vSavings), "", FORMAT(vSavings, Fmt))
+			VAR fTotalBankAccounts = IF(ISBLANK(vTotalBankAccounts), "", FORMAT(vTotalBankAccounts, Fmt))
+			VAR fAR = IF(ISBLANK(vsar), "", FORMAT(vsar, Fmt))
+			VAR fTotalAR = IF(ISBLANK(vTotalAR), "", FORMAT(vTotalAR, Fmt))
+			VAR fInventoryAsset = IF(ISBLANK(vInventoryAsset), "", FORMAT(vInventoryAsset, Fmt))
+			VAR fUndepositedFunds = IF(ISBLANK(vUndepositedFunds), "", FORMAT(vUndepositedFunds, Fmt))
+			VAR fTotalOtherCurrentAssets = IF(ISBLANK(vTotalOtherCurrentAssets), "", FORMAT(vTotalOtherCurrentAssets, Fmt))
+			VAR fTotalCurrentAssets = IF(ISBLANK(vTotalCurrentAssets), "", FORMAT(vTotalCurrentAssets, Fmt))
+			VAR fTruckOriginalCost = IF(ISBLANK(vTruckOriginalCost), "", FORMAT(vTruckOriginalCost, Fmt))
+			VAR fTotalTruck = IF(ISBLANK(vTotalTruck), "", FORMAT(vTotalTruck, Fmt))
+			VAR fTotalFixedAssets = IF(ISBLANK(vTotalFixedAssets), "", FORMAT(vTotalFixedAssets, Fmt))
+			VAR fTotalAssets = IF(ISBLANK(vTotalAssets), "", FORMAT(vTotalAssets, Fmt))
+			VAR fAP = IF(ISBLANK(vAP), "", FORMAT(vAP, Fmt))
+			VAR fTotalAP = IF(ISBLANK(vTotalAP), "", FORMAT(vTotalAP, Fmt))
+			VAR fMastercard = IF(ISBLANK(vMastercard), "", FORMAT(vMastercard, Fmt))
+			VAR fTotalCreditCards = IF(ISBLANK(vTotalCreditCards), "", FORMAT(vTotalCreditCards, Fmt))
+			VAR fArizonaDept = IF(ISBLANK(vArizonaDept), "", FORMAT(vArizonaDept, Fmt))
+			VAR fBoardOfEqualization = IF(ISBLANK(vBoardOfEqualization), "", FORMAT(vBoardOfEqualization, Fmt))
+			VAR fLoanPayable = IF(ISBLANK(vLoanPayable), "", FORMAT(vLoanPayable, Fmt))
+			VAR fTotalOtherCurrentLiabilities = IF(ISBLANK(vTotalOtherCurrentLiabilities), "", FORMAT(vTotalOtherCurrentLiabilities, Fmt))
+			VAR fTotalCurrentLiabilities = IF(ISBLANK(vTotalCurrentLiabilities), "", FORMAT(vTotalCurrentLiabilities, Fmt))
+			VAR fNotesPayable = IF(ISBLANK(vNotesPayable), "", FORMAT(vNotesPayable, Fmt))
+			VAR fTotalLongTermLiabilities = IF(ISBLANK(vTotalLongTermLiabilities), "", FORMAT(vTotalLongTermLiabilities, Fmt))
+			VAR fTotalLiabilities = IF(ISBLANK(vTotalLiabilities), "", FORMAT(vTotalLiabilities, Fmt))
+			VAR fOpeningBalanceEquity = IF(ISBLANK(vOpeningBalanceEquity), "", FORMAT(vOpeningBalanceEquity, Fmt))
+			VAR fRetainedEarnings = IF(ISBLANK(vRetainedEarnings), "", FORMAT(vRetainedEarnings, Fmt))
+			VAR fNetIncome = IF(ISBLANK(vNetIncome), "", FORMAT(vNetIncome, Fmt))
+			VAR fTotalEquity = IF(ISBLANK(vTotalEquity), "", FORMAT(vTotalEquity, Fmt))
+			VAR fTotalLiabilitiesAndEquity = IF(ISBLANK(vTotalLiabilitiesAndEquity), "", FORMAT(vTotalLiabilitiesAndEquity, Fmt))
+			
+			// ===== CSS =====
+			VAR CSS = "<style>
+			    /* SCROLLBAR WRAPPER */
+			    .scroll-wrapper { height: 100vh; overflow-y: auto; padding-right: 2px; }
+			    .scroll-wrapper::-webkit-scrollbar { width: 8px; background: transparent; }
+			    .scroll-wrapper::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
+			    .scroll-wrapper:hover::-webkit-scrollbar-thumb { background-color: #bbb; }
+			
+			    /* TABLE STYLES */
+			    html,body { margin:0; padding:0; height:100%; overflow:hidden; }
+			    .bs { width:100%; border-collapse:collapse; font-family:Segoe UI,Arial; font-size:12px; background:#fff; }
+			    .bs td { padding:4px 8px; border-bottom:1px solid #E8E8E8; }
+			    .bs td.r { text-align:right; font-family:Consolas,monospace; }
+			    
+			    /* ROW STYLES */
+			    .bs .t td { font-weight:bold; background:#F2F2F2; } /* Total Rows */
+			    .bs .g td { font-weight:bold; background:#D9E2F3; border-top:2px solid #2F5496; border-bottom:2px solid #2F5496; } /* Grand Total */
+			    .bs .s td { font-weight:600; padding-top:12px; } /* Section Headers */
+			    
+			    /* INDENTATION */
+			    .bs .i1 td { padding-left:16px; }
+			    .bs .i2 td { padding-left:32px; }
+			    .bs .i3 td { padding-left:48px; }
+			    .bs .i4 td { padding-left:64px; }
+			    
+			    /* TITLE STYLES */
+			    .title { font-size:16px; font-weight:bold; text-align:center; padding:12px; background:#e6e6e6; color:black; position:sticky; top:0; z-index:11; }
+			    .subtitle { font-size:12px; color:#666; text-align:center; padding-bottom:10px; background:#e6e6e6; }
+			</style>"
+			
+			// ===== HTML OUTPUT =====
+			VAR Result = 
+			"<div class='scroll-wrapper'>" &
+			    "<div class='title'>Balance Sheet</div>" &
+			    "<table class='bs'><tbody>" &
+			        "<tr class='s'><td>Assets</td><td></td></tr>" &
+			        "<tr class='i1'><td>Current Assets</td><td></td></tr>" &
+			        "<tr class='i2'><td>Bank Accounts</td><td></td></tr>" &
+			        "<tr class='i3'><td>Checking</td><td class='r'>" & fChecking & "</td></tr>" &
+			        "<tr class='i3'><td>Savings</td><td class='r'>" & fSavings & "</td></tr>" &
+			        "<tr class='t i2'><td>Total for Bank Accounts</td><td class='r'>" & fTotalBankAccounts & "</td></tr>" &
+			        "<tr class='i2'><td>Accounts Receivable</td><td></td></tr>" &
+			        "<tr class='i3'><td>Accounts Receivable (A/R)</td><td class='r'>" & fAR & "</td></tr>" &
+			        "<tr class='t i2'><td>Total for Accounts Receivable</td><td class='r'>" & fTotalAR & "</td></tr>" &
+			        "<tr class='i2'><td>Other Current Assets</td><td></td></tr>" &
+			        "<tr class='i3'><td>Inventory Asset</td><td class='r'>" & fInventoryAsset & "</td></tr>" &
+			        "<tr class='i3'><td>Undeposited Funds</td><td class='r'>" & fUndepositedFunds & "</td></tr>" &
+			        "<tr class='t i2'><td>Total for Other Current Assets</td><td class='r'>" & fTotalOtherCurrentAssets & "</td></tr>" &
+			        "<tr class='t i1'><td>Total for Current Assets</td><td class='r'>" & fTotalCurrentAssets & "</td></tr>" &
+			        "<tr class='i1'><td>Fixed Assets</td><td></td></tr>" &
+			        "<tr class='i2'><td>Truck</td><td></td></tr>" &
+			        "<tr class='i3'><td>Original Cost</td><td class='r'>" & fTruckOriginalCost & "</td></tr>" &
+			        "<tr class='t i2'><td>Total for Truck</td><td class='r'>" & fTotalTruck & "</td></tr>" &
+			        "<tr class='t i1'><td>Total for Fixed Assets</td><td class='r'>" & fTotalFixedAssets & "</td></tr>" &
+			        "<tr class='g s'><td>Total for Assets</td><td class='r'>" & fTotalAssets & "</td></tr>" &
+			        "<tr class='s'><td>Liabilities and Equity</td><td></td></tr>" &
+			        "<tr class='i1'><td>Liabilities</td><td></td></tr>" &
+			        "<tr class='i2'><td>Current Liabilities</td><td></td></tr>" &
+			        "<tr class='i3'><td>Accounts Payable</td><td></td></tr>" &
+			        "<tr class='i4'><td>Accounts Payable (A/P)</td><td class='r'>" & fAP & "</td></tr>" &
+			        "<tr class='t i3'><td>Total for Accounts Payable</td><td class='r'>" & fTotalAP & "</td></tr>" &
+			        "<tr class='i3'><td>Credit Cards</td><td></td></tr>" &
+			        "<tr class='i4'><td>Mastercard</td><td class='r'>" & fMastercard & "</td></tr>" &
+			        "<tr class='t i3'><td>Total for Credit Cards</td><td class='r'>" & fTotalCreditCards & "</td></tr>" &
+			        "<tr class='i3'><td>Other Current Liabilities</td><td></td></tr>" &
+			        "<tr class='i4'><td>Arizona Dept. of Revenue Payable</td><td class='r'>" & fArizonaDept & "</td></tr>" &
+			        "<tr class='i4'><td>Board of Equalization Payable</td><td class='r'>" & fBoardOfEqualization & "</td></tr>" &
+			        "<tr class='i4'><td>Loan Payable</td><td class='r'>" & fLoanPayable & "</td></tr>" &
+			        "<tr class='t i3'><td>Total for Other Current Liabilities</td><td class='r'>" & fTotalOtherCurrentLiabilities & "</td></tr>" &
+			        "<tr class='t i2'><td>Total for Current Liabilities</td><td class='r'>" & fTotalCurrentLiabilities & "</td></tr>" &
+			        "<tr class='i2'><td>Long-term Liabilities</td><td></td></tr>" &
+			        "<tr class='i3'><td>Notes Payable</td><td class='r'>" & fNotesPayable & "</td></tr>" &
+			        "<tr class='t i2'><td>Total for Long-term Liabilities</td><td class='r'>" & fTotalLongTermLiabilities & "</td></tr>" &
+			        "<tr class='t i1'><td>Total for Liabilities</td><td class='r'>" & fTotalLiabilities & "</td></tr>" &
+			        "<tr class='i1'><td>Equity</td><td></td></tr>" &
+			        "<tr class='i2'><td>Opening Balance Equity</td><td class='r'>" & fOpeningBalanceEquity & "</td></tr>" &
+			        "<tr class='i2'><td>Retained Earnings</td><td class='r'>" & fRetainedEarnings & "</td></tr>" &
+			        "<tr class='i2'><td>Net Income</td><td class='r'>" & fNetIncome & "</td></tr>" &
+			        "<tr class='t i1'><td>Total for Equity</td><td class='r'>" & fTotalEquity & "</td></tr>" &
+			        "<tr class='g s'><td>Total for Liabilities and Equity</td><td class='r'>" & fTotalLiabilitiesAndEquity & "</td></tr>" &
+			    "</tbody></table>" &
+			"</div>"
+			
+			RETURN CSS & Result
+			```
+		lineageTag: html-bs-report-0001-0000-000000000001
+
+	measure 'PL HTML Report' =
+			VAR Fmt = "$#,##0.00"
+			VAR PctFmt = "0.0%"
+			
+			// ===== CURRENT YEAR VALUES =====
+			VAR vBillableExpenseIncome = [_BillableExpenseIncome]
+			VAR vDesignincome = [_Designincome]
+			VAR vDiscountsgiven = [_Discountsgiven]
+			VAR vLandscapingServices = [_LandscapingServices]
+			VAR vPestControlServices = [_PestControlServices]
+			VAR vSalesofProductIncome = [_SalesofProductIncome]
+			VAR vServices = [_Services]
+			VAR vTotalIncome = [_TotalIncome]
+			VAR vCostofGoodsSold = [_CostofGoodsSold]
+			VAR vTotalCostofSales = [_TotalCostofSales]
+			VAR vGrossProfit = [_GrossProfit]
+			VAR vAdvertising = [_Advertising]
+			VAR vAutomobile = [_Automobile]
+			VAR vEquipmentRental = [_EquipmentRental]
+			VAR vInsurance = [_Insurance]
+			VAR vJobExpenses = [_JobExpenses]
+			VAR vLegalProfessionalFees = [_LegalProfessionalFees]
+			VAR vMaintenanceandRepair = [_MaintenanceandRepair]
+			VAR vMealsandEntertainment = [_MealsandEntertainment]
+			VAR vOfficeExpenses = [_OfficeExpenses]
+			VAR vRentorLease = [_RentorLease]
+			VAR vUtilities = [_Utilities]
+			VAR vTotalExpenses = [_TotalExpenses]
+			VAR vNetOperatingIncome = [_NetOperatingIncome]
+			VAR vMiscellaneous = [_Miscellaneous]
+			VAR vTotalOtherExpenses = [_TotalOtherExpenses]
+			VAR vNetOtherIncome = [_NetOtherIncome]
+			VAR vNetIncome = [_NetIncome]
+			
+			// ===== PRIOR YEAR VALUES =====
+			VAR pyBillableExpenseIncome = CALCULATE([_BillableExpenseIncome], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyDesignincome = CALCULATE([_Designincome], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyDiscountsgiven = CALCULATE([_Discountsgiven], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyLandscapingServices = CALCULATE([_LandscapingServices], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyPestControlServices = CALCULATE([_PestControlServices], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pySalesofProductIncome = CALCULATE([_SalesofProductIncome], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyServices = CALCULATE([_Services], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyTotalIncome = CALCULATE([_TotalIncome], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyCostofGoodsSold = CALCULATE([_CostofGoodsSold], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyTotalCostofSales = CALCULATE([_TotalCostofSales], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyGrossProfit = CALCULATE([_GrossProfit], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyAdvertising = CALCULATE([_Advertising], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyAutomobile = CALCULATE([_Automobile], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyEquipmentRental = CALCULATE([_EquipmentRental], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyInsurance = CALCULATE([_Insurance], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyJobExpenses = CALCULATE([_JobExpenses], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyLegalProfessionalFees = CALCULATE([_LegalProfessionalFees], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyMaintenanceandRepair = CALCULATE([_MaintenanceandRepair], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyMealsandEntertainment = CALCULATE([_MealsandEntertainment], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyOfficeExpenses = CALCULATE([_OfficeExpenses], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyRentorLease = CALCULATE([_RentorLease], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyUtilities = CALCULATE([_Utilities], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyTotalExpenses = CALCULATE([_TotalExpenses], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyNetOperatingIncome = CALCULATE([_NetOperatingIncome], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyMiscellaneous = CALCULATE([_Miscellaneous], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyTotalOtherExpenses = CALCULATE([_TotalOtherExpenses], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyNetOtherIncome = CALCULATE([_NetOtherIncome], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR pyNetIncome = CALCULATE([_NetIncome], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			
+			// ===== FORMAT CURRENT YEAR (Income positive, Expenses in brackets) =====
+			VAR fBillableExpenseIncome = IF(ISBLANK(vBillableExpenseIncome), "", FORMAT(vBillableExpenseIncome, Fmt))
+			VAR fDesignincome = IF(ISBLANK(vDesignincome), "", FORMAT(vDesignincome, Fmt))
+			VAR fDiscountsgiven = IF(ISBLANK(vDiscountsgiven), "", IF(vDiscountsgiven < 0, "(" & FORMAT(ABS(vDiscountsgiven), Fmt) & ")", FORMAT(vDiscountsgiven, Fmt)))
+			VAR fLandscapingServices = IF(ISBLANK(vLandscapingServices), "", FORMAT(vLandscapingServices, Fmt))
+			VAR fPestControlServices = IF(ISBLANK(vPestControlServices), "", FORMAT(vPestControlServices, Fmt))
+			VAR fSalesofProductIncome = IF(ISBLANK(vSalesofProductIncome), "", FORMAT(vSalesofProductIncome, Fmt))
+			VAR fServices = IF(ISBLANK(vServices), "", FORMAT(vServices, Fmt))
+			VAR fTotalIncome = IF(ISBLANK(vTotalIncome), "", FORMAT(vTotalIncome, Fmt))
+			VAR fCostofGoodsSold = IF(ISBLANK(vCostofGoodsSold), "", "(" & FORMAT(ABS(vCostofGoodsSold), Fmt) & ")")
+			VAR fTotalCostofSales = IF(ISBLANK(vTotalCostofSales), "", "(" & FORMAT(ABS(vTotalCostofSales), Fmt) & ")")
+			VAR fGrossProfit = IF(ISBLANK(vGrossProfit), "", IF(vGrossProfit < 0, "(" & FORMAT(ABS(vGrossProfit), Fmt) & ")", FORMAT(vGrossProfit, Fmt)))
+			VAR fAdvertising = IF(ISBLANK(vAdvertising), "", "(" & FORMAT(ABS(vAdvertising), Fmt) & ")")
+			VAR fAutomobile = IF(ISBLANK(vAutomobile), "", "(" & FORMAT(ABS(vAutomobile), Fmt) & ")")
+			VAR fEquipmentRental = IF(ISBLANK(vEquipmentRental), "", "(" & FORMAT(ABS(vEquipmentRental), Fmt) & ")")
+			VAR fInsurance = IF(ISBLANK(vInsurance), "", "(" & FORMAT(ABS(vInsurance), Fmt) & ")")
+			VAR fJobExpenses = IF(ISBLANK(vJobExpenses), "", "(" & FORMAT(ABS(vJobExpenses), Fmt) & ")")
+			VAR fLegalProfessionalFees = IF(ISBLANK(vLegalProfessionalFees) || vLegalProfessionalFees = 0, "", "(" & FORMAT(ABS(vLegalProfessionalFees), Fmt) & ")")
+			VAR fMaintenanceandRepair = IF(ISBLANK(vMaintenanceandRepair), "", "(" & FORMAT(ABS(vMaintenanceandRepair), Fmt) & ")")
+			VAR fMealsandEntertainment = IF(ISBLANK(vMealsandEntertainment), "", "(" & FORMAT(ABS(vMealsandEntertainment), Fmt) & ")")
+			VAR fOfficeExpenses = IF(ISBLANK(vOfficeExpenses), "", "(" & FORMAT(ABS(vOfficeExpenses), Fmt) & ")")
+			VAR fRentorLease = IF(ISBLANK(vRentorLease), "", "(" & FORMAT(ABS(vRentorLease), Fmt) & ")")
+			VAR fUtilities = IF(ISBLANK(vUtilities), "", "(" & FORMAT(ABS(vUtilities), Fmt) & ")")
+			VAR fTotalExpenses = IF(ISBLANK(vTotalExpenses), "", "(" & FORMAT(ABS(vTotalExpenses), Fmt) & ")")
+			VAR fNetOperatingIncome = IF(ISBLANK(vNetOperatingIncome), "", IF(vNetOperatingIncome < 0, "(" & FORMAT(ABS(vNetOperatingIncome), Fmt) & ")", FORMAT(vNetOperatingIncome, Fmt)))
+			VAR fMiscellaneous = IF(ISBLANK(vMiscellaneous), "", "(" & FORMAT(ABS(vMiscellaneous), Fmt) & ")")
+			VAR fTotalOtherExpenses = IF(ISBLANK(vTotalOtherExpenses), "", "(" & FORMAT(ABS(vTotalOtherExpenses), Fmt) & ")")
+			VAR fNetOtherIncome = IF(ISBLANK(vNetOtherIncome), "", IF(vNetOtherIncome < 0, "(" & FORMAT(ABS(vNetOtherIncome), Fmt) & ")", FORMAT(vNetOtherIncome, Fmt)))
+			VAR fNetIncome = IF(ISBLANK(vNetIncome), "", IF(vNetIncome < 0, "(" & FORMAT(ABS(vNetIncome), Fmt) & ")", FORMAT(vNetIncome, Fmt)))
+			
+			// ===== FORMAT PRIOR YEAR =====
+			VAR fpyBillableExpenseIncome = IF(ISBLANK(pyBillableExpenseIncome), "", FORMAT(pyBillableExpenseIncome, Fmt))
+			VAR fpyDesignincome = IF(ISBLANK(pyDesignincome), "", FORMAT(pyDesignincome, Fmt))
+			VAR fpyDiscountsgiven = IF(ISBLANK(pyDiscountsgiven), "", IF(pyDiscountsgiven < 0, "(" & FORMAT(ABS(pyDiscountsgiven), Fmt) & ")", FORMAT(pyDiscountsgiven, Fmt)))
+			VAR fpyLandscapingServices = IF(ISBLANK(pyLandscapingServices), "", FORMAT(pyLandscapingServices, Fmt))
+			VAR fpyPestControlServices = IF(ISBLANK(pyPestControlServices), "", FORMAT(pyPestControlServices, Fmt))
+			VAR fpySalesofProductIncome = IF(ISBLANK(pySalesofProductIncome), "", FORMAT(pySalesofProductIncome, Fmt))
+			VAR fpyServices = IF(ISBLANK(pyServices), "", FORMAT(pyServices, Fmt))
+			VAR fpyTotalIncome = IF(ISBLANK(pyTotalIncome), "", FORMAT(pyTotalIncome, Fmt))
+			VAR fpyCostofGoodsSold = IF(ISBLANK(pyCostofGoodsSold), "", "(" & FORMAT(ABS(pyCostofGoodsSold), Fmt) & ")")
+			VAR fpyTotalCostofSales = IF(ISBLANK(pyTotalCostofSales), "", "(" & FORMAT(ABS(pyTotalCostofSales), Fmt) & ")")
+			VAR fpyGrossProfit = IF(ISBLANK(pyGrossProfit), "", IF(pyGrossProfit < 0, "(" & FORMAT(ABS(pyGrossProfit), Fmt) & ")", FORMAT(pyGrossProfit, Fmt)))
+			VAR fpyAdvertising = IF(ISBLANK(pyAdvertising), "", "(" & FORMAT(ABS(pyAdvertising), Fmt) & ")")
+			VAR fpyAutomobile = IF(ISBLANK(pyAutomobile), "", "(" & FORMAT(ABS(pyAutomobile), Fmt) & ")")
+			VAR fpyEquipmentRental = IF(ISBLANK(pyEquipmentRental), "", "(" & FORMAT(ABS(pyEquipmentRental), Fmt) & ")")
+			VAR fpyInsurance = IF(ISBLANK(pyInsurance), "", "(" & FORMAT(ABS(pyInsurance), Fmt) & ")")
+			VAR fpyJobExpenses = IF(ISBLANK(pyJobExpenses), "", "(" & FORMAT(ABS(pyJobExpenses), Fmt) & ")")
+			VAR fpyLegalProfessionalFees = IF(ISBLANK(pyLegalProfessionalFees) || pyLegalProfessionalFees = 0, "", "(" & FORMAT(ABS(pyLegalProfessionalFees), Fmt) & ")")
+			VAR fpyMaintenanceandRepair = IF(ISBLANK(pyMaintenanceandRepair), "", "(" & FORMAT(ABS(pyMaintenanceandRepair), Fmt) & ")")
+			VAR fpyMealsandEntertainment = IF(ISBLANK(pyMealsandEntertainment), "", "(" & FORMAT(ABS(pyMealsandEntertainment), Fmt) & ")")
+			VAR fpyOfficeExpenses = IF(ISBLANK(pyOfficeExpenses), "", "(" & FORMAT(ABS(pyOfficeExpenses), Fmt) & ")")
+			VAR fpyRentorLease = IF(ISBLANK(pyRentorLease), "", "(" & FORMAT(ABS(pyRentorLease), Fmt) & ")")
+			VAR fpyUtilities = IF(ISBLANK(pyUtilities), "", "(" & FORMAT(ABS(pyUtilities), Fmt) & ")")
+			VAR fpyTotalExpenses = IF(ISBLANK(pyTotalExpenses), "", "(" & FORMAT(ABS(pyTotalExpenses), Fmt) & ")")
+			VAR fpyNetOperatingIncome = IF(ISBLANK(pyNetOperatingIncome), "", IF(pyNetOperatingIncome < 0, "(" & FORMAT(ABS(pyNetOperatingIncome), Fmt) & ")", FORMAT(pyNetOperatingIncome, Fmt)))
+			VAR fpyMiscellaneous = IF(ISBLANK(pyMiscellaneous), "", "(" & FORMAT(ABS(pyMiscellaneous), Fmt) & ")")
+			VAR fpyTotalOtherExpenses = IF(ISBLANK(pyTotalOtherExpenses), "", "(" & FORMAT(ABS(pyTotalOtherExpenses), Fmt) & ")")
+			VAR fpyNetOtherIncome = IF(ISBLANK(pyNetOtherIncome), "", IF(pyNetOtherIncome < 0, "(" & FORMAT(ABS(pyNetOtherIncome), Fmt) & ")", FORMAT(pyNetOtherIncome, Fmt)))
+			VAR fpyNetIncome = IF(ISBLANK(pyNetIncome), "", IF(pyNetIncome < 0, "(" & FORMAT(ABS(pyNetIncome), Fmt) & ")", FORMAT(pyNetIncome, Fmt)))
+			
+			// ===== VARIANCE (CY - PY) =====
+			VAR varBillableExpenseIncome = vBillableExpenseIncome - pyBillableExpenseIncome
+			VAR varDesignincome = vDesignincome - pyDesignincome
+			VAR varDiscountsgiven = vDiscountsgiven - pyDiscountsgiven
+			VAR varLandscapingServices = vLandscapingServices - pyLandscapingServices
+			VAR varPestControlServices = vPestControlServices - pyPestControlServices
+			VAR varSalesofProductIncome = vSalesofProductIncome - pySalesofProductIncome
+			VAR varServices = vServices - pyServices
+			VAR varTotalIncome = vTotalIncome - pyTotalIncome
+			VAR varCostofGoodsSold = vCostofGoodsSold - pyCostofGoodsSold
+			VAR varTotalCostofSales = vTotalCostofSales - pyTotalCostofSales
+			VAR varGrossProfit = vGrossProfit - pyGrossProfit
+			VAR varAdvertising = vAdvertising - pyAdvertising
+			VAR varAutomobile = vAutomobile - pyAutomobile
+			VAR varEquipmentRental = vEquipmentRental - pyEquipmentRental
+			VAR varInsurance = vInsurance - pyInsurance
+			VAR varJobExpenses = vJobExpenses - pyJobExpenses
+			VAR varLegalProfessionalFees = vLegalProfessionalFees - pyLegalProfessionalFees
+			VAR varMaintenanceandRepair = vMaintenanceandRepair - pyMaintenanceandRepair
+			VAR varMealsandEntertainment = vMealsandEntertainment - pyMealsandEntertainment
+			VAR varOfficeExpenses = vOfficeExpenses - pyOfficeExpenses
+			VAR varRentorLease = vRentorLease - pyRentorLease
+			VAR varUtilities = vUtilities - pyUtilities
+			VAR varTotalExpenses = vTotalExpenses - pyTotalExpenses
+			VAR varNetOperatingIncome = vNetOperatingIncome - pyNetOperatingIncome
+			VAR varMiscellaneous = vMiscellaneous - pyMiscellaneous
+			VAR varTotalOtherExpenses = vTotalOtherExpenses - pyTotalOtherExpenses
+			VAR varNetOtherIncome = vNetOtherIncome - pyNetOtherIncome
+			VAR varNetIncome = vNetIncome - pyNetIncome
+			
+			// ===== VARIANCE % =====
+			VAR pctBillableExpenseIncome = DIVIDE(varBillableExpenseIncome, ABS(pyBillableExpenseIncome), 0)
+			VAR pctDesignincome = DIVIDE(varDesignincome, ABS(pyDesignincome), 0)
+			VAR pctDiscountsgiven = DIVIDE(varDiscountsgiven, ABS(pyDiscountsgiven), 0)
+			VAR pctLandscapingServices = DIVIDE(varLandscapingServices, ABS(pyLandscapingServices), 0)
+			VAR pctPestControlServices = DIVIDE(varPestControlServices, ABS(pyPestControlServices), 0)
+			VAR pctSalesofProductIncome = DIVIDE(varSalesofProductIncome, ABS(pySalesofProductIncome), 0)
+			VAR pctServices = DIVIDE(varServices, ABS(pyServices), 0)
+			VAR pctTotalIncome = DIVIDE(varTotalIncome, ABS(pyTotalIncome), 0)
+			VAR pctCostofGoodsSold = DIVIDE(varCostofGoodsSold, ABS(pyCostofGoodsSold), 0)
+			VAR pctTotalCostofSales = DIVIDE(varTotalCostofSales, ABS(pyTotalCostofSales), 0)
+			VAR pctGrossProfit = DIVIDE(varGrossProfit, ABS(pyGrossProfit), 0)
+			VAR pctAdvertising = DIVIDE(varAdvertising, ABS(pyAdvertising), 0)
+			VAR pctAutomobile = DIVIDE(varAutomobile, ABS(pyAutomobile), 0)
+			VAR pctEquipmentRental = DIVIDE(varEquipmentRental, ABS(pyEquipmentRental), 0)
+			VAR pctInsurance = DIVIDE(varInsurance, ABS(pyInsurance), 0)
+			VAR pctJobExpenses = DIVIDE(varJobExpenses, ABS(pyJobExpenses), 0)
+			VAR pctLegalProfessionalFees = DIVIDE(varLegalProfessionalFees, ABS(pyLegalProfessionalFees), 0)
+			VAR pctMaintenanceandRepair = DIVIDE(varMaintenanceandRepair, ABS(pyMaintenanceandRepair), 0)
+			VAR pctMealsandEntertainment = DIVIDE(varMealsandEntertainment, ABS(pyMealsandEntertainment), 0)
+			VAR pctOfficeExpenses = DIVIDE(varOfficeExpenses, ABS(pyOfficeExpenses), 0)
+			VAR pctRentorLease = DIVIDE(varRentorLease, ABS(pyRentorLease), 0)
+			VAR pctUtilities = DIVIDE(varUtilities, ABS(pyUtilities), 0)
+			VAR pctTotalExpenses = DIVIDE(varTotalExpenses, ABS(pyTotalExpenses), 0)
+			VAR pctNetOperatingIncome = DIVIDE(varNetOperatingIncome, ABS(pyNetOperatingIncome), 0)
+			VAR pctMiscellaneous = DIVIDE(varMiscellaneous, ABS(pyMiscellaneous), 0)
+			VAR pctTotalOtherExpenses = DIVIDE(varTotalOtherExpenses, ABS(pyTotalOtherExpenses), 0)
+			VAR pctNetOtherIncome = DIVIDE(varNetOtherIncome, ABS(pyNetOtherIncome), 0)
+			VAR pctNetIncome = DIVIDE(varNetIncome, ABS(pyNetIncome), 0)
+			
+			// ===== FORMAT VARIANCE with BACKGROUND COLOR (Income: positive=good, Expenses: negative=good) =====
+			VAR fvarBillableExpenseIncome = IF(ISBLANK(varBillableExpenseIncome) || varBillableExpenseIncome = 0, "<td class='val'></td>", IF(varBillableExpenseIncome > 0, "<td class='val var-pos'>" & FORMAT(varBillableExpenseIncome, Fmt) & "</td>", "<td class='val var-neg'>(" & FORMAT(ABS(varBillableExpenseIncome), Fmt) & ")</td>"))
+			VAR fvarDesignincome = IF(ISBLANK(varDesignincome) || varDesignincome = 0, "<td class='val'></td>", IF(varDesignincome > 0, "<td class='val var-pos'>" & FORMAT(varDesignincome, Fmt) & "</td>", "<td class='val var-neg'>(" & FORMAT(ABS(varDesignincome), Fmt) & ")</td>"))
+			VAR fvarDiscountsgiven = IF(ISBLANK(varDiscountsgiven) || varDiscountsgiven = 0, "<td class='val'></td>", IF(varDiscountsgiven > 0, "<td class='val var-pos'>" & FORMAT(varDiscountsgiven, Fmt) & "</td>", "<td class='val var-neg'>(" & FORMAT(ABS(varDiscountsgiven), Fmt) & ")</td>"))
+			VAR fvarLandscapingServices = IF(ISBLANK(varLandscapingServices) || varLandscapingServices = 0, "<td class='val'></td>", IF(varLandscapingServices > 0, "<td class='val var-pos'>" & FORMAT(varLandscapingServices, Fmt) & "</td>", "<td class='val var-neg'>(" & FORMAT(ABS(varLandscapingServices), Fmt) & ")</td>"))
+			VAR fvarPestControlServices = IF(ISBLANK(varPestControlServices) || varPestControlServices = 0, "<td class='val'></td>", IF(varPestControlServices > 0, "<td class='val var-pos'>" & FORMAT(varPestControlServices, Fmt) & "</td>", "<td class='val var-neg'>(" & FORMAT(ABS(varPestControlServices), Fmt) & ")</td>"))
+			VAR fvarSalesofProductIncome = IF(ISBLANK(varSalesofProductIncome) || varSalesofProductIncome = 0, "<td class='val'></td>", IF(varSalesofProductIncome > 0, "<td class='val var-pos'>" & FORMAT(varSalesofProductIncome, Fmt) & "</td>", "<td class='val var-neg'>(" & FORMAT(ABS(varSalesofProductIncome), Fmt) & ")</td>"))
+			VAR fvarServices = IF(ISBLANK(varServices) || varServices = 0, "<td class='val'></td>", IF(varServices > 0, "<td class='val var-pos'>" & FORMAT(varServices, Fmt) & "</td>", "<td class='val var-neg'>(" & FORMAT(ABS(varServices), Fmt) & ")</td>"))
+			VAR fvarTotalIncome = IF(ISBLANK(varTotalIncome) || varTotalIncome = 0, "<td class='val bold'></td>", IF(varTotalIncome > 0, "<td class='val bold var-pos'>" & FORMAT(varTotalIncome, Fmt) & "</td>", "<td class='val bold var-neg'>(" & FORMAT(ABS(varTotalIncome), Fmt) & ")</td>"))
+			VAR fvarCostofGoodsSold = IF(ISBLANK(varCostofGoodsSold) || varCostofGoodsSold = 0, "<td class='val'></td>", IF(varCostofGoodsSold < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varCostofGoodsSold), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varCostofGoodsSold, Fmt) & "</td>"))
+			VAR fvarTotalCostofSales = IF(ISBLANK(varTotalCostofSales) || varTotalCostofSales = 0, "<td class='val bold'></td>", IF(varTotalCostofSales < 0, "<td class='val bold var-pos'>(" & FORMAT(ABS(varTotalCostofSales), Fmt) & ")</td>", "<td class='val bold var-neg'>" & FORMAT(varTotalCostofSales, Fmt) & "</td>"))
+			VAR fvarGrossProfit = IF(ISBLANK(varGrossProfit) || varGrossProfit = 0, "<td class='val bold'></td>", IF(varGrossProfit > 0, "<td class='val bold var-pos'>" & FORMAT(varGrossProfit, Fmt) & "</td>", "<td class='val bold var-neg'>(" & FORMAT(ABS(varGrossProfit), Fmt) & ")</td>"))
+			VAR fvarAdvertising = IF(ISBLANK(varAdvertising) || varAdvertising = 0, "<td class='val'></td>", IF(varAdvertising < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varAdvertising), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varAdvertising, Fmt) & "</td>"))
+			VAR fvarAutomobile = IF(ISBLANK(varAutomobile) || varAutomobile = 0, "<td class='val'></td>", IF(varAutomobile < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varAutomobile), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varAutomobile, Fmt) & "</td>"))
+			VAR fvarEquipmentRental = IF(ISBLANK(varEquipmentRental) || varEquipmentRental = 0, "<td class='val'></td>", IF(varEquipmentRental < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varEquipmentRental), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varEquipmentRental, Fmt) & "</td>"))
+			VAR fvarInsurance = IF(ISBLANK(varInsurance) || varInsurance = 0, "<td class='val'></td>", IF(varInsurance < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varInsurance), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varInsurance, Fmt) & "</td>"))
+			VAR fvarJobExpenses = IF(ISBLANK(varJobExpenses) || varJobExpenses = 0, "<td class='val'></td>", IF(varJobExpenses < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varJobExpenses), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varJobExpenses, Fmt) & "</td>"))
+			VAR fvarLegalProfessionalFees = IF(ISBLANK(varLegalProfessionalFees) || varLegalProfessionalFees = 0, "<td class='val'></td>", IF(varLegalProfessionalFees < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varLegalProfessionalFees), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varLegalProfessionalFees, Fmt) & "</td>"))
+			VAR fvarMaintenanceandRepair = IF(ISBLANK(varMaintenanceandRepair) || varMaintenanceandRepair = 0, "<td class='val'></td>", IF(varMaintenanceandRepair < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varMaintenanceandRepair), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varMaintenanceandRepair, Fmt) & "</td>"))
+			VAR fvarMealsandEntertainment = IF(ISBLANK(varMealsandEntertainment) || varMealsandEntertainment = 0, "<td class='val'></td>", IF(varMealsandEntertainment < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varMealsandEntertainment), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varMealsandEntertainment, Fmt) & "</td>"))
+			VAR fvarOfficeExpenses = IF(ISBLANK(varOfficeExpenses) || varOfficeExpenses = 0, "<td class='val'></td>", IF(varOfficeExpenses < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varOfficeExpenses), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varOfficeExpenses, Fmt) & "</td>"))
+			VAR fvarRentorLease = IF(ISBLANK(varRentorLease) || varRentorLease = 0, "<td class='val'></td>", IF(varRentorLease < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varRentorLease), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varRentorLease, Fmt) & "</td>"))
+			VAR fvarUtilities = IF(ISBLANK(varUtilities) || varUtilities = 0, "<td class='val'></td>", IF(varUtilities < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varUtilities), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varUtilities, Fmt) & "</td>"))
+			VAR fvarTotalExpenses = IF(ISBLANK(varTotalExpenses) || varTotalExpenses = 0, "<td class='val bold'></td>", IF(varTotalExpenses < 0, "<td class='val bold var-pos'>(" & FORMAT(ABS(varTotalExpenses), Fmt) & ")</td>", "<td class='val bold var-neg'>" & FORMAT(varTotalExpenses, Fmt) & "</td>"))
+			VAR fvarNetOperatingIncome = IF(ISBLANK(varNetOperatingIncome) || varNetOperatingIncome = 0, "<td class='val bold'></td>", IF(varNetOperatingIncome > 0, "<td class='val bold var-pos'>" & FORMAT(varNetOperatingIncome, Fmt) & "</td>", "<td class='val bold var-neg'>(" & FORMAT(ABS(varNetOperatingIncome), Fmt) & ")</td>"))
+			VAR fvarMiscellaneous = IF(ISBLANK(varMiscellaneous) || varMiscellaneous = 0, "<td class='val'></td>", IF(varMiscellaneous < 0, "<td class='val var-pos'>(" & FORMAT(ABS(varMiscellaneous), Fmt) & ")</td>", "<td class='val var-neg'>" & FORMAT(varMiscellaneous, Fmt) & "</td>"))
+			VAR fvarTotalOtherExpenses = IF(ISBLANK(varTotalOtherExpenses) || varTotalOtherExpenses = 0, "<td class='val bold'></td>", IF(varTotalOtherExpenses < 0, "<td class='val bold var-pos'>(" & FORMAT(ABS(varTotalOtherExpenses), Fmt) & ")</td>", "<td class='val bold var-neg'>" & FORMAT(varTotalOtherExpenses, Fmt) & "</td>"))
+			VAR fvarNetOtherIncome = IF(ISBLANK(varNetOtherIncome) || varNetOtherIncome = 0, "<td class='val bold'></td>", IF(varNetOtherIncome > 0, "<td class='val bold var-pos'>" & FORMAT(varNetOtherIncome, Fmt) & "</td>", "<td class='val bold var-neg'>(" & FORMAT(ABS(varNetOtherIncome), Fmt) & ")</td>"))
+			VAR fvarNetIncome = IF(ISBLANK(varNetIncome) || varNetIncome = 0, "<td class='val bold'></td>", IF(varNetIncome > 0, "<td class='val bold var-pos'>" & FORMAT(varNetIncome, Fmt) & "</td>", "<td class='val bold var-neg'>(" & FORMAT(ABS(varNetIncome), Fmt) & ")</td>"))
+			
+			// ===== FORMAT VARIANCE % with BACKGROUND COLOR =====
+			VAR fpctBillableExpenseIncome = IF(pctBillableExpenseIncome = 0, "<td class='val'></td>", IF(pctBillableExpenseIncome > 0, "<td class='val var-pos'>" & FORMAT(pctBillableExpenseIncome, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctBillableExpenseIncome, PctFmt) & "</td>"))
+			VAR fpctDesignincome = IF(pctDesignincome = 0, "<td class='val'></td>", IF(pctDesignincome > 0, "<td class='val var-pos'>" & FORMAT(pctDesignincome, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctDesignincome, PctFmt) & "</td>"))
+			VAR fpctDiscountsgiven = IF(pctDiscountsgiven = 0, "<td class='val'></td>", IF(pctDiscountsgiven > 0, "<td class='val var-pos'>" & FORMAT(pctDiscountsgiven, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctDiscountsgiven, PctFmt) & "</td>"))
+			VAR fpctLandscapingServices = IF(pctLandscapingServices = 0, "<td class='val'></td>", IF(pctLandscapingServices > 0, "<td class='val var-pos'>" & FORMAT(pctLandscapingServices, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctLandscapingServices, PctFmt) & "</td>"))
+			VAR fpctPestControlServices = IF(pctPestControlServices = 0, "<td class='val'></td>", IF(pctPestControlServices > 0, "<td class='val var-pos'>" & FORMAT(pctPestControlServices, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctPestControlServices, PctFmt) & "</td>"))
+			VAR fpctSalesofProductIncome = IF(pctSalesofProductIncome = 0, "<td class='val'></td>", IF(pctSalesofProductIncome > 0, "<td class='val var-pos'>" & FORMAT(pctSalesofProductIncome, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctSalesofProductIncome, PctFmt) & "</td>"))
+			VAR fpctServices = IF(pctServices = 0, "<td class='val'></td>", IF(pctServices > 0, "<td class='val var-pos'>" & FORMAT(pctServices, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctServices, PctFmt) & "</td>"))
+			VAR fpctTotalIncome = IF(pctTotalIncome = 0, "<td class='val bold'></td>", IF(pctTotalIncome > 0, "<td class='val bold var-pos'>" & FORMAT(pctTotalIncome, PctFmt) & "</td>", "<td class='val bold var-neg'>" & FORMAT(pctTotalIncome, PctFmt) & "</td>"))
+			VAR fpctCostofGoodsSold = IF(pctCostofGoodsSold = 0, "<td class='val'></td>", IF(pctCostofGoodsSold < 0, "<td class='val var-pos'>" & FORMAT(pctCostofGoodsSold, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctCostofGoodsSold, PctFmt) & "</td>"))
+			VAR fpctTotalCostofSales = IF(pctTotalCostofSales = 0, "<td class='val bold'></td>", IF(pctTotalCostofSales < 0, "<td class='val bold var-pos'>" & FORMAT(pctTotalCostofSales, PctFmt) & "</td>", "<td class='val bold var-neg'>" & FORMAT(pctTotalCostofSales, PctFmt) & "</td>"))
+			VAR fpctGrossProfit = IF(pctGrossProfit = 0, "<td class='val bold'></td>", IF(pctGrossProfit > 0, "<td class='val bold var-pos'>" & FORMAT(pctGrossProfit, PctFmt) & "</td>", "<td class='val bold var-neg'>" & FORMAT(pctGrossProfit, PctFmt) & "</td>"))
+			VAR fpctAdvertising = IF(pctAdvertising = 0, "<td class='val'></td>", IF(pctAdvertising < 0, "<td class='val var-pos'>" & FORMAT(pctAdvertising, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctAdvertising, PctFmt) & "</td>"))
+			VAR fpctAutomobile = IF(pctAutomobile = 0, "<td class='val'></td>", IF(pctAutomobile < 0, "<td class='val var-pos'>" & FORMAT(pctAutomobile, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctAutomobile, PctFmt) & "</td>"))
+			VAR fpctEquipmentRental = IF(pctEquipmentRental = 0, "<td class='val'></td>", IF(pctEquipmentRental < 0, "<td class='val var-pos'>" & FORMAT(pctEquipmentRental, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctEquipmentRental, PctFmt) & "</td>"))
+			VAR fpctInsurance = IF(pctInsurance = 0, "<td class='val'></td>", IF(pctInsurance < 0, "<td class='val var-pos'>" & FORMAT(pctInsurance, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctInsurance, PctFmt) & "</td>"))
+			VAR fpctJobExpenses = IF(pctJobExpenses = 0, "<td class='val'></td>", IF(pctJobExpenses < 0, "<td class='val var-pos'>" & FORMAT(pctJobExpenses, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctJobExpenses, PctFmt) & "</td>"))
+			VAR fpctLegalProfessionalFees = IF(pctLegalProfessionalFees = 0, "<td class='val'></td>", IF(pctLegalProfessionalFees < 0, "<td class='val var-pos'>" & FORMAT(pctLegalProfessionalFees, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctLegalProfessionalFees, PctFmt) & "</td>"))
+			VAR fpctMaintenanceandRepair = IF(pctMaintenanceandRepair = 0, "<td class='val'></td>", IF(pctMaintenanceandRepair < 0, "<td class='val var-pos'>" & FORMAT(pctMaintenanceandRepair, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctMaintenanceandRepair, PctFmt) & "</td>"))
+			VAR fpctMealsandEntertainment = IF(pctMealsandEntertainment = 0, "<td class='val'></td>", IF(pctMealsandEntertainment < 0, "<td class='val var-pos'>" & FORMAT(pctMealsandEntertainment, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctMealsandEntertainment, PctFmt) & "</td>"))
+			VAR fpctOfficeExpenses = IF(pctOfficeExpenses = 0, "<td class='val'></td>", IF(pctOfficeExpenses < 0, "<td class='val var-pos'>" & FORMAT(pctOfficeExpenses, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctOfficeExpenses, PctFmt) & "</td>"))
+			VAR fpctRentorLease = IF(pctRentorLease = 0, "<td class='val'></td>", IF(pctRentorLease < 0, "<td class='val var-pos'>" & FORMAT(pctRentorLease, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctRentorLease, PctFmt) & "</td>"))
+			VAR fpctUtilities = IF(pctUtilities = 0, "<td class='val'></td>", IF(pctUtilities < 0, "<td class='val var-pos'>" & FORMAT(pctUtilities, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctUtilities, PctFmt) & "</td>"))
+			VAR fpctTotalExpenses = IF(pctTotalExpenses = 0, "<td class='val bold'></td>", IF(pctTotalExpenses < 0, "<td class='val bold var-pos'>" & FORMAT(pctTotalExpenses, PctFmt) & "</td>", "<td class='val bold var-neg'>" & FORMAT(pctTotalExpenses, PctFmt) & "</td>"))
+			VAR fpctNetOperatingIncome = IF(pctNetOperatingIncome = 0, "<td class='val bold'></td>", IF(pctNetOperatingIncome > 0, "<td class='val bold var-pos'>" & FORMAT(pctNetOperatingIncome, PctFmt) & "</td>", "<td class='val bold var-neg'>" & FORMAT(pctNetOperatingIncome, PctFmt) & "</td>"))
+			VAR fpctMiscellaneous = IF(pctMiscellaneous = 0, "<td class='val'></td>", IF(pctMiscellaneous < 0, "<td class='val var-pos'>" & FORMAT(pctMiscellaneous, PctFmt) & "</td>", "<td class='val var-neg'>" & FORMAT(pctMiscellaneous, PctFmt) & "</td>"))
+			VAR fpctTotalOtherExpenses = IF(pctTotalOtherExpenses = 0, "<td class='val bold'></td>", IF(pctTotalOtherExpenses < 0, "<td class='val bold var-pos'>" & FORMAT(pctTotalOtherExpenses, PctFmt) & "</td>", "<td class='val bold var-neg'>" & FORMAT(pctTotalOtherExpenses, PctFmt) & "</td>"))
+			VAR fpctNetOtherIncome = IF(pctNetOtherIncome = 0, "<td class='val bold'></td>", IF(pctNetOtherIncome > 0, "<td class='val bold var-pos'>" & FORMAT(pctNetOtherIncome, PctFmt) & "</td>", "<td class='val bold var-neg'>" & FORMAT(pctNetOtherIncome, PctFmt) & "</td>"))
+			VAR fpctNetIncome = IF(pctNetIncome = 0, "<td class='val bold'></td>", IF(pctNetIncome > 0, "<td class='val bold var-pos'>" & FORMAT(pctNetIncome, PctFmt) & "</td>", "<td class='val bold var-neg'>" & FORMAT(pctNetIncome, PctFmt) & "</td>"))
+			
+			// ===== CSS with Background Colors =====
+			VAR CSS = "<style>.scroll-wrapper{height:100vh;overflow-y:auto;padding-right:2px}.scroll-wrapper::-webkit-scrollbar{width:8px;background:transparent}.scroll-wrapper::-webkit-scrollbar-thumb{background-color:transparent;border-radius:4px;border:2px solid transparent;background-clip:content-box}.scroll-wrapper:hover::-webkit-scrollbar-thumb{background-color:#bbb}html,body{margin:0;padding:0;height:100%;overflow:hidden}table{width:100%;border-collapse:collapse;font-family:Segoe UI,sans-serif;font-size:13px}th{background:#e6e6e6;color:black;padding:6px 4px;text-align:center;position:sticky;top:0;z-index:10}td{padding:4px 6px;border-bottom:1px solid #e0e0e0}.desc{text-align:left;white-space:nowrap}.val{text-align:right}.bold{font-weight:bold}.indent1{padding-left:20px}.section{background:#f5f5f5}.title{font-size:15px;font-weight:bold;text-align:center;padding:10px;background:#e6e6e6;color:black;position:sticky;top:0;z-index:11}.var-pos{background-color:#d4edda;color:#155724}.var-neg{background-color:#f8d7da;color:#721c24}</style>"
+			
+			// ===== HTML TABLE with Variance background colors =====
+			VAR HTMLL = "<div class='scroll-wrapper'><div class='title'>Profit & Loss Statement</div><table>" &
+			"<tr><th></th><th>Current</th><th>Prior Year</th><th>Variance</th><th>Variance %</th></tr>" &
+			"<tr class='section'><td class='desc bold'>Income</td><td></td><td></td><td></td><td></td></tr>" &
+			"<tr><td class='desc indent1'>Billable Expense Income</td><td class='val'>" & fBillableExpenseIncome & "</td><td class='val'>" & fpyBillableExpenseIncome & "</td>" & fvarBillableExpenseIncome & fpctBillableExpenseIncome & "</tr>" &
+			"<tr><td class='desc indent1'>Design income</td><td class='val'>" & fDesignincome & "</td><td class='val'>" & fpyDesignincome & "</td>" & fvarDesignincome & fpctDesignincome & "</tr>" &
+			"<tr><td class='desc indent1'>Discounts given</td><td class='val'>" & fDiscountsgiven & "</td><td class='val'>" & fpyDiscountsgiven & "</td>" & fvarDiscountsgiven & fpctDiscountsgiven & "</tr>" &
+			"<tr><td class='desc indent1'>Landscaping Services</td><td class='val'>" & fLandscapingServices & "</td><td class='val'>" & fpyLandscapingServices & "</td>" & fvarLandscapingServices & fpctLandscapingServices & "</tr>" &
+			"<tr><td class='desc indent1'>Pest Control Services</td><td class='val'>" & fPestControlServices & "</td><td class='val'>" & fpyPestControlServices & "</td>" & fvarPestControlServices & fpctPestControlServices & "</tr>" &
+			"<tr><td class='desc indent1'>Sales of Product Income</td><td class='val'>" & fSalesofProductIncome & "</td><td class='val'>" & fpySalesofProductIncome & "</td>" & fvarSalesofProductIncome & fpctSalesofProductIncome & "</tr>" &
+			"<tr><td class='desc indent1'>Services</td><td class='val'>" & fServices & "</td><td class='val'>" & fpyServices & "</td>" & fvarServices & fpctServices & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Total Income</td><td class='val bold'>" & fTotalIncome & "</td><td class='val bold'>" & fpyTotalIncome & "</td>" & fvarTotalIncome & fpctTotalIncome & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Cost of Sales</td><td></td><td></td><td></td><td></td></tr>" &
+			"<tr><td class='desc indent1'>Cost of Goods Sold</td><td class='val'>" & fCostofGoodsSold & "</td><td class='val'>" & fpyCostofGoodsSold & "</td>" & fvarCostofGoodsSold & fpctCostofGoodsSold & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Total Cost of Sales</td><td class='val bold'>" & fTotalCostofSales & "</td><td class='val bold'>" & fpyTotalCostofSales & "</td>" & fvarTotalCostofSales & fpctTotalCostofSales & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Gross Profit</td><td class='val bold'>" & fGrossProfit & "</td><td class='val bold'>" & fpyGrossProfit & "</td>" & fvarGrossProfit & fpctGrossProfit & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Expenses</td><td></td><td></td><td></td><td></td></tr>" &
+			"<tr><td class='desc indent1'>Advertising</td><td class='val'>" & fAdvertising & "</td><td class='val'>" & fpyAdvertising & "</td>" & fvarAdvertising & fpctAdvertising & "</tr>" &
+			"<tr><td class='desc indent1'>Automobile</td><td class='val'>" & fAutomobile & "</td><td class='val'>" & fpyAutomobile & "</td>" & fvarAutomobile & fpctAutomobile & "</tr>" &
+			"<tr><td class='desc indent1'>Equipment Rental</td><td class='val'>" & fEquipmentRental & "</td><td class='val'>" & fpyEquipmentRental & "</td>" & fvarEquipmentRental & fpctEquipmentRental & "</tr>" &
+			"<tr><td class='desc indent1'>Insurance</td><td class='val'>" & fInsurance & "</td><td class='val'>" & fpyInsurance & "</td>" & fvarInsurance & fpctInsurance & "</tr>" &
+			"<tr><td class='desc indent1'>Job Expenses</td><td class='val'>" & fJobExpenses & "</td><td class='val'>" & fpyJobExpenses & "</td>" & fvarJobExpenses & fpctJobExpenses & "</tr>" &
+			"<tr><td class='desc indent1'>Legal & Professional Fees</td><td class='val'>" & fLegalProfessionalFees & "</td><td class='val'>" & fpyLegalProfessionalFees & "</td>" & fvarLegalProfessionalFees & fpctLegalProfessionalFees & "</tr>" &
+			"<tr><td class='desc indent1'>Maintenance and Repair</td><td class='val'>" & fMaintenanceandRepair & "</td><td class='val'>" & fpyMaintenanceandRepair & "</td>" & fvarMaintenanceandRepair & fpctMaintenanceandRepair & "</tr>" &
+			"<tr><td class='desc indent1'>Meals and Entertainment</td><td class='val'>" & fMealsandEntertainment & "</td><td class='val'>" & fpyMealsandEntertainment & "</td>" & fvarMealsandEntertainment & fpctMealsandEntertainment & "</tr>" &
+			"<tr><td class='desc indent1'>Office Expenses</td><td class='val'>" & fOfficeExpenses & "</td><td class='val'>" & fpyOfficeExpenses & "</td>" & fvarOfficeExpenses & fpctOfficeExpenses & "</tr>" &
+			"<tr><td class='desc indent1'>Rent or Lease</td><td class='val'>" & fRentorLease & "</td><td class='val'>" & fpyRentorLease & "</td>" & fvarRentorLease & fpctRentorLease & "</tr>" &
+			"<tr><td class='desc indent1'>Utilities</td><td class='val'>" & fUtilities & "</td><td class='val'>" & fpyUtilities & "</td>" & fvarUtilities & fpctUtilities & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Total Expenses</td><td class='val bold'>" & fTotalExpenses & "</td><td class='val bold'>" & fpyTotalExpenses & "</td>" & fvarTotalExpenses & fpctTotalExpenses & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Net Operating Income</td><td class='val bold'>" & fNetOperatingIncome & "</td><td class='val bold'>" & fpyNetOperatingIncome & "</td>" & fvarNetOperatingIncome & fpctNetOperatingIncome & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Other Expenses</td><td></td><td></td><td></td><td></td></tr>" &
+			"<tr><td class='desc indent1'>Miscellaneous</td><td class='val'>" & fMiscellaneous & "</td><td class='val'>" & fpyMiscellaneous & "</td>" & fvarMiscellaneous & fpctMiscellaneous & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Total Other Expenses</td><td class='val bold'>" & fTotalOtherExpenses & "</td><td class='val bold'>" & fpyTotalOtherExpenses & "</td>" & fvarTotalOtherExpenses & fpctTotalOtherExpenses & "</tr>" &
+			"<tr class='section'><td class='desc bold'>Net Other Income</td><td class='val bold'>" & fNetOtherIncome & "</td><td class='val bold'>" & fpyNetOtherIncome & "</td>" & fvarNetOtherIncome & fpctNetOtherIncome & "</tr>" &
+			"<tr style='background:#e8f0fe'><td class='desc bold'>Net Income</td><td class='val bold'>" & fNetIncome & "</td><td class='val bold'>" & fpyNetIncome & "</td>" & fvarNetIncome & fpctNetIncome & "</tr>" &
+			"</table></div>"
+			
+			RETURN CSS & HTMLL
+		lineageTag: 143265da-fdc7-4581-abef-e5ec3501dc86
+
+	measure 'Waterfall Value' =
+			
+			VAR SelectedCategory = SELECTEDVALUE('PL Waterfall Data'[Category])
+			RETURN
+			SWITCH(
+			    SelectedCategory,
+			    "Total Income", [_TotalIncome],
+			    "Cost of Sales", -[_TotalCostofSales],
+			    "Overall Expenses", -[_TotalExpenses] - [_TotalOtherExpenses],
+			    "Net Income", [_NetIncome],
+			    BLANK()
+			)
+		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
+		lineageTag: 6e1bcdd9-30b7-4bc5-85ea-721f7f970f9f
+
+	column Column1
+		dataType: string
+		lineageTag: 26737ca2-042c-4743-90a2-b3f2fa6f8d0d
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,137 @@
+table 'Fact BS Balance'
+	lineageTag: f8c21d3e-5b47-4a9c-b123-456789abcdef
+
+	column balance_key
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: f8c21d3e-0001-0000-0000-000000000001
+		summarizeBy: sum
+		sourceColumn: balance_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_key
+		dataType: int64
+		formatString: 0
+		lineageTag: f8c21d3e-0002-0000-0000-000000000002
+		summarizeBy: sum
+		sourceColumn: account_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_id
+		dataType: string
+		lineageTag: f8c21d3e-0003-0000-0000-000000000003
+		summarizeBy: none
+		sourceColumn: account_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_name
+		dataType: string
+		lineageTag: f8c21d3e-0004-0000-0000-000000000004
+		summarizeBy: none
+		sourceColumn: account_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column fully_qualified_name
+		dataType: string
+		lineageTag: f8c21d3e-0005-0000-0000-000000000005
+		summarizeBy: none
+		sourceColumn: fully_qualified_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_type
+		dataType: string
+		lineageTag: f8c21d3e-0006-0000-0000-000000000006
+		summarizeBy: none
+		sourceColumn: account_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_sub_type
+		dataType: string
+		lineageTag: f8c21d3e-0007-0000-0000-000000000007
+		summarizeBy: none
+		sourceColumn: account_sub_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column classification
+		dataType: string
+		lineageTag: f8c21d3e-0008-0000-0000-000000000008
+		summarizeBy: none
+		sourceColumn: classification
+
+		annotation SummarizationSetBy = Automatic
+
+	column bs_category
+		dataType: string
+		lineageTag: f8c21d3e-0009-0000-0000-000000000009
+		summarizeBy: none
+		sourceColumn: bs_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column parent_account_name
+		dataType: string
+		lineageTag: f8c21d3e-0010-0000-0000-000000000010
+		summarizeBy: none
+		sourceColumn: parent_account_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_balance
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: f8c21d3e-0011-0000-0000-000000000011
+		summarizeBy: sum
+		sourceColumn: current_balance
+
+		annotation SummarizationSetBy = Automatic
+
+	column display_balance
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: f8c21d3e-0012-0000-0000-000000000012
+		summarizeBy: sum
+		sourceColumn: display_balance
+
+		annotation SummarizationSetBy = Automatic
+
+	column report_order
+		dataType: int64
+		formatString: 0
+		lineageTag: f8c21d3e-0013-0000-0000-000000000013
+		summarizeBy: sum
+		sourceColumn: report_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column balance_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 9b67b6bc-bca9-41b8-a665-c4507117a272
+		summarizeBy: none
+		sourceColumn: balance_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'Fact BS Balance' = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database("localhost", "icla_finance_gold", [ReturnSingleDatabase=true]),
+				    icla_finance_gold_fact_bs_balance = Source{[Schema="icla_finance_gold",Item="fact_bs_balance"]}[Data]
+				in
+				    icla_finance_gold_fact_bs_balance
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

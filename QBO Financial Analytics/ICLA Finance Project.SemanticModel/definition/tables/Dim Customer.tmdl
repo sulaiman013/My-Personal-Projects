@@ -1,0 +1,107 @@
+table 'Dim Customer'
+	lineageTag: 4232ec1b-86d1-4266-b99e-eca0b0aee56f
+
+	column customer_key
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: aeccf5ad-0cee-466b-ad92-b0fd93017df8
+		summarizeBy: none
+		sourceColumn: customer_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: string
+		lineageTag: 9bb6455a-0a5c-493c-bfdb-776ec20978c6
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_name
+		dataType: string
+		lineageTag: e3abfaf3-db62-4625-8457-f7038e752b29
+		summarizeBy: none
+		sourceColumn: customer_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: d006d75b-ecc0-43b1-a814-9354867fb172
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column email
+		dataType: string
+		lineageTag: 969d53af-a1ab-446d-832c-e6bcb81bc8f9
+		summarizeBy: none
+		sourceColumn: email
+
+		annotation SummarizationSetBy = Automatic
+
+	column phone
+		dataType: string
+		lineageTag: 6b555100-33d8-4fea-83ed-05c71afcab2c
+		summarizeBy: none
+		sourceColumn: phone
+
+		annotation SummarizationSetBy = Automatic
+
+	column city
+		dataType: string
+		lineageTag: e8835da7-d70f-4017-a7b5-85321702cc6b
+		summarizeBy: none
+		sourceColumn: city
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: string
+		lineageTag: f452db17-d50e-42c9-8283-32adb34552ca
+		summarizeBy: none
+		sourceColumn: state
+
+		annotation SummarizationSetBy = Automatic
+
+	column postal_code
+		dataType: string
+		lineageTag: ccc6f5df-6b33-4f5a-8c20-3f29cc2b16a9
+		summarizeBy: none
+		sourceColumn: postal_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column lead_source
+		dataType: string
+		lineageTag: 5e620f00-7a64-4236-8ded-0f45b5e0fc7c
+		summarizeBy: none
+		sourceColumn: lead_source
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: e64c9956-1eb6-491e-a105-b4d4af2d8fa6
+		summarizeBy: none
+		sourceColumn: is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim Customer' = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database("localhost", "icla_finance_gold", [ReturnSingleDatabase=true]),
+				    icla_finance_gold_dim_customer = Source{[Schema="icla_finance_gold",Item="dim_customer"]}[Data]
+				in
+				    icla_finance_gold_dim_customer
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

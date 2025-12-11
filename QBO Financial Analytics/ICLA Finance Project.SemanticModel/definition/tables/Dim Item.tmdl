@@ -1,0 +1,77 @@
+table 'Dim Item'
+	lineageTag: 54d49756-8048-4811-9b5f-c68edbcfaf04
+
+	column item_key
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: 0977e540-70f1-4937-bdbf-259c2b7b4969
+		summarizeBy: none
+		sourceColumn: item_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_id
+		dataType: string
+		lineageTag: a387512f-e4d3-4cbb-ac13-1629256cd8b6
+		summarizeBy: none
+		sourceColumn: item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_name
+		dataType: string
+		lineageTag: ed5abd9a-78b1-4323-8f8b-8055a5d04545
+		summarizeBy: none
+		sourceColumn: item_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_type
+		dataType: string
+		lineageTag: a4d2f221-9025-4465-b4ee-f7f6e649c11a
+		summarizeBy: none
+		sourceColumn: item_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: 2784c735-5afa-4378-88a9-9da917fc0cc2
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_price
+		dataType: double
+		lineageTag: 5138bb9d-0bd0-460c-8779-aeb3c3ea10b9
+		summarizeBy: sum
+		sourceColumn: unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 207d4248-3289-4300-86a3-470c064ad5ba
+		summarizeBy: none
+		sourceColumn: is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim Item' = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database("localhost", "icla_finance_gold", [ReturnSingleDatabase=true]),
+				    icla_finance_gold_dim_item = Source{[Schema="icla_finance_gold",Item="dim_item"]}[Data]
+				in
+				    icla_finance_gold_dim_item
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

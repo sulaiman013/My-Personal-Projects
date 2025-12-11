@@ -1,0 +1,156 @@
+table 'Fact AR Aging'
+	lineageTag: fb9b1726-9293-47dc-811d-7516c9186a29
+
+	column ar_key
+		dataType: int64
+		formatString: 0
+		lineageTag: e4efc9fe-3557-4fa2-8a99-8b91e4dfdfb1
+		summarizeBy: none
+		sourceColumn: ar_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column as_of_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7c80542f-78d8-43c7-b8d4-804db0f2bf0f
+		summarizeBy: none
+		sourceColumn: as_of_date
+
+		variation Variation
+			isDefault
+			relationship: 40e84c5f-bc11-40fe-b046-7c3fd0e45bb7
+			defaultHierarchy: LocalDateTable_360ab994-877a-4250-9d42-0e8e853159fa.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column invoice_id
+		dataType: string
+		lineageTag: 4be78d5d-d677-44d1-af4a-c8bced077090
+		summarizeBy: none
+		sourceColumn: invoice_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 3fd379b7-3dab-484f-969c-d2a50c3d2c7f
+		summarizeBy: none
+		sourceColumn: customer_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column bucket_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 50cc319d-414f-43c8-9c27-f2ade9d83013
+		summarizeBy: none
+		sourceColumn: bucket_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column original_amount
+		dataType: double
+		lineageTag: dd990359-ac3f-474a-a112-918a6a467472
+		summarizeBy: sum
+		sourceColumn: original_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column amount_paid
+		dataType: double
+		lineageTag: 60e9027d-73a4-46db-977f-f608f93ea1a5
+		summarizeBy: sum
+		sourceColumn: amount_paid
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column balance_due
+		dataType: double
+		lineageTag: 87b98260-047d-44e4-acc3-aef1d2881cf5
+		summarizeBy: sum
+		sourceColumn: balance_due
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column days_outstanding
+		dataType: int64
+		formatString: 0
+		lineageTag: b3b2aaf8-d670-483f-adcd-e5e58d1cf193
+		summarizeBy: sum
+		sourceColumn: days_outstanding
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_amount
+		dataType: double
+		lineageTag: 1c35e8ce-f5f8-412e-8735-516b5935862a
+		summarizeBy: sum
+		sourceColumn: current_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column days_1_30
+		dataType: double
+		lineageTag: b8d9089d-757c-4bef-82a7-1eb4d95b08c9
+		summarizeBy: sum
+		sourceColumn: days_1_30
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column days_31_60
+		dataType: double
+		lineageTag: f6218bc0-f84b-4359-935c-0f2d1a399b3a
+		summarizeBy: sum
+		sourceColumn: days_31_60
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column days_61_90
+		dataType: double
+		lineageTag: 693d020b-d21e-4d67-9583-a536796cfea4
+		summarizeBy: sum
+		sourceColumn: days_61_90
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column days_over_90
+		dataType: double
+		lineageTag: 7f261103-2f9c-4ae8-96f5-aa5b46b4e3d4
+		summarizeBy: sum
+		sourceColumn: days_over_90
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Fact AR Aging' = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database("localhost", "icla_finance_gold", [ReturnSingleDatabase=true]),
+				    icla_finance_gold_fact_ar_aging = Source{[Schema="icla_finance_gold",Item="fact_ar_aging"]}[Data]
+				in
+				    icla_finance_gold_fact_ar_aging
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

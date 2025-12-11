@@ -1,0 +1,61 @@
+table 'Dim Aging Bucket'
+	lineageTag: d49fc3df-7f48-47ca-a707-28d724da39b4
+
+	column bucket_key
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: 1786bcd2-d65d-460c-9a07-5419e1b36b87
+		summarizeBy: none
+		sourceColumn: bucket_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column bucket_name
+		dataType: string
+		lineageTag: 955bdbb4-8f35-4bce-a658-d636efc5e4f3
+		summarizeBy: none
+		sourceColumn: bucket_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column bucket_order
+		dataType: int64
+		formatString: 0
+		lineageTag: ca69ba0f-3a27-4a53-a67e-667de502117d
+		summarizeBy: sum
+		sourceColumn: bucket_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column min_days
+		dataType: int64
+		formatString: 0
+		lineageTag: e799dd90-010c-47f3-9a71-66446c9be34c
+		summarizeBy: sum
+		sourceColumn: min_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column max_days
+		dataType: int64
+		formatString: 0
+		lineageTag: 1a99ef77-f814-4a4d-a6eb-9afe88d5da48
+		summarizeBy: sum
+		sourceColumn: max_days
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim Aging Bucket' = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database("localhost", "icla_finance_gold", [ReturnSingleDatabase=true]),
+				    icla_finance_gold_dim_aging_bucket = Source{[Schema="icla_finance_gold",Item="dim_aging_bucket"]}[Data]
+				in
+				    icla_finance_gold_dim_aging_bucket
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

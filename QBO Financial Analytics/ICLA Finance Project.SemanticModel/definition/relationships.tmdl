@@ -1,0 +1,121 @@
+relationship 0da3a053-3799-4654-a7fe-ab7e0db01607
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fact AP Aging'.as_of_date
+	toColumn: LocalDateTable_eecccaab-b722-4c81-a994-fd03442cf510.Date
+
+relationship 40e84c5f-bc11-40fe-b046-7c3fd0e45bb7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fact AR Aging'.as_of_date
+	toColumn: LocalDateTable_360ab994-877a-4250-9d42-0e8e853159fa.Date
+
+relationship e4147834-5af9-4e42-9c05-af5bdbd4933d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fact Bill'.due_date_key
+	toColumn: LocalDateTable_be78c1c2-ab72-4c1b-a7d1-7f946ca52066.Date
+
+relationship 2c11c714-811d-47cd-9737-a182b6f00c7e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Fact Invoice'.due_date_key
+	toColumn: LocalDateTable_fc7b76de-a87b-4e14-9bc2-b5b2b29db8e0.Date
+
+relationship FactInvoice_DimCustomer
+	fromColumn: 'Fact Invoice'.customer_key
+	toColumn: 'Dim Customer'.customer_key
+
+relationship FactInvoice_DimDate
+	fromColumn: 'Fact Invoice'.invoice_date_key
+	toColumn: 'Dim Date'.date_key
+
+relationship FactInvoiceLine_DimCustomer
+	fromColumn: 'Fact Invoice Line'.customer_key
+	toColumn: 'Dim Customer'.customer_key
+
+relationship FactInvoiceLine_DimItem
+	fromColumn: 'Fact Invoice Line'.item_key
+	toColumn: 'Dim Item'.item_key
+
+relationship FactInvoiceLine_DimDate
+	fromColumn: 'Fact Invoice Line'.invoice_date_key
+	toColumn: 'Dim Date'.date_key
+
+relationship FactBill_DimVendor
+	fromColumn: 'Fact Bill'.vendor_key
+	toColumn: 'Dim Vendor'.vendor_key
+
+relationship FactBill_DimDate
+	fromColumn: 'Fact Bill'.bill_date_key
+	toColumn: 'Dim Date'.date_key
+
+relationship FactBillLine_DimVendor
+	isActive: false
+	fromColumn: 'Fact Bill Line'.vendor_key
+	toColumn: 'Dim Vendor'.vendor_key
+
+relationship FactBillLine_DimAccount
+	fromColumn: 'Fact Bill Line'.account_key
+	toColumn: 'Dim Account'.account_key
+
+relationship FactBillLine_DimItem
+	fromColumn: 'Fact Bill Line'.item_key
+	toColumn: 'Dim Item'.item_key
+
+relationship FactBillLine_DimDate
+	fromColumn: 'Fact Bill Line'.bill_date_key
+	toColumn: 'Dim Date'.date_key
+
+relationship FactPayment_DimCustomer
+	fromColumn: 'Fact Payment'.customer_key
+	toColumn: 'Dim Customer'.customer_key
+
+relationship FactPayment_DimVendor
+	fromColumn: 'Fact Payment'.vendor_key
+	toColumn: 'Dim Vendor'.vendor_key
+
+relationship FactPayment_DimDate
+	fromColumn: 'Fact Payment'.payment_date_key
+	toColumn: 'Dim Date'.date_key
+
+relationship FactARAging_DimCustomer
+	fromColumn: 'Fact AR Aging'.customer_key
+	toColumn: 'Dim Customer'.customer_key
+
+relationship FactARAging_DimAgingBucket
+	fromColumn: 'Fact AR Aging'.bucket_key
+	toColumn: 'Dim Aging Bucket'.bucket_key
+
+relationship FactAPAging_DimVendor
+	fromColumn: 'Fact AP Aging'.vendor_key
+	toColumn: 'Dim Vendor'.vendor_key
+
+relationship FactAPAging_DimAgingBucket
+	fromColumn: 'Fact AP Aging'.bucket_key
+	toColumn: 'Dim Aging Bucket'.bucket_key
+
+relationship FactInvoiceLine_DimAccount
+	fromColumn: 'Fact Invoice Line'.account_key
+	toColumn: 'Dim Account'.account_key
+
+relationship FactPLLine_DimAccount
+	fromColumn: 'Fact PL Line'.account_key
+	toColumn: 'Dim Account'.account_key
+
+relationship FactPLLine_DimDate
+	fromColumn: 'Fact PL Line'.transaction_date_key
+	toColumn: 'Dim Date'.date_key
+
+relationship 30acd9ba-428b-395b-d379-94b097e0ee19
+	fromColumn: 'Fact BS Balance'.balance_date
+	toColumn: 'Dim Date'.date_key
+
+relationship FactPLLine_DimCustomer
+	fromColumn: 'Fact PL Line'.customer_key
+	toColumn: 'Dim Customer'.customer_key
+
+relationship FactPLLine_DimVendor
+	fromColumn: 'Fact PL Line'.vendor_key
+	toColumn: 'Dim Vendor'.vendor_key
+
+relationship FactPLLine_DimItem
+	fromColumn: 'Fact PL Line'.item_key
+	toColumn: 'Dim Item'.item_key
+

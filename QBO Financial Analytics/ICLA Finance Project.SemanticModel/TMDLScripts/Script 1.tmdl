@@ -1,0 +1,483 @@
+createOrReplace
+
+	table _Measures
+		lineageTag: b428b961-c068-403d-8339-0ce1fdf973ed
+
+		measure 'Total Revenue' = SUM('Fact Invoice'[total_amount])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000001
+
+		measure 'Total Expenses' = SUM('Fact Bill'[total_amount])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000002
+
+		measure 'Net Income' = [Total Revenue] - [Total Expenses]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000003
+
+		measure 'Gross Margin %' = DIVIDE([Net Income], [Total Revenue], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000004
+
+		measure 'Invoice Count' = COUNTROWS('Fact Invoice')
+			formatString: #,0
+			lineageTag: 10000001-0000-0000-0000-000000000005
+
+		measure 'Bill Count' = COUNTROWS('Fact Bill')
+			formatString: #,0
+			lineageTag: 10000001-0000-0000-0000-000000000006
+
+		measure 'Avg Invoice Amount' = AVERAGE('Fact Invoice'[total_amount])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000007
+
+		measure 'Avg Bill Amount' = AVERAGE('Fact Bill'[total_amount])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000008
+
+		measure 'Total AR Outstanding' = SUM('Fact AR Aging'[balance_due])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000010
+
+		measure 'AR Current' = SUM('Fact AR Aging'[current_amount])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000011
+
+		measure 'AR 1-30 Days' = SUM('Fact AR Aging'[days_1_30])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000012
+
+		measure 'AR 31-60 Days' = SUM('Fact AR Aging'[days_31_60])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000013
+
+		measure 'AR 61-90 Days' = SUM('Fact AR Aging'[days_61_90])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000014
+
+		measure 'AR Over 90 Days' = SUM('Fact AR Aging'[days_over_90])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000015
+
+		measure 'AR Current %' = DIVIDE([AR Current], [Total AR Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000016
+
+		measure 'AR 1-30 %' = DIVIDE([AR 1-30 Days], [Total AR Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000017
+
+		measure 'AR 31-60 %' = DIVIDE([AR 31-60 Days], [Total AR Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000018
+
+		measure 'AR 61-90 %' = DIVIDE([AR 61-90 Days], [Total AR Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000019
+
+		measure 'AR Over 90 %' = DIVIDE([AR Over 90 Days], [Total AR Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000020
+
+		measure 'Total AP Outstanding' = SUM('Fact AP Aging'[balance_due])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000021
+
+		measure 'AP Current' = SUM('Fact AP Aging'[current_amount])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000022
+
+		measure 'AP 1-30 Days' = SUM('Fact AP Aging'[days_1_30])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000023
+
+		measure 'AP 31-60 Days' = SUM('Fact AP Aging'[days_31_60])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000024
+
+		measure 'AP 61-90 Days' = SUM('Fact AP Aging'[days_61_90])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000025
+
+		measure 'AP Over 90 Days' = SUM('Fact AP Aging'[days_over_90])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000026
+
+		measure 'AP Current %' = DIVIDE([AP Current], [Total AP Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000027
+
+		measure 'AP 1-30 %' = DIVIDE([AP 1-30 Days], [Total AP Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000028
+
+		measure 'AP 31-60 %' = DIVIDE([AP 31-60 Days], [Total AP Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000029
+
+		measure 'AP 61-90 %' = DIVIDE([AP 61-90 Days], [Total AP Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000030
+
+		measure 'AP Over 90 %' = DIVIDE([AP Over 90 Days], [Total AP Outstanding], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000031
+
+		measure 'Cash from Customers' = CALCULATE(SUM('Fact Payment'[amount]), 'Fact Payment'[payment_type] = "Customer")
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000032
+
+		measure 'Cash to Vendors' = CALCULATE(SUM('Fact Payment'[amount]), 'Fact Payment'[payment_type] = "Vendor")
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000033
+
+		measure 'Net Cash Flow' = [Cash from Customers] - [Cash to Vendors]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000034
+
+		measure 'Total Payments' = SUM('Fact Payment'[amount])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000035
+
+		measure 'Payment Count' = COUNTROWS('Fact Payment')
+			formatString: #,0
+			lineageTag: 10000001-0000-0000-0000-000000000036
+
+		measure 'Revenue YTD' = TOTALYTD([Total Revenue], 'Dim Date'[date_key])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000037
+
+		measure 'Expenses YTD' = TOTALYTD([Total Expenses], 'Dim Date'[date_key])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000038
+
+		measure 'Revenue PY' = CALCULATE([Total Revenue], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000039
+
+		measure 'Revenue YoY Growth' = DIVIDE([Total Revenue] - [Revenue PY], [Revenue PY], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000040
+
+		measure 'Expenses PY' = CALCULATE([Total Expenses], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000041
+
+		measure 'Amount Paid (Invoices)' = SUM('Fact Invoice'[amount_paid])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000042
+
+		measure 'Amount Paid (Bills)' = SUM('Fact Bill'[amount_paid])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000043
+
+		measure 'Invoice Balance Due' = SUM('Fact Invoice'[balance_due])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000044
+
+		measure 'Bill Balance Due' = SUM('Fact Bill'[balance_due])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000045
+
+		measure 'Customer Count' = DISTINCTCOUNT('Fact Invoice'[customer_key])
+			formatString: #,0
+			lineageTag: 10000001-0000-0000-0000-000000000046
+
+		measure 'Vendor Count' = DISTINCTCOUNT('Fact Bill'[vendor_key])
+			formatString: #,0
+			lineageTag: 10000001-0000-0000-0000-000000000047
+
+		measure 'Revenue per Customer' = DIVIDE([Total Revenue], [Customer Count], 0)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000048
+
+		measure 'Expenses per Vendor' = DIVIDE([Total Expenses], [Vendor Count], 0)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000049
+
+		measure 'Collection Rate' = DIVIDE([Amount Paid (Invoices)], [Total Revenue], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000050
+
+		measure 'Payment Rate' = DIVIDE([Amount Paid (Bills)], [Total Expenses], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000051
+
+		measure 'Expense Amount' = SUM('Fact Bill Line'[amount])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000060
+
+		measure 'Revenue Amount' = SUM('Fact Invoice Line'[amount])
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000061
+
+		measure 'P&L Net Income' = [Revenue Amount] - [Expense Amount]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000062
+
+		measure 'P&L Amount' =
+				VAR ExpenseAmt = [Expense Amount]
+				VAR RevenueAmt = [Revenue Amount]
+				RETURN
+				IF(
+					NOT ISBLANK(ExpenseAmt) || NOT ISBLANK(RevenueAmt),
+					COALESCE(RevenueAmt, 0) - COALESCE(ExpenseAmt, 0),
+					BLANK()
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000063
+
+		measure 'Operating Expenses' =
+				CALCULATE(
+					[Expense Amount],
+					'Dim Account'[account_type] = "Expense"
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 03ad7a39-0fa6-458e-80f4-5d924bc99895
+
+		measure 'Cost of Goods Sold' =
+				CALCULATE(
+					[Expense Amount],
+					'Dim Account'[account_type] = "Cost of Goods Sold"
+				)
+			lineageTag: 3e72cbb6-7c92-40fc-9953-a6f282fe929b
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Gross Profit' = [Revenue Amount] - [Cost of Goods Sold]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000066
+
+		measure 'Operating Income' = [Gross Profit] - [Operating Expenses]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000067
+
+		measure 'Expense Amount PM' =
+				CALCULATE(
+					[Expense Amount],
+					DATEADD('Dim Date'[date_key], -1, MONTH)
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: adce6877-57b4-417a-87e4-5b7f203053cc
+
+		measure 'Expense MoM Change' = [Expense Amount] - [Expense Amount PM]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000069
+
+		measure 'Expense MoM %' = DIVIDE([Expense MoM Change], [Expense Amount PM], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000070
+
+		measure 'Expense Amount PY' =
+				CALCULATE(
+					[Expense Amount],
+					SAMEPERIODLASTYEAR('Dim Date'[date_key])
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 6bbfddfc-ae0e-4c9a-b6b0-125a7b56c502
+
+		measure 'Expense YoY Change' = [Expense Amount] - [Expense Amount PY]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000072
+
+		measure 'Expense YoY %' = DIVIDE([Expense YoY Change], [Expense Amount PY], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000073
+
+		measure 'Expense YTD' =
+				TOTALYTD(
+					[Expense Amount],
+					'Dim Date'[date_key]
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 824fcb01-13c5-41c7-8440-92e5542a2ff6
+
+		measure 'Revenue Amount PM' =
+				CALCULATE(
+					[Revenue Amount],
+					DATEADD('Dim Date'[date_key], -1, MONTH)
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: bdc7c3c0-4ece-4cc2-9823-c72b6558a677
+
+		measure 'Revenue MoM Change' = [Revenue Amount] - [Revenue Amount PM]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000076
+
+		measure 'Revenue MoM %' = DIVIDE([Revenue MoM Change], [Revenue Amount PM], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000077
+
+		measure 'Revenue Amount PY' =
+				CALCULATE(
+					[Revenue Amount],
+					SAMEPERIODLASTYEAR('Dim Date'[date_key])
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: c3c2e1bc-1450-4573-8020-34d9cd79c878
+
+		measure 'Revenue YoY Change' = [Revenue Amount] - [Revenue Amount PY]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000079
+
+		measure 'Revenue YoY %' = DIVIDE([Revenue YoY Change], [Revenue Amount PY], 0)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 10000001-0000-0000-0000-000000000080
+
+		measure 'P&L Revenue YTD' =
+				TOTALYTD(
+					[Revenue Amount],
+					'Dim Date'[date_key]
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 7fffcbfe-f8b3-4f16-9cf2-5dc4cf99e663
+
+		measure 'Income Amount' =
+				CALCULATE(
+					SUM('Fact Invoice Line'[amount]),
+					USERELATIONSHIP('Fact Invoice Line'[account_key], 'Dim Account'[account_key])
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 2b0bd8c8-7cc0-456c-89d9-029b6406dd7a
+
+		measure 'P&L Account Amount' =
+				VAR IncomeAmt = [Income Amount]
+				VAR ExpenseAmt = [Expense Amount]
+				RETURN
+				IF(
+					NOT ISBLANK(IncomeAmt),
+					IncomeAmt,
+					IF(
+						NOT ISBLANK(ExpenseAmt),
+						-ExpenseAmt,
+						BLANK()
+					)
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 4151420d-52a3-4f48-b163-9e85f5abd08d
+
+		measure 'Total Income' =
+				CALCULATE(
+					[Income Amount],
+					'Dim Account'[account_type] = "Income"
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 11db347c-5862-40bc-9904-e3cfab0b7dfc
+
+		measure 'Total COGS' =
+				CALCULATE(
+					[Expense Amount],
+					'Dim Account'[account_type] = "Cost of Goods Sold"
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 68f63ca3-20bd-4d20-9cd1-22fca4039607
+
+		measure 'Total Operating Expenses' =
+				CALCULATE(
+					[Expense Amount],
+					'Dim Account'[account_type] = "Expense"
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 8b171dec-bb59-48bc-bbf1-4b02374c01cb
+
+		measure 'P&L Gross Profit' = [Total Income] - [Total COGS]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000087
+
+		measure 'P&L Net Income Total' = [Total Income] - [Total COGS] - [Total Operating Expenses]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000088
+
+		measure 'P&L Line Amount' = SUM('Fact PL Line'[amount])
+			formatString: \$#,0.0;(\$#,0.0);\$#,0.0
+			lineageTag: e8e99671-4af2-4965-a5f4-f3d7c63ee8de
+
+		measure 'P&L Income Lines' =
+				CALCULATE(
+					SUM('Fact PL Line'[amount]),
+					'Fact PL Line'[line_type] = "Income"
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 4a86b063-3900-464f-9ed4-e1b60c2b1d7c
+
+		measure 'P&L Expense Lines' =
+				CALCULATE(
+					SUM('Fact PL Line'[amount]),
+					'Fact PL Line'[line_type] = "Expense"
+				)
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 755d2c19-f2bc-40f4-9ba9-b3e1bba7b771
+
+		measure 'P&L Net' = [P&L Income Lines] - [P&L Expense Lines]
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: 10000001-0000-0000-0000-000000000093
+
+		measure 'P&L Structure Amount' =
+				VAR CurrentRowType = SELECTEDVALUE('Dim PL Structure'[row_type])
+				VAR CurrentAccountFilter = SELECTEDVALUE('Dim PL Structure'[account_type_filter])
+				VAR CurrentCalcType = SELECTEDVALUE('Dim PL Structure'[calculation_type])
+				
+				VAR TotalIncome = CALCULATE(
+					SUM('Fact PL Line'[amount]),
+					'Dim Account'[account_type] = "Income"
+				)
+				VAR TotalCOGS = CALCULATE(
+					SUM('Fact PL Line'[amount]),
+					'Dim Account'[account_type] = "Cost of Goods Sold"
+				)
+				VAR TotalExpenses = CALCULATE(
+					SUM('Fact PL Line'[amount]),
+					'Dim Account'[account_type] = "Expense"
+				)
+				VAR TotalOtherIncome = CALCULATE(
+					SUM('Fact PL Line'[amount]),
+					'Dim Account'[account_type] = "Other Income"
+				)
+				VAR TotalOtherExpense = CALCULATE(
+					SUM('Fact PL Line'[amount]),
+					'Dim Account'[account_type] = "Other Expense"
+				)
+				
+				VAR GrossProfit = TotalIncome - TotalCOGS
+				VAR NetOperating = GrossProfit - TotalExpenses
+				VAR NetOther = TotalOtherIncome - TotalOtherExpense
+				VAR NetIncome = NetOperating + NetOther
+				
+				RETURN
+				SWITCH(
+					TRUE(),
+					CurrentRowType = "header", BLANK(),
+					CurrentRowType = "account_type",
+						CALCULATE(
+							SUM('Fact PL Line'[amount]),
+							'Dim Account'[account_type] = CurrentAccountFilter
+						),
+					CurrentCalcType = "gross_profit", GrossProfit,
+					CurrentCalcType = "net_operating", NetOperating,
+					CurrentCalcType = "net_other", NetOther,
+					CurrentCalcType = "net_income", NetIncome,
+					BLANK()
+				)
+			lineageTag: pl-struct-meas-0001-0000-000000000001
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column Column1
+			dataType: string
+			lineageTag: 26737ca2-042c-4743-90a2-b3f2fa6f8d0d
+			summarizeBy: none
+			sourceColumn: Column1
+
+			annotation SummarizationSetBy = Automatic
+
+		partition _Measures = m
+			mode: import
+			source =
+					let
+					    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+					    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}})
+					in
+					    #"Changed Type"
+
+		annotation PBI_ResultType = Table
+
