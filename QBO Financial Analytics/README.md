@@ -9,15 +9,16 @@ A Power BI financial reporting solution built on QuickBooks Online data, featuri
 3. [Data Model](#data-model)
 4. [Financial Reports](#financial-reports)
 5. [Advanced Visualizations](#advanced-visualizations)
-6. [Technical Implementation](#technical-implementation)
-7. [Setup Instructions](#setup-instructions)
+6. [Balance Sheet Analytics](#balance-sheet-analytics)
+7. [Technical Implementation](#technical-implementation)
+8. [Setup Instructions](#setup-instructions)
 
 ## Project Overview
 
 This project transforms raw QuickBooks Online accounting data into interactive Power BI reports that replicate standard financial statements:
 
 - **Profit and Loss Statement** with year-over-year comparison
-- **Balance Sheet** with proper account hierarchy
+- **Balance Sheet** with proper account hierarchy and financial KPIs
 - **Accounts Receivable Aging** by customer
 - **Accounts Payable Aging** by vendor
 
@@ -44,6 +45,16 @@ icla_finance_gold      Dimensional model optimized for reporting
 **Silver Layer**: Applies data quality rules, standardizes data types, handles null values, and creates audit columns for tracking data lineage.
 
 **Gold Layer**: Implements a star schema with conformed dimensions and fact tables designed for analytical queries and Power BI consumption.
+
+### Balance Sheet Data Flow
+
+The Balance Sheet follows a specific transformation path:
+
+1. **Bronze**: `bronze_accounts` stores raw QuickBooks account data with `current_balance`
+2. **Silver**: `silver_accounts` adds `bs_category` classification (Cash, AR, AP, Equity, etc.)
+3. **Gold**: `fact_bs_balance` creates monthly snapshots with proper sign conventions:
+   - `current_balance`: Raw signed value from QuickBooks
+   - `display_balance`: Absolute value for reporting display
 
 ## Data Model
 
@@ -95,6 +106,7 @@ The semantic model follows star schema principles with a central date dimension 
 The model uses single-direction relationships from fact tables to dimensions, enabling filter propagation from slicers to measures:
 
 - **Fact PL Line** connects to Dim Date, Dim Account, Dim Customer, Dim Vendor, and Dim Item
+- **Fact BS Balance** connects to Dim Date via `balance_date` for historical snapshots
 - Customer filtering on P&L affects revenue transactions (from invoices)
 - Vendor filtering on P&L affects expense transactions (from bills)
 
@@ -171,7 +183,7 @@ VAR SvgContent = "
     <rect ... />  <!-- Card background -->
     <text ...>" & RevenueFormatted & "</text>  <!-- Main value -->
     <polygon points='" & SparklineArea & "' fill='url(#sparkGrad)'/>
-    <polyline points='" & SafePoints & "' stroke='" & SparklineColor & "'/>
+    <polyline points='" & SparklinePoints & "' stroke='" & SparklineColor & "'/>
 </svg>"
 ```
 
@@ -187,46 +199,106 @@ For formatted financial statements, the project uses the HTML Content custom vis
 - Fixed-width columns for alignment
 - Scrollable content with custom scrollbar styling
 
-**PL HTML Report measure structure:**
+## Balance Sheet Analytics
 
-```dax
-VAR CSS = "
-<style>
-    .scroll-wrapper { height: 100vh; overflow-y: auto; }
-    .scroll-wrapper::-webkit-scrollbar { width: 8px; }
-    .scroll-wrapper:hover::-webkit-scrollbar-thumb { background-color: #bbb; }
-    table { width: 100%; border-collapse: collapse; }
-    .header { font-weight: bold; background: #f5f5f5; }
-    .indent { padding-left: 20px; }
-    .total { font-weight: bold; border-top: 1px solid #333; }
-    .neg { color: #D13438; }
-    .pos { color: #107C10; }
-</style>"
+### SVG KPI Cards for Balance Sheet
 
-VAR TableRows = "
-<tr class='header'>
-    <td>Description</td>
-    <td>Current Year</td>
-    <td>Prior Year</td>
-    <td>Variance</td>
-    <td>Var %</td>
-</tr>
-<tr>
-    <td class='indent'>Landscaping Services</td>
-    <td>" & fLandscapingServices & "</td>
-    <td>" & fpyLandscapingServices & "</td>
-    <td class='" & IF(varLandscapingServices >= 0, "pos", "neg") & "'>" & fvarLandscapingServices & "</td>
-    <td>" & fpctLandscapingServices & "</td>
-</tr>
-..."
+The Balance Sheet page features four specialized SVG KPI cards that visualize key financial health indicators:
 
-RETURN CSS & "<div class='scroll-wrapper'><table>" & TableRows & "</table></div>"
+#### 1. Working Capital
+Displays the difference between Current Assets and Current Liabilities with a visual comparison bar.
+
+```
+Working Capital = Current Assets - Current Liabilities
 ```
 
-The HTML Content visual renders this as a fully formatted financial statement with:
-- Five columns: Description, Current Year, Prior Year, Variance, Variance %
-- Conditional formatting on variance columns
-- Proper accounting format with brackets for negative values
+**Visual Features:**
+- Main value displayed in large format ($2.6M)
+- Horizontal comparison bars showing CA vs CL amounts
+- Color-coded bars (green for assets, gray for liabilities)
+- Labels showing actual dollar amounts
+
+#### 2. Current Ratio
+Shows the organization's ability to pay short-term obligations with a threshold indicator bar.
+
+```
+Current Ratio = Current Assets / Current Liabilities
+```
+
+**Visual Features:**
+- Ratio value displayed (e.g., 2.17x)
+- Health threshold bar with three zones:
+  - Red zone: < 1.0 (Poor)
+  - Yellow zone: 1.0 - 1.5 (Fair)
+  - Green zone: > 1.5 (Good)
+- Triangle marker indicating current position
+- Threshold labels for quick interpretation
+
+#### 3. Quick Ratio (Acid-Test)
+Measures the ability to meet short-term obligations with liquid assets only.
+
+```
+Quick Ratio = (Current Assets - Inventory) / Current Liabilities
+```
+
+**Visual Features:**
+- Ratio value displayed (e.g., 2.17x)
+- Stacked bar showing liquid vs non-liquid asset breakdown
+- Color differentiation between liquid assets and inventory
+- Percentage labels for each component
+
+#### 4. Debt-to-Equity Ratio
+Illustrates the capital structure split between debt financing and equity.
+
+```
+Debt-to-Equity = Total Liabilities / Total Equity
+```
+
+**Visual Features:**
+- Ratio value displayed (e.g., 0.86x)
+- Capital structure bar split into debt and equity portions
+- Percentage labels (e.g., 46% Debt | 54% Equity)
+- Color-coded segments for easy interpretation
+
+### Balance Sheet Trend Charts
+
+Two DAX measures enable trend analysis over time:
+
+```dax
+_BS_TotalAssets_Trend =
+VAR SelectedDate = MAX('Dim Date'[date_key])
+RETURN CALCULATE(
+    SUM('Fact BS Balance'[display_balance]),
+    'Fact BS Balance'[classification] = "Asset",
+    'Fact BS Balance'[balance_date] = EOMONTH(SelectedDate, 0)
+)
+
+_BS_TotalLiabilities_Trend =
+VAR SelectedDate = MAX('Dim Date'[date_key])
+RETURN CALCULATE(
+    SUM('Fact BS Balance'[display_balance]),
+    'Fact BS Balance'[classification] = "Liability",
+    'Fact BS Balance'[balance_date] = EOMONTH(SelectedDate, 0)
+)
+```
+
+These measures map to Dim Date allowing line charts to show Assets vs Liabilities over time.
+
+### HTML Financial Ratios Table
+
+An HTML Content visual displays additional financial ratios with multi-year comparison:
+
+| Ratio | 2023 | 2024 | 2025 YTD | Description |
+|-------|------|------|----------|-------------|
+| Debt Ratio | 42% | 46% | 46% | Total Liabilities / Total Assets |
+| Financial Leverage | 1.72x | 1.86x | 1.86x | Total Assets / Total Equity |
+| Equity Ratio | 58% | 54% | 54% | Total Equity / Total Assets |
+
+**Styling Features:**
+- Matches existing HTML report scrollbar pattern
+- Conditional formatting on year-over-year changes
+- Color-coded variance indicators (green = favorable, red = unfavorable)
+- Header styled with #e6e6e6 border
 
 ## Technical Implementation
 
@@ -239,7 +311,8 @@ Measures follow a naming convention:
 | `_` | P&L line items | `_TotalIncome`, `_NetIncome` |
 | `_BS_` | Balance Sheet line items | `_BS_Checking`, `_BS_TotalAssets` |
 | None | General calculations | `Total Revenue`, `Revenue PY` |
-| `SVG KPI -` | SVG visualizations | `SVG KPI - Total Revenue` |
+| `SVG KPI -` | SVG visualizations | `SVG KPI - Total Revenue`, `SVG KPI - Working Capital` |
+| `HTML` | HTML Content reports | `HTML Financial Ratios Table` |
 
 ### Time Intelligence
 
@@ -261,6 +334,15 @@ VAR MonthlyData = CALCULATETABLE(
 )
 ```
 
+### Data Validation
+
+The Balance Sheet data has been validated through:
+
+1. **Accounting Equation Check**: Assets = Liabilities + Equity (verified to balance)
+2. **Transaction Tracing**: AR/AP changes traced through invoices, bills, and payments
+3. **Historical Continuity**: Balance changes verified against transaction activity
+4. **Cross-Layer Validation**: Bronze -> Silver -> Gold transformations verified
+
 ### TMDL Format
 
 The semantic model uses Tabular Model Definition Language (TMDL), a human-readable format for Power BI models that enables:
@@ -278,7 +360,9 @@ ICLA Finance Project.SemanticModel/
     tables/
       Dim Account.tmdl   # Table definition + columns
       Fact PL Line.tmdl
-      _Measures.tmdl     # All measures
+      Fact BS Balance.tmdl
+      BS Header Table.tmdl
+      _Measures.tmdl     # All measures (P&L, BS, KPIs, HTML)
 ```
 
 ## Setup Instructions
@@ -335,3 +419,12 @@ To adapt for different chart of accounts:
 | `ICLA Finance Project.pbip` | Power BI project file |
 | `ICLA Finance Project.Report/` | Report pages and visuals |
 | `ICLA Finance Project.SemanticModel/` | Data model (TMDL) |
+
+## Recent Updates
+
+### December 2024
+- Added Balance Sheet Analytics page with 4 SVG KPI cards
+- Implemented trend charts for Assets vs Liabilities over time
+- Created HTML Financial Ratios Table with multi-year comparison
+- Validated all Balance Sheet KPIs against MySQL source data
+- Documented ETL transformation logic through Bronze -> Silver -> Gold layers

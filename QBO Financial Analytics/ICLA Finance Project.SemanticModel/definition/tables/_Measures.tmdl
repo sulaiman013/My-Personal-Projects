@@ -1852,6 +1852,477 @@ table _Measures
 		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
 		lineageTag: 6e1bcdd9-30b7-4bc5-85ea-721f7f970f9f
 
+	measure 'SVG KPI - Working Capital' = ```
+			
+			// ============================================================
+			// WORKING CAPITAL - Clean minimalist design
+			// ============================================================
+			
+			VAR CurrentAssets = [_BS_TotalCurrentAssets]
+			VAR CurrentLiabilities = ABS([_BS_TotalCurrentLiabilities])
+			VAR WorkingCapital = CurrentAssets - CurrentLiabilities
+			
+			// Prior Year
+			VAR PYWorkingCapital = 
+			    CALCULATE([_BS_TotalCurrentAssets], SAMEPERIODLASTYEAR('Dim Date'[date_key])) - 
+			    ABS(CALCULATE([_BS_TotalCurrentLiabilities], SAMEPERIODLASTYEAR('Dim Date'[date_key])))
+			VAR YoYChange = WorkingCapital - PYWorkingCapital
+			VAR YoYPct = DIVIDE(YoYChange, ABS(PYWorkingCapital), 0)
+			VAR IsUp = YoYChange >= 0
+			
+			// Formatting
+			VAR FmtValue = IF(ABS(WorkingCapital) >= 1000000, FORMAT(WorkingCapital/1000000, "$#,##0.0") & "M",
+			               IF(ABS(WorkingCapital) >= 1000, FORMAT(WorkingCapital/1000, "$#,##0") & "K", FORMAT(WorkingCapital, "$#,##0")))
+			VAR FmtCA = IF(CurrentAssets >= 1000000, FORMAT(CurrentAssets/1000000, "$#,##0.0M"), FORMAT(CurrentAssets/1000, "$#,##0K"))
+			VAR FmtCL = IF(CurrentLiabilities >= 1000000, FORMAT(CurrentLiabilities/1000000, "$#,##0.0M"), FORMAT(CurrentLiabilities/1000, "$#,##0K"))
+			VAR FmtPct = IF(IsUp, "+", "") & FORMAT(YoYPct, "0.0%")
+			
+			// Bar widths (max 140px)
+			VAR MaxVal = MAX(CurrentAssets, CurrentLiabilities)
+			VAR CAWidth = INT(DIVIDE(CurrentAssets, MaxVal, 0) * 140)
+			VAR CLWidth = INT(DIVIDE(CurrentLiabilities, MaxVal, 0) * 140)
+			
+			// Colors
+			VAR AccentColor = "#0078D4"
+			VAR GreenColor = "#10B981"
+			VAR RedColor = "#EF4444"
+			VAR TrendBg = IF(IsUp, "#ECFDF5", "#FEF2F2")
+			VAR TrendColor = IF(IsUp, GreenColor, RedColor)
+			
+			VAR Arrow = IF(IsUp, 
+			    "<polygon points='6,0 12,8 0,8' fill='" & TrendColor & "'/>",
+			    "<polygon points='0,0 12,0 6,8' fill='" & TrendColor & "'/>")
+			
+			VAR Svg = "
+			<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 130'>
+			  <rect x='0' y='0' width='240' height='130' rx='8' fill='white' stroke='#E5E7EB' stroke-width='1'/>
+			  <rect x='0' y='0' width='240' height='4' rx='8' fill='" & AccentColor & "'/>
+			  
+			  <text x='16' y='24' font-family='Segoe UI' font-size='11' font-weight='500' fill='#6B7280'>WORKING CAPITAL</text>
+			  
+			  <text x='16' y='52' font-family='Segoe UI' font-size='26' font-weight='700' fill='#111827'>" & FmtValue & "</text>
+			  
+			  <g transform='translate(150,30)'>
+			    <rect width='70' height='24' rx='12' fill='" & TrendBg & "'/>
+			    <g transform='translate(10,6)'>" & Arrow & "</g>
+			    <text x='28' y='16' font-family='Segoe UI' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & FmtPct & "</text>
+			  </g>
+			  
+			  <text x='16' y='74' font-family='Segoe UI' font-size='9' fill='#9CA3AF'>Current Assets</text>
+			  <rect x='16' y='78' width='" & CAWidth & "' height='10' rx='2' fill='" & GreenColor & "'/>
+			  <text x='" & (20 + CAWidth) & "' y='87' font-family='Segoe UI' font-size='9' font-weight='500' fill='#374151'>" & FmtCA & "</text>
+			  
+			  <text x='16' y='102' font-family='Segoe UI' font-size='9' fill='#9CA3AF'>Current Liabilities</text>
+			  <rect x='16' y='106' width='" & CLWidth & "' height='10' rx='2' fill='" & RedColor & "'/>
+			  <text x='" & (20 + CLWidth) & "' y='115' font-family='Segoe UI' font-size='9' font-weight='500' fill='#374151'>" & FmtCL & "</text>
+			</svg>"
+			
+			RETURN "data:image/svg+xml;utf8," & Svg
+			```
+		lineageTag: 320d2ac5-fbf4-4179-8bf7-7b88d726a933
+
+	measure 'SVG KPI - Current Ratio' = ```
+			
+			// ============================================================
+			// CURRENT RATIO - Clean threshold bar design
+			// ============================================================
+			
+			VAR CurrentAssets = [_BS_TotalCurrentAssets]
+			VAR CurrentLiabilities = ABS([_BS_TotalCurrentLiabilities])
+			VAR Ratio = DIVIDE(CurrentAssets, CurrentLiabilities, 0)
+			
+			// Prior Year
+			VAR PYRatio = DIVIDE(
+			    CALCULATE([_BS_TotalCurrentAssets], SAMEPERIODLASTYEAR('Dim Date'[date_key])),
+			    ABS(CALCULATE([_BS_TotalCurrentLiabilities], SAMEPERIODLASTYEAR('Dim Date'[date_key]))), 0)
+			VAR YoYChange = Ratio - PYRatio
+			VAR IsUp = YoYChange >= 0
+			
+			// Formatting
+			VAR FmtValue = FORMAT(Ratio, "0.00") & "x"
+			VAR FmtChange = IF(IsUp, "+", "") & FORMAT(YoYChange, "0.00")
+			
+			// Health
+			VAR Statuss = IF(Ratio >= 1.5, "Healthy", IF(Ratio >= 1, "Adequate", "At Risk"))
+			VAR StatusColor = IF(Ratio >= 1.5, "#10B981", IF(Ratio >= 1, "#F59E0B", "#EF4444"))
+			
+			// Threshold bar position (0 to 3 scale, bar width 180)
+			VAR BarMax = 3
+			VAR MarkerPos = MIN(INT(DIVIDE(Ratio, BarMax, 0) * 180), 180) + 16
+			
+			// Colors
+			VAR AccentColor = "#0078D4"
+			VAR GreenColor = "#10B981"
+			VAR RedColor = "#EF4444"
+			VAR TrendBg = IF(IsUp, "#ECFDF5", "#FEF2F2")
+			VAR TrendColor = IF(IsUp, GreenColor, RedColor)
+			
+			VAR Arrow = IF(IsUp, 
+			    "<polygon points='6,0 12,8 0,8' fill='" & TrendColor & "'/>",
+			    "<polygon points='0,0 12,0 6,8' fill='" & TrendColor & "'/>")
+			
+			VAR Svg = "
+			<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 130'>
+			  <rect x='0' y='0' width='240' height='130' rx='8' fill='white' stroke='#E5E7EB' stroke-width='1'/>
+			  <rect x='0' y='0' width='240' height='4' rx='8' fill='" & AccentColor & "'/>
+			  
+			  <text x='16' y='24' font-family='Segoe UI' font-size='11' font-weight='500' fill='#6B7280'>CURRENT RATIO</text>
+			  
+			  <text x='16' y='52' font-family='Segoe UI' font-size='26' font-weight='700' fill='" & StatusColor & "'>" & FmtValue & "</text>
+			  
+			  <g transform='translate(100,30)'>
+			    <rect width='56' height='24' rx='12' fill='" & TrendBg & "'/>
+			    <g transform='translate(8,6)'>" & Arrow & "</g>
+			    <text x='24' y='16' font-family='Segoe UI' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & FmtChange & "</text>
+			  </g>
+			  
+			  <rect x='165' y='34' width='60' height='20' rx='10' fill='" & StatusColor & "' fill-opacity='0.15'/>
+			  <text x='195' y='48' font-family='Segoe UI' font-size='10' font-weight='600' fill='" & StatusColor & "' text-anchor='middle'>" & Statuss & "</text>
+			  
+			  <text x='16' y='76' font-family='Segoe UI' font-size='9' fill='#9CA3AF'>Liquidity Threshold</text>
+			  
+			  <rect x='16' y='82' width='60' height='8' rx='2' fill='#EF4444'/>
+			  <rect x='76' y='82' width='30' height='8' fill='#F59E0B'/>
+			  <rect x='106' y='82' width='90' height='8' rx='2' fill='#10B981'/>
+			  
+			  <circle cx='" & MarkerPos & "' cy='86' r='6' fill='white' stroke='" & StatusColor & "' stroke-width='3'/>
+			  
+			  <text x='16' y='104' font-family='Segoe UI' font-size='8' fill='#9CA3AF'>0</text>
+			  <text x='73' y='104' font-family='Segoe UI' font-size='8' fill='#9CA3AF'>1.0</text>
+			  <text x='103' y='104' font-family='Segoe UI' font-size='8' fill='#9CA3AF'>1.5</text>
+			  <text x='190' y='104' font-family='Segoe UI' font-size='8' fill='#9CA3AF'>3.0+</text>
+			  
+			  <text x='16' y='120' font-family='Segoe UI' font-size='9' fill='#6B7280'>Target: Above 1.5x</text>
+			</svg>"
+			
+			RETURN "data:image/svg+xml;utf8," & Svg
+			```
+		lineageTag: 8bf7020e-cc43-4f2a-804e-494fa1561431
+
+	measure 'SVG KPI - Quick Ratio' = ```
+			
+			// ============================================================
+			// QUICK RATIO - Clean design with liquid asset highlight
+			// ============================================================
+			
+			VAR CurrentAssets = [_BS_TotalCurrentAssets]
+			VAR Inventory = COALESCE([_BS_InventoryAsset], 0)
+			VAR LiquidAssets = CurrentAssets - Inventory
+			VAR CurrentLiabilities = ABS([_BS_TotalCurrentLiabilities])
+			VAR Ratio = DIVIDE(LiquidAssets, CurrentLiabilities, 0)
+			
+			// Prior Year
+			VAR PYLiquid = CALCULATE([_BS_TotalCurrentAssets], SAMEPERIODLASTYEAR('Dim Date'[date_key])) - 
+			               CALCULATE(COALESCE([_BS_InventoryAsset], 0), SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR PYCL = ABS(CALCULATE([_BS_TotalCurrentLiabilities], SAMEPERIODLASTYEAR('Dim Date'[date_key])))
+			VAR PYRatio = DIVIDE(PYLiquid, PYCL, 0)
+			VAR YoYChange = Ratio - PYRatio
+			VAR IsUp = YoYChange >= 0
+			
+			// Formatting
+			VAR FmtValue = FORMAT(Ratio, "0.00") & "x"
+			VAR FmtChange = IF(IsUp, "+", "") & FORMAT(YoYChange, "0.00")
+			VAR LiquidPct = DIVIDE(LiquidAssets, CurrentAssets, 0)
+			VAR FmtLiquidPct = FORMAT(LiquidPct, "0%")
+			
+			// Health
+			VAR Statuss = IF(Ratio >= 1, "Healthy", IF(Ratio >= 0.8, "Adequate", "At Risk"))
+			VAR StatusColor = IF(Ratio >= 1, "#10B981", IF(Ratio >= 0.8, "#F59E0B", "#EF4444"))
+			
+			// Bar widths
+			VAR LiquidWidth = INT(LiquidPct * 180)
+			VAR InvWidth = 180 - LiquidWidth
+			
+			// Colors
+			VAR AccentColor = "#0891B2"
+			VAR GreenColor = "#10B981"
+			VAR RedColor = "#EF4444"
+			VAR TrendBg = IF(IsUp, "#ECFDF5", "#FEF2F2")
+			VAR TrendColor = IF(IsUp, GreenColor, RedColor)
+			
+			VAR Arrow = IF(IsUp, 
+			    "<polygon points='6,0 12,8 0,8' fill='" & TrendColor & "'/>",
+			    "<polygon points='0,0 12,0 6,8' fill='" & TrendColor & "'/>")
+			
+			VAR Svg = "
+			<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 130'>
+			  <rect x='0' y='0' width='240' height='130' rx='8' fill='white' stroke='#E5E7EB' stroke-width='1'/>
+			  <rect x='0' y='0' width='240' height='4' rx='8' fill='" & AccentColor & "'/>
+			  
+			  <text x='16' y='24' font-family='Segoe UI' font-size='11' font-weight='500' fill='#6B7280'>QUICK RATIO</text>
+			  
+			  <text x='16' y='52' font-family='Segoe UI' font-size='26' font-weight='700' fill='" & StatusColor & "'>" & FmtValue & "</text>
+			  
+			  <g transform='translate(100,30)'>
+			    <rect width='56' height='24' rx='12' fill='" & TrendBg & "'/>
+			    <g transform='translate(8,6)'>" & Arrow & "</g>
+			    <text x='24' y='16' font-family='Segoe UI' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & FmtChange & "</text>
+			  </g>
+			  
+			  <rect x='165' y='34' width='60' height='20' rx='10' fill='" & StatusColor & "' fill-opacity='0.15'/>
+			  <text x='195' y='48' font-family='Segoe UI' font-size='10' font-weight='600' fill='" & StatusColor & "' text-anchor='middle'>" & Statuss & "</text>
+			  
+			  <text x='16' y='76' font-family='Segoe UI' font-size='9' fill='#9CA3AF'>Asset Liquidity (" & FmtLiquidPct & " liquid)</text>
+			  
+			  <rect x='16' y='82' width='" & LiquidWidth & "' height='14' rx='3' fill='" & GreenColor & "'/>
+			  <rect x='" & (16 + LiquidWidth) & "' y='82' width='" & InvWidth & "' height='14' rx='3' fill='#E5E7EB'/>
+			  
+			  <rect x='16' y='104' width='8' height='8' rx='2' fill='" & GreenColor & "'/>
+			  <text x='28' y='112' font-family='Segoe UI' font-size='9' fill='#6B7280'>Liquid Assets</text>
+			  
+			  <rect x='110' y='104' width='8' height='8' rx='2' fill='#E5E7EB'/>
+			  <text x='122' y='112' font-family='Segoe UI' font-size='9' fill='#6B7280'>Inventory</text>
+			  
+			  <text x='16' y='124' font-family='Segoe UI' font-size='8' fill='#9CA3AF'>Target: Above 1.0x (excludes inventory)</text>
+			</svg>"
+			
+			RETURN "data:image/svg+xml;utf8," & Svg
+			```
+		lineageTag: 1948beba-8819-4b90-a4b2-1c7c523c68fd
+
+	measure 'SVG KPI - Debt to Equity' = ```
+			
+			// ============================================================
+			// DEBT TO EQUITY - Clean capital structure design
+			// ============================================================
+			
+			VAR TotalLiabilities = ABS([_BS_TotalLiabilities])
+			VAR TotalEquity = [_BS_TotalEquity]
+			VAR Ratio = DIVIDE(TotalLiabilities, TotalEquity, 0)
+			VAR TotalCapital = TotalLiabilities + TotalEquity
+			
+			// Prior Year
+			VAR PYLiab = ABS(CALCULATE([_BS_TotalLiabilities], SAMEPERIODLASTYEAR('Dim Date'[date_key])))
+			VAR PYEq = CALCULATE([_BS_TotalEquity], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+			VAR PYRatio = DIVIDE(PYLiab, PYEq, 0)
+			VAR YoYChange = Ratio - PYRatio
+			VAR IsUp = YoYChange <= 0  // For D/E, down is good
+			
+			// Formatting
+			VAR FmtValue = FORMAT(Ratio, "0.00") & "x"
+			VAR FmtChange = IF(YoYChange >= 0, "+", "") & FORMAT(YoYChange, "0.00")
+			VAR DebtPct = DIVIDE(TotalLiabilities, TotalCapital, 0)
+			VAR EquityPct = 1 - DebtPct
+			VAR FmtDebtPct = FORMAT(DebtPct, "0%")
+			VAR FmtEquityPct = FORMAT(EquityPct, "0%")
+			
+			// Health (lower is better)
+			VAR Statuss = IF(Ratio <= 1, "Conservative", IF(Ratio <= 2, "Moderate", "Leveraged"))
+			VAR StatusColor = IF(Ratio <= 1, "#10B981", IF(Ratio <= 2, "#F59E0B", "#EF4444"))
+			
+			// Bar widths
+			VAR DebtWidth = INT(DebtPct * 180)
+			VAR EquityWidth = 180 - DebtWidth
+			
+			// Colors
+			VAR AccentColor = "#7C3AED"
+			VAR GreenColor = "#10B981"
+			VAR RedColor = "#EF4444"
+			VAR TrendBg = IF(IsUp, "#ECFDF5", "#FEF2F2")
+			VAR TrendColor = IF(IsUp, GreenColor, RedColor)
+			
+			VAR Arrow = IF(IsUp, 
+			    "<polygon points='0,0 12,0 6,8' fill='" & TrendColor & "'/>",  // Down arrow for D/E improvement
+			    "<polygon points='6,0 12,8 0,8' fill='" & TrendColor & "'/>")
+			
+			VAR Svg = "
+			<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 130'>
+			  <rect x='0' y='0' width='240' height='130' rx='8' fill='white' stroke='#E5E7EB' stroke-width='1'/>
+			  <rect x='0' y='0' width='240' height='4' rx='8' fill='" & AccentColor & "'/>
+			  
+			  <text x='16' y='24' font-family='Segoe UI' font-size='11' font-weight='500' fill='#6B7280'>DEBT TO EQUITY</text>
+			  
+			  <text x='16' y='52' font-family='Segoe UI' font-size='26' font-weight='700' fill='" & StatusColor & "'>" & FmtValue & "</text>
+			  
+			  <g transform='translate(100,30)'>
+			    <rect width='56' height='24' rx='12' fill='" & TrendBg & "'/>
+			    <g transform='translate(8,6)'>" & Arrow & "</g>
+			    <text x='24' y='16' font-family='Segoe UI' font-size='11' font-weight='600' fill='" & TrendColor & "'>" & FmtChange & "</text>
+			  </g>
+			  
+			  <rect x='160' y='34' width='68' height='20' rx='10' fill='" & StatusColor & "' fill-opacity='0.15'/>
+			  <text x='194' y='48' font-family='Segoe UI' font-size='10' font-weight='600' fill='" & StatusColor & "' text-anchor='middle'>" & Statuss & "</text>
+			  
+			  <text x='16' y='76' font-family='Segoe UI' font-size='9' fill='#9CA3AF'>Capital Structure</text>
+			  
+			  <rect x='16' y='82' width='" & DebtWidth & "' height='18' rx='3' fill='#EF4444'/>
+			  <rect x='" & (16 + DebtWidth) & "' y='82' width='" & EquityWidth & "' height='18' rx='3' fill='" & GreenColor & "'/>
+			  
+			  <text x='" & (16 + DebtWidth/2) & "' y='94' font-family='Segoe UI' font-size='9' font-weight='600' fill='white' text-anchor='middle'>" & FmtDebtPct & "</text>
+			  <text x='" & (16 + DebtWidth + EquityWidth/2) & "' y='94' font-family='Segoe UI' font-size='9' font-weight='600' fill='white' text-anchor='middle'>" & FmtEquityPct & "</text>
+			  
+			  <rect x='16' y='108' width='8' height='8' rx='2' fill='#EF4444'/>
+			  <text x='28' y='116' font-family='Segoe UI' font-size='9' fill='#6B7280'>Debt</text>
+			  
+			  <rect x='70' y='108' width='8' height='8' rx='2' fill='" & GreenColor & "'/>
+			  <text x='82' y='116' font-family='Segoe UI' font-size='9' fill='#6B7280'>Equity</text>
+			  
+			  <text x='130' y='116' font-family='Segoe UI' font-size='8' fill='#9CA3AF'>Target: Below 1.0x</text>
+			</svg>"
+			
+			RETURN "data:image/svg+xml;utf8," & Svg
+			```
+		lineageTag: 8b1176bc-a65c-4934-bb30-5fc433045e1c
+
+	measure _BS_TotalAssets_Trend =
+			
+			VAR SelectedDate = MAX('Dim Date'[date_key])
+			RETURN
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[classification] = "Asset",
+			    'Fact BS Balance'[balance_date] = EOMONTH(SelectedDate, 0)
+			)
+		lineageTag: a9ffba8a-7c45-4db6-9c52-74717b6594c4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _BS_TotalLiabilities_Trend =
+			
+			VAR SelectedDate = MAX('Dim Date'[date_key])
+			RETURN
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[classification] = "Liability",
+			    'Fact BS Balance'[balance_date] = EOMONTH(SelectedDate, 0)
+			)
+		lineageTag: fff20fe7-d7e2-43b6-a7db-2635314c929f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _BS_TotalEquity_Trend =
+			
+			VAR SelectedDate = MAX('Dim Date'[date_key])
+			RETURN
+			CALCULATE(
+			    SUM('Fact BS Balance'[display_balance]),
+			    'Fact BS Balance'[classification] = "Equity",
+			    'Fact BS Balance'[balance_date] = EOMONTH(SelectedDate, 0)
+			)
+		lineageTag: 8ea4305f-b795-40be-93ef-4d28630a77f8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _BS_NetWorth_Trend =
+			
+			[_BS_TotalAssets_Trend] - [_BS_TotalLiabilities_Trend]
+		lineageTag: 44e1ddcc-d3bd-4d27-b692-e130c8596ada
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'HTML Financial Ratios Table' =
+			
+			// ============================================================
+			// FINANCIAL RATIOS TABLE - Matching existing HTML styling
+			// ============================================================
+			
+			// Get year-end balances for each fiscal year
+			VAR Y2023Assets = CALCULATE(SUM('Fact BS Balance'[display_balance]), 'Fact BS Balance'[classification] = "Asset", 'Fact BS Balance'[balance_date] = DATE(2023, 12, 31))
+			VAR Y2023Liabilities = CALCULATE(SUM('Fact BS Balance'[display_balance]), 'Fact BS Balance'[classification] = "Liability", 'Fact BS Balance'[balance_date] = DATE(2023, 12, 31))
+			VAR Y2023Equity = CALCULATE(SUM('Fact BS Balance'[display_balance]), 'Fact BS Balance'[classification] = "Equity", 'Fact BS Balance'[balance_date] = DATE(2023, 12, 31))
+			
+			VAR Y2024Assets = CALCULATE(SUM('Fact BS Balance'[display_balance]), 'Fact BS Balance'[classification] = "Asset", 'Fact BS Balance'[balance_date] = DATE(2024, 12, 31))
+			VAR Y2024Liabilities = CALCULATE(SUM('Fact BS Balance'[display_balance]), 'Fact BS Balance'[classification] = "Liability", 'Fact BS Balance'[balance_date] = DATE(2024, 12, 31))
+			VAR Y2024Equity = CALCULATE(SUM('Fact BS Balance'[display_balance]), 'Fact BS Balance'[classification] = "Equity", 'Fact BS Balance'[balance_date] = DATE(2024, 12, 31))
+			
+			VAR Y2025Assets = CALCULATE(SUM('Fact BS Balance'[display_balance]), 'Fact BS Balance'[classification] = "Asset", 'Fact BS Balance'[balance_date] = DATE(2025, 11, 30))
+			VAR Y2025Liabilities = CALCULATE(SUM('Fact BS Balance'[display_balance]), 'Fact BS Balance'[classification] = "Liability", 'Fact BS Balance'[balance_date] = DATE(2025, 11, 30))
+			VAR Y2025Equity = CALCULATE(SUM('Fact BS Balance'[display_balance]), 'Fact BS Balance'[classification] = "Equity", 'Fact BS Balance'[balance_date] = DATE(2025, 11, 30))
+			
+			// Calculate Ratios
+			VAR DebtRatio2023 = DIVIDE(Y2023Liabilities, Y2023Assets, 0)
+			VAR DebtRatio2024 = DIVIDE(Y2024Liabilities, Y2024Assets, 0)
+			VAR DebtRatio2025 = DIVIDE(Y2025Liabilities, Y2025Assets, 0)
+			
+			VAR AssetsToEquity2023 = DIVIDE(Y2023Assets, Y2023Equity, 0)
+			VAR AssetsToEquity2024 = DIVIDE(Y2024Assets, Y2024Equity, 0)
+			VAR AssetsToEquity2025 = DIVIDE(Y2025Assets, Y2025Equity, 0)
+			
+			VAR EquityRatio2023 = DIVIDE(Y2023Equity, Y2023Assets, 0)
+			VAR EquityRatio2024 = DIVIDE(Y2024Equity, Y2024Assets, 0)
+			VAR EquityRatio2025 = DIVIDE(Y2025Equity, Y2025Assets, 0)
+			
+			// Format values
+			VAR fDebtRatio2023 = FORMAT(DebtRatio2023, "0.00")
+			VAR fDebtRatio2024 = FORMAT(DebtRatio2024, "0.00")
+			VAR fDebtRatio2025 = FORMAT(DebtRatio2025, "0.00")
+			
+			VAR fAssetsToEquity2023 = FORMAT(AssetsToEquity2023, "0.00")
+			VAR fAssetsToEquity2024 = FORMAT(AssetsToEquity2024, "0.00")
+			VAR fAssetsToEquity2025 = FORMAT(AssetsToEquity2025, "0.00")
+			
+			VAR fEquityRatio2023 = FORMAT(EquityRatio2023, "0.0%")
+			VAR fEquityRatio2024 = FORMAT(EquityRatio2024, "0.0%")
+			VAR fEquityRatio2025 = FORMAT(EquityRatio2025, "0.0%")
+			
+			// Trend classes (for debt ratio and leverage, lower is better; for equity ratio, higher is better)
+			VAR DebtTrend2024 = IF(DebtRatio2024 < DebtRatio2023, "var-pos", IF(DebtRatio2024 > DebtRatio2023, "var-neg", ""))
+			VAR DebtTrend2025 = IF(DebtRatio2025 < DebtRatio2024, "var-pos", IF(DebtRatio2025 > DebtRatio2024, "var-neg", ""))
+			
+			VAR LevTrend2024 = IF(AssetsToEquity2024 < AssetsToEquity2023, "var-pos", IF(AssetsToEquity2024 > AssetsToEquity2023, "var-neg", ""))
+			VAR LevTrend2025 = IF(AssetsToEquity2025 < AssetsToEquity2024, "var-pos", IF(AssetsToEquity2025 > AssetsToEquity2024, "var-neg", ""))
+			
+			VAR EqTrend2024 = IF(EquityRatio2024 > EquityRatio2023, "var-pos", IF(EquityRatio2024 < EquityRatio2023, "var-neg", ""))
+			VAR EqTrend2025 = IF(EquityRatio2025 > EquityRatio2024, "var-pos", IF(EquityRatio2025 < EquityRatio2024, "var-neg", ""))
+			
+			// CSS - matching existing HTML reports
+			VAR CSS = "<style>
+			.scroll-wrapper{height:100vh;overflow-y:auto;padding-right:2px}
+			.scroll-wrapper::-webkit-scrollbar{width:8px;background:transparent}
+			.scroll-wrapper::-webkit-scrollbar-thumb{background-color:transparent;border-radius:4px;border:2px solid transparent;background-clip:content-box}
+			.scroll-wrapper:hover::-webkit-scrollbar-thumb{background-color:#bbb}
+			html,body{margin:0;padding:0;height:100%;overflow:hidden}
+			.ratio-table{width:100%;border-collapse:collapse;font-family:Segoe UI,sans-serif;font-size:14px}
+			.ratio-table th{background:#f5f5f5;color:#333;font-weight:600;padding:10px 12px;text-align:center;border-bottom:1px solid #e0e0e0}
+			.ratio-table th:first-child{text-align:left}
+			.ratio-table td{padding:10px 12px;border-bottom:1px solid #f0f0f0}
+			.ratio-table td:first-child{font-weight:500;color:#333}
+			.ratio-table td:not(:first-child){text-align:center;font-weight:600}
+			.ratio-table tr:hover{background:#fafafa}
+			.title{font-size:16px;font-weight:bold;padding:12px;background:#e6e6e6;color:#333;border-bottom:1px solid #e6e6e6}
+			.ratio-desc{font-size:11px;color:#888;font-weight:400;display:block;margin-top:3px}
+			.var-pos{background-color:#d4edda;color:#155724}
+			.var-neg{background-color:#f8d7da;color:#721c24}
+			.note{font-size:11px;color:#888;padding:10px 12px;font-style:italic}
+			</style>"
+			
+			// HTML Table
+			VAR HTMLL = "
+			<div class='scroll-wrapper'>
+			    <div class='title'>Additional Financial Ratios</div>
+			    <table class='ratio-table'>
+			        <tr>
+			            <th>Ratio</th>
+			            <th>2023</th>
+			            <th>2024</th>
+			            <th>2025 YTD</th>
+			        </tr>
+			        <tr>
+			            <td>Debt Ratio<span class='ratio-desc'>Liabilities / Assets</span></td>
+			            <td>" & fDebtRatio2023 & "</td>
+			            <td class='" & DebtTrend2024 & "'>" & fDebtRatio2024 & "</td>
+			            <td class='" & DebtTrend2025 & "'>" & fDebtRatio2025 & "</td>
+			        </tr>
+			        <tr>
+			            <td>Financial Leverage<span class='ratio-desc'>Assets / Equity</span></td>
+			            <td>" & fAssetsToEquity2023 & "</td>
+			            <td class='" & LevTrend2024 & "'>" & fAssetsToEquity2024 & "</td>
+			            <td class='" & LevTrend2025 & "'>" & fAssetsToEquity2025 & "</td>
+			        </tr>
+			        <tr>
+			            <td>Equity Ratio<span class='ratio-desc'>Equity / Assets</span></td>
+			            <td>" & fEquityRatio2023 & "</td>
+			            <td class='" & EqTrend2024 & "'>" & fEquityRatio2024 & "</td>
+			            <td class='" & EqTrend2025 & "'>" & fEquityRatio2025 & "</td>
+			        </tr>
+			    </table>
+			    <div class='note'>Lower debt ratio and leverage indicates conservative financing. Higher equity ratio indicates stronger financial position.</div>
+			</div>
+			"
+			
+			RETURN CSS & HTMLL
+		lineageTag: d13e17d6-da5f-472c-b3cd-5ccbaace8e2a
+
 	column Column1
 		dataType: string
 		lineageTag: 26737ca2-042c-4743-90a2-b3f2fa6f8d0d

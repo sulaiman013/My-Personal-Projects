@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "89d75c2adbe33383cda9",
+  "position": {
+    "x": 743.03797468354423,
+    "y": 567.08860759493666,
+    "z": 13007,
+    "height": 315.18987341772151,
+    "width": 1164.5569620253164,
+    "tabOrder": 13007
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "HTML Financial Ratios Table"
+                }
+              },
+              "queryRef": "_Measures.HTML Financial Ratios Table",
+              "nativeQueryRef": "HTML Financial Ratios Table"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

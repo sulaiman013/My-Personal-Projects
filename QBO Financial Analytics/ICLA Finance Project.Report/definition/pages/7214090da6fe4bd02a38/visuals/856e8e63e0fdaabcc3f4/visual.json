@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
-  "name": "773e4b454d7c71dbee7d",
+  "name": "856e8e63e0fdaabcc3f4",
   "position": {
     "x": 15.53956834532374,
     "y": 12.086330935251798,
-    "z": 10003,
+    "z": 13000,
     "height": 79.424460431654666,
     "width": 89.7841726618705,
-    "tabOrder": 10003
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "image",
@@ -47,6 +47,19 @@
       ]
     },
     "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'OGImage'"
+                }
+              }
+            }
+          }
+        }
+      ],
       "visualLink": [
         {
           "properties": {
@@ -67,7 +80,7 @@
             "bookmark": {
               "expr": {
                 "Literal": {
-                  "Value": "'433ba10c6944c3610d9f'"
+                  "Value": "'74ccf0ab4f916c99f3d3'"
                 }
               }
             }

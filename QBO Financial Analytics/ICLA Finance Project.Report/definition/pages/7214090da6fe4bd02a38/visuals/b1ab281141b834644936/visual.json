@@ -1,12 +1,12 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
-  "name": "b49d7a4995cffc59a329",
+  "name": "b1ab281141b834644936",
   "position": {
-    "x": 602.68551236749113,
-    "y": 11.307420494699647,
+    "x": 1582.6310947562097,
+    "y": 12.364305427782888,
     "z": 1000,
-    "height": 79.15194346289752,
-    "width": 293.9929328621908,
+    "height": 79.4848206071757,
+    "width": 326.77092916283345,
     "tabOrder": 1000
   },
   "visual": {
@@ -91,6 +91,36 @@
                 {
                   "Literal": {
                     "Value": "2025L"
+                  }
+                }
+              ],
+              "isToggled": true
+            },
+            {
+              "identityValues": [
+                {
+                  "Literal": {
+                    "Value": "2024L"
+                  }
+                }
+              ],
+              "isToggled": true
+            },
+            {
+              "identityValues": [
+                {
+                  "Literal": {
+                    "Value": "2023L"
+                  }
+                }
+              ],
+              "isToggled": true
+            },
+            {
+              "identityValues": [
+                {
+                  "Literal": {
+                    "Value": "2022L"
                   }
                 }
               ],
@@ -260,6 +290,40 @@
                     }
                   }
                 ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": -0.1
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "3D"
+                }
               }
             }
           }

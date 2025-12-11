@@ -44,7 +44,7 @@
               },
               "queryRef": "Dim Date.month_name",
               "nativeQueryRef": "Month",
-              "active": true,
+              "active": false,
               "displayName": "Month"
             }
           ]
@@ -84,20 +84,7 @@
             "isPinned": true
           }
         ],
-        "root": {
-          "children": [
-            {
-              "identityValues": [
-                {
-                  "Literal": {
-                    "Value": "2025L"
-                  }
-                }
-              ],
-              "isToggled": true
-            }
-          ]
-        }
+        "root": {}
       }
     ],
     "objects": {
