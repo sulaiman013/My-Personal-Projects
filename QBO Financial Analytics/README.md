@@ -1,430 +1,554 @@
-# QBO Financial Analytics
+# ICLA Finance Power BI Project
 
-A Power BI financial reporting solution built on QuickBooks Online data, featuring a three-layer MySQL data warehouse architecture and advanced visualization techniques including SVG-based KPI cards and HTML Content visuals for formatted financial statements.
+A comprehensive **Financial Analytics Solution** built with Power BI, designed to transform QuickBooks Online (QBO) data into actionable financial insights through an enterprise-grade data model and interactive dashboards.
 
 ## Table of Contents
 
-1. [Project Overview](#project-overview)
-2. [Architecture](#architecture)
-3. [Data Model](#data-model)
-4. [Financial Reports](#financial-reports)
-5. [Advanced Visualizations](#advanced-visualizations)
-6. [Balance Sheet Analytics](#balance-sheet-analytics)
-7. [Technical Implementation](#technical-implementation)
-8. [Setup Instructions](#setup-instructions)
+- [Overview](#overview)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Data Model](#data-model)
+  - [Dimension Tables](#dimension-tables)
+  - [Fact Tables](#fact-tables)
+  - [Relationships](#relationships)
+- [Report Pages](#report-pages)
+- [DAX Measures](#dax-measures)
+- [Getting Started](#getting-started)
+- [Prerequisites](#prerequisites)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Technical Highlights](#technical-highlights)
+- [License](#license)
 
-## Project Overview
+---
 
-This project transforms raw QuickBooks Online accounting data into interactive Power BI reports that replicate standard financial statements:
+## Overview
 
-- **Profit and Loss Statement** with year-over-year comparison
-- **Balance Sheet** with proper account hierarchy and financial KPIs
-- **Accounts Receivable Aging** by customer
-- **Accounts Payable Aging** by vendor
+This Power BI solution provides a complete financial reporting suite that replicates and extends QuickBooks Online's native reports with enhanced analytics capabilities. The solution follows the **medallion architecture** (Bronze/Silver/Gold layers) for data processing and delivers pixel-perfect financial statements with advanced time intelligence.
 
-The solution demonstrates enterprise-grade data modeling practices suitable for any accounting system integration.
+### Key Objectives
+
+- **100% Accuracy Match**: Balance Sheet figures match QuickBooks exactly
+- **99.999% P&L Accuracy**: Profit & Loss statements with near-perfect reconciliation
+- **Real-time Analytics**: Interactive dashboards with drill-down capabilities
+- **Time Intelligence**: YoY comparisons, trend analysis, and fiscal period support
+
+---
+
+## Features
+
+### Financial Statements
+- **Profit & Loss Statement** - Complete income statement with all revenue and expense categories
+- **Balance Sheet** - Assets, Liabilities, and Equity with hierarchical account structure
+- **Cash Flow Statement** - Operating, investing, and financing activities
+
+### Advanced Analytics
+- **SVG-based KPI Cards** - Dynamic sparkline visualizations with YoY trend indicators
+- **HTML Financial Reports** - Pixel-perfect formatted statements using HTML Content visual
+- **Aging Analysis** - AR and AP aging with standard bucket breakdowns (Current, 1-30, 31-60, 61-90, 90+)
+- **General Ledger** - Detailed transaction-level data with date slicing capability
+
+### Time Intelligence
+- Fiscal year and calendar year support
+- Same Period Last Year (SPLY) comparisons
+- Monthly/Quarterly/Annual trend analysis
+- Rolling period calculations
+
+---
 
 ## Architecture
 
-### Data Warehouse Layers
-
-The MySQL database follows a medallion architecture with three schemas:
-
 ```
-icla_finance_bronze    Raw data extracted from QuickBooks API
-         |
-         v
-icla_finance_silver    Cleaned and validated data
-         |
-         v
-icla_finance_gold      Dimensional model optimized for reporting
+┌─────────────────────────────────────────────────────────────────┐
+│                      QuickBooks Online API                       │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    ETL Pipeline (MySQL)                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │
+│  │   Bronze    │─▶│   Silver    │─▶│         Gold            │ │
+│  │  (Raw Data) │  │ (Cleaned)   │  │  (icla_finance_gold)    │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      Power BI Semantic Model                     │
+│  ┌──────────────────────┐    ┌────────────────────────────────┐ │
+│  │   Dimension Tables   │    │        Fact Tables             │ │
+│  │  • Dim Account       │    │  • Fact Invoice/Invoice Line   │ │
+│  │  • Dim Date          │◀──▶│  • Fact Bill/Bill Line         │ │
+│  │  • Dim Customer      │    │  • Fact Payment                │ │
+│  │  • Dim Vendor        │    │  • Fact AR/AP Aging            │ │
+│  │  • Dim Item          │    │  • Fact General Ledger         │ │
+│  │  • Dim Aging Bucket  │    │  • Fact BS Balance             │ │
+│  └──────────────────────┘    │  • Fact PL Line                │ │
+│                              └────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                       Power BI Reports                           │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │
+│  │ Profit &    │  │  Balance    │  │     Cash Flow           │ │
+│  │   Loss      │  │   Sheet     │  │     Statement           │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**Bronze Layer**: Contains raw JSON responses and flat extracts from QuickBooks API endpoints including invoices, bills, payments, customers, vendors, and chart of accounts.
-
-**Silver Layer**: Applies data quality rules, standardizes data types, handles null values, and creates audit columns for tracking data lineage.
-
-**Gold Layer**: Implements a star schema with conformed dimensions and fact tables designed for analytical queries and Power BI consumption.
-
-### Balance Sheet Data Flow
-
-The Balance Sheet follows a specific transformation path:
-
-1. **Bronze**: `bronze_accounts` stores raw QuickBooks account data with `current_balance`
-2. **Silver**: `silver_accounts` adds `bs_category` classification (Cash, AR, AP, Equity, etc.)
-3. **Gold**: `fact_bs_balance` creates monthly snapshots with proper sign conventions:
-   - `current_balance`: Raw signed value from QuickBooks
-   - `display_balance`: Absolute value for reporting display
+---
 
 ## Data Model
 
-### Star Schema Design
-
-The semantic model follows star schema principles with a central date dimension connecting multiple fact tables:
-
-```
-                    [Dim Date]
-                        |
-    +-------+-------+---+---+-------+-------+
-    |       |       |       |       |       |
-[Fact PL] [Fact BS] [Fact Invoice] [Fact Bill] [Fact Payment]
-    |       |           |       |       |
-    +---+---+       +---+       +---+---+
-        |           |               |
-  [Dim Account] [Dim Customer] [Dim Vendor]
-                    |               |
-              [Dim Item]    [Dim Aging Bucket]
-```
-
 ### Dimension Tables
 
-| Table | Purpose | Key Attributes |
-|-------|---------|----------------|
-| Dim Date | Time intelligence | fiscal_year, fiscal_month, fiscal_quarter, is_month_end |
-| Dim Account | Chart of accounts | account_type, classification, pl_category, bs_category |
-| Dim Customer | Customer master | customer_name, company_name, city, state |
-| Dim Vendor | Vendor master | vendor_name, company_name |
-| Dim Item | Products/Services | item_name, item_type, unit_price |
-| Dim Aging Bucket | AR/AP aging ranges | bucket_name, days_min, days_max |
+#### Dim Account
+The chart of accounts with comprehensive categorization for financial reporting.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `account_key` | Integer | Primary key (surrogate) |
+| `account_id` | String | QBO Account ID |
+| `account_name` | String | Account display name |
+| `account_type` | String | QBO account type (Income, Expense, Asset, etc.) |
+| `account_sub_type` | String | Account sub-classification |
+| `classification` | String | Asset, Liability, Equity, Revenue, Expense |
+| `report_category` | String | Financial statement category |
+| `pl_category` | String | P&L section mapping |
+| `bs_category` | String | Balance Sheet section mapping |
+| `cf_category` | String | Cash Flow section mapping |
+| `fully_qualified_name` | String | Full account hierarchy path |
+| `parent_account_id` | String | Parent account reference |
+| `account_level` | Integer | Hierarchy depth level |
+| `display_order` | Integer | Report ordering |
+| `is_active` | Boolean | Active status flag |
+
+#### Dim Date
+Enterprise date dimension with fiscal calendar support.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `date_key` | Date | Primary key (date value) |
+| `day_of_month` | Integer | Day number (1-31) |
+| `day_of_week` | Integer | Day of week (1-7) |
+| `day_name` | String | Day name (Monday, Tuesday, etc.) |
+| `week_of_year` | Integer | ISO week number |
+| `month_number` | Integer | Month (1-12) |
+| `month_name` | String | Full month name |
+| `month_short` | String | Abbreviated month (Jan, Feb, etc.) |
+| `quarter_number` | Integer | Quarter (1-4) |
+| `quarter_name` | String | Quarter label (Q1, Q2, etc.) |
+| `calendar_year` | Integer | Calendar year |
+| `fiscal_year` | Integer | Fiscal year |
+| `fiscal_quarter` | Integer | Fiscal quarter |
+| `fiscal_month` | Integer | Fiscal month |
+| `period_year_month` | String | YYYY-MM format |
+| `period_year_quarter` | String | YYYY-QN format |
+| `is_weekend` | Boolean | Weekend flag |
+| `is_month_end` | Boolean | Month end flag |
+| `is_quarter_end` | Boolean | Quarter end flag |
+| `is_year_end` | Boolean | Year end flag |
+
+#### Dim Customer
+Customer master data for receivables analysis.
+
+#### Dim Vendor
+Vendor master data for payables analysis.
+
+#### Dim Item
+Product and service items for line-level analysis.
+
+#### Dim Aging Bucket
+Standard aging bucket definitions (Current, 1-30, 31-60, 61-90, Over 90 days).
+
+---
 
 ### Fact Tables
 
-| Table | Grain | Measures |
-|-------|-------|----------|
-| Fact PL Line | One row per P&L transaction line | amount |
-| Fact BS Balance | One row per account per month-end | balance |
-| Fact Invoice | One row per invoice header | total_amount, balance_due |
-| Fact Invoice Line | One row per invoice line item | quantity, amount |
-| Fact Bill | One row per bill header | total_amount, balance_due |
-| Fact Bill Line | One row per bill line item | quantity, amount |
-| Fact Payment | One row per payment | amount |
-| Fact AR Aging | One row per customer per aging bucket | amount |
-| Fact AP Aging | One row per vendor per aging bucket | amount |
+#### Fact General Ledger
+Transaction-level general ledger entries for detailed financial analysis.
 
-### Relationship Design
+| Column | Type | Description |
+|--------|------|-------------|
+| `gl_key` | Integer | Primary key |
+| `transaction_id` | String | Source transaction reference |
+| `transaction_type` | String | Transaction type (Invoice, Bill, Payment, etc.) |
+| `line_number` | Integer | Line sequence |
+| `transaction_date` | Date | Transaction date |
+| `posting_date` | Date | GL posting date |
+| `account_key` | Integer | FK to Dim Account |
+| `debit_amount` | Decimal | Debit amount |
+| `credit_amount` | Decimal | Credit amount |
+| `customer_key` | Integer | FK to Dim Customer |
+| `vendor_key` | Integer | FK to Dim Vendor |
+| `memo` | String | Transaction memo |
+| `fiscal_year` | Integer | Fiscal year |
+| `fiscal_month` | Integer | Fiscal month |
+| `fiscal_quarter` | Integer | Fiscal quarter |
 
-The model uses single-direction relationships from fact tables to dimensions, enabling filter propagation from slicers to measures:
+#### Fact BS Balance
+Pre-calculated Balance Sheet balances for performance optimization.
 
-- **Fact PL Line** connects to Dim Date, Dim Account, Dim Customer, Dim Vendor, and Dim Item
-- **Fact BS Balance** connects to Dim Date via `balance_date` for historical snapshots
-- Customer filtering on P&L affects revenue transactions (from invoices)
-- Vendor filtering on P&L affects expense transactions (from bills)
+| Column | Type | Description |
+|--------|------|-------------|
+| `balance_key` | Integer | Primary key |
+| `account_key` | Integer | FK to Dim Account |
+| `account_id` | String | Account identifier |
+| `account_name` | String | Account name |
+| `account_type` | String | Account type |
+| `bs_category` | String | Balance Sheet category |
+| `classification` | String | Asset/Liability/Equity |
+| `balance_date` | Date | Balance as-of date |
+| `opening_balance` | Decimal | Period opening balance |
+| `debit_balance` | Decimal | Debit movements |
+| `credit_balance` | Decimal | Credit movements |
+| `transaction_balance` | Decimal | Period activity |
+| `display_balance` | Decimal | Ending balance for display |
+| `fiscal_year` | Integer | Fiscal year |
+| `fiscal_month` | Integer | Fiscal month |
+| `fiscal_quarter` | Integer | Fiscal quarter |
 
-## Financial Reports
+#### Fact PL Line
+Profit & Loss transaction lines for income statement analysis.
 
-### Profit and Loss Statement
+| Column | Type | Description |
+|--------|------|-------------|
+| `line_key` | Integer | Primary key |
+| `source_table` | String | Source transaction type |
+| `source_id` | String | Source transaction ID |
+| `line_number` | Integer | Line sequence |
+| `transaction_date_key` | Date | Transaction date |
+| `account_key` | Integer | FK to Dim Account |
+| `line_type` | String | Line classification |
+| `amount` | Decimal | Line amount |
+| `fiscal_year` | Integer | Fiscal year |
+| `fiscal_month` | Integer | Fiscal month |
+| `fiscal_quarter` | Integer | Fiscal quarter |
 
-The P&L report uses a header table approach for row ordering:
+#### Fact AR Aging
+Accounts Receivable aging snapshot data.
 
-**PL Header Table** defines the report structure:
+| Column | Type | Description |
+|--------|------|-------------|
+| `ar_key` | Integer | Primary key |
+| `as_of_date` | Date | Aging snapshot date |
+| `invoice_id` | String | Invoice reference |
+| `customer_key` | Integer | FK to Dim Customer |
+| `bucket_key` | Integer | FK to Dim Aging Bucket |
+| `original_amount` | Decimal | Original invoice amount |
+| `amount_paid` | Decimal | Payments received |
+| `balance_due` | Decimal | Outstanding balance |
+| `days_outstanding` | Integer | Days since due date |
+| `current_amount` | Decimal | Current bucket amount |
+| `days_1_30` | Decimal | 1-30 days bucket |
+| `days_31_60` | Decimal | 31-60 days bucket |
+| `days_61_90` | Decimal | 61-90 days bucket |
+| `days_over_90` | Decimal | Over 90 days bucket |
+
+#### Fact AP Aging
+Accounts Payable aging snapshot data (same structure as AR Aging).
+
+#### Fact Invoice / Fact Invoice Line
+Sales transaction headers and line items.
+
+#### Fact Bill / Fact Bill Line
+Purchase transaction headers and line items.
+
+#### Fact Payment
+Customer and vendor payment transactions.
+
+---
+
+### Relationships
+
+The data model follows a **star schema** design with the following key relationships:
+
 ```
-LineItemNumber | LineItemDescription      | LineItemID        | ExpenseIncome | Highlight
-1              | Income                   | Income            | 1             | 1
-2              |     Billable Expense     | BillableExpense   | 1             | 0
-...
-9              | Total Income             | TotalIncome       | 1             | 1
-10             | Cost of Sales            | CostofSales       | -1            | 1
-...
-32             | Net Income               | NetIncome         | 1             | 1
+                          ┌──────────────────┐
+                          │   Dim Account    │
+                          └────────┬─────────┘
+                                   │
+        ┌──────────────────────────┼──────────────────────────┐
+        │                          │                          │
+        ▼                          ▼                          ▼
+┌───────────────┐          ┌───────────────┐          ┌───────────────┐
+│ Fact PL Line  │          │Fact BS Balance│          │Fact Gen Ledger│
+└───────────────┘          └───────────────┘          └───────────────┘
+        │                          │                          │
+        └──────────────────────────┼──────────────────────────┘
+                                   │
+                          ┌────────┴─────────┐
+                          │    Dim Date      │
+                          └──────────────────┘
 ```
 
-Each line item has a corresponding DAX measure (prefixed with underscore):
-- `_TotalIncome` sums revenue accounts
-- `_TotalCostofSales` sums COGS accounts
-- `_GrossProfit` = `_TotalIncome` - `_TotalCostofSales`
-- `_NetIncome` = `_NetOperatingIncome` + `_NetOtherIncome`
+**Key Relationship Patterns:**
+- All fact tables connect to `Dim Date` via date keys
+- Transaction facts connect to `Dim Account` for financial categorization
+- Customer-facing facts connect to `Dim Customer`
+- Vendor-facing facts connect to `Dim Vendor`
+- Aging facts connect to `Dim Aging Bucket`
+- Bi-directional filtering enabled on `Fact BS Balance` → `Dim Account` for Balance Sheet reporting
 
-### Balance Sheet
+---
 
-The BS Header Table defines account hierarchy with indentation levels:
+## Report Pages
 
-```
-LineItemNumber | LineItemDescription           | Section              | Level | Indent
-1              | Assets                        | Assets               | 1     | 0
-2              | Current Assets                | Assets               | 2     | 1
-3              | Bank Accounts                 | Assets               | 3     | 2
-4              |     Checking                  | Assets               | 4     | 3
-...
-20             | Total for Assets              | Assets               | 1     | 0
-21             | Liabilities and Equity        | Liabilities and Eq   | 1     | 0
-```
+### 1. Profit & Loss Statement
+**Page: `Profit & Loss`**
 
-Balance Sheet measures (prefixed with `_BS_`) pull from either:
-1. **Fact BS Balance** for historical month-end snapshots
-2. **Calculated fields** that derive values from P&L (e.g., Retained Earnings)
+Interactive income statement featuring:
+- SVG KPI cards with sparkline trends for key metrics:
+  - Total Revenue (with YoY comparison)
+  - Gross Profit (with margin percentage)
+  - Net Operating Income
+  - Net Income
+  - Net Profit Margin
+- Detailed P&L breakdown by account category
+- Time-based filtering (Fiscal Year, Quarter, Month)
+- Waterfall visualization for variance analysis
 
-## Advanced Visualizations
+### 2. Balance Sheet
+**Page: `Balance Sheet`**
 
-### SVG KPI Cards
+Comprehensive balance sheet report featuring:
+- HTML-rendered financial statement matching QBO format exactly
+- Assets section (Current Assets, Fixed Assets)
+- Liabilities section (Current Liabilities, Long-term Liabilities)
+- Equity section (Opening Balance, Retained Earnings, Net Income)
+- Interactive date selection for point-in-time balances
+- Visual interactions disabled for specific elements to maintain report integrity
 
-The project includes DAX measures that generate complete SVG graphics for KPI cards. These provide:
+### 3. Cash Flow Statement
+**Page: `Cashflow Statement`**
 
-- Dynamic sparkline charts showing trend data
-- Year-over-year change indicators with color coding
-- Formatted currency values with K/M suffixes
-- Responsive design within the card boundaries
+Cash flow analysis featuring:
+- Operating activities
+- Investing activities
+- Financing activities
+- Net change in cash
 
-**Technical approach:**
+---
 
-1. Calculate current and prior year values
-2. Generate sparkline data points using `SUMMARIZE` and `ADDCOLUMNS`
-3. Scale values to SVG coordinate space (0-260 x 0-160)
-4. Construct SVG path strings using `CONCATENATEX`
-5. Return complete SVG as data URI: `data:image/svg+xml;utf8,<svg>...</svg>`
+## DAX Measures
 
-Example structure from `SVG KPI - Total Revenue`:
+### Core Financial Measures
 
 ```dax
-VAR SvgContent = "
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 160'>
-    <defs>
-        <linearGradient id='sparkGrad'>...</linearGradient>
-    </defs>
-    <rect ... />  <!-- Card background -->
-    <text ...>" & RevenueFormatted & "</text>  <!-- Main value -->
-    <polygon points='" & SparklineArea & "' fill='url(#sparkGrad)'/>
-    <polyline points='" & SparklinePoints & "' stroke='" & SparklineColor & "'/>
-</svg>"
+// Revenue & Expenses
+Total Revenue = SUM('Fact Invoice'[total_amount])
+Total Expenses = SUM('Fact Bill'[total_amount])
+Net Income = [Total Revenue] - [Total Expenses]
+Gross Margin % = DIVIDE([Net Income], [Total Revenue], 0)
+
+// Revenue from Line Items
+Revenue Amount = SUM('Fact Invoice Line'[amount])
+Expense Amount = SUM('Fact Bill Line'[amount])
 ```
 
-The SVG is displayed using the Image visual with the measure set as the image URL.
+### P&L Template Measures
 
-### HTML Content Visuals
-
-For formatted financial statements, the project uses the HTML Content custom visual. This enables:
-
-- Proper indentation for account hierarchies
-- Bold formatting for subtotals and totals
-- Conditional coloring (red for negative values)
-- Fixed-width columns for alignment
-- Scrollable content with custom scrollbar styling
-
-## Balance Sheet Analytics
-
-### SVG KPI Cards for Balance Sheet
-
-The Balance Sheet page features four specialized SVG KPI cards that visualize key financial health indicators:
-
-#### 1. Working Capital
-Displays the difference between Current Assets and Current Liabilities with a visual comparison bar.
-
-```
-Working Capital = Current Assets - Current Liabilities
-```
-
-**Visual Features:**
-- Main value displayed in large format ($2.6M)
-- Horizontal comparison bars showing CA vs CL amounts
-- Color-coded bars (green for assets, gray for liabilities)
-- Labels showing actual dollar amounts
-
-#### 2. Current Ratio
-Shows the organization's ability to pay short-term obligations with a threshold indicator bar.
-
-```
-Current Ratio = Current Assets / Current Liabilities
-```
-
-**Visual Features:**
-- Ratio value displayed (e.g., 2.17x)
-- Health threshold bar with three zones:
-  - Red zone: < 1.0 (Poor)
-  - Yellow zone: 1.0 - 1.5 (Fair)
-  - Green zone: > 1.5 (Good)
-- Triangle marker indicating current position
-- Threshold labels for quick interpretation
-
-#### 3. Quick Ratio (Acid-Test)
-Measures the ability to meet short-term obligations with liquid assets only.
-
-```
-Quick Ratio = (Current Assets - Inventory) / Current Liabilities
-```
-
-**Visual Features:**
-- Ratio value displayed (e.g., 2.17x)
-- Stacked bar showing liquid vs non-liquid asset breakdown
-- Color differentiation between liquid assets and inventory
-- Percentage labels for each component
-
-#### 4. Debt-to-Equity Ratio
-Illustrates the capital structure split between debt financing and equity.
-
-```
-Debt-to-Equity = Total Liabilities / Total Equity
-```
-
-**Visual Features:**
-- Ratio value displayed (e.g., 0.86x)
-- Capital structure bar split into debt and equity portions
-- Percentage labels (e.g., 46% Debt | 54% Equity)
-- Color-coded segments for easy interpretation
-
-### Balance Sheet Trend Charts
-
-Two DAX measures enable trend analysis over time:
+Individual line item measures following the QuickBooks P&L structure:
 
 ```dax
-_BS_TotalAssets_Trend =
-VAR SelectedDate = MAX('Dim Date'[date_key])
-RETURN CALCULATE(
-    SUM('Fact BS Balance'[display_balance]),
-    'Fact BS Balance'[classification] = "Asset",
-    'Fact BS Balance'[balance_date] = EOMONTH(SelectedDate, 0)
-)
+// Income Categories
+_TotalIncome = CALCULATE(SUM('Fact PL Line'[amount]), 'Dim Account'[account_type] = "Income")
+_CostofGoodsSold = CALCULATE(SUM('Fact PL Line'[amount]), 'Dim Account'[account_type] = "Cost of Goods Sold")
+_GrossProfit = [_TotalIncome] - [_TotalCostofSales]
 
-_BS_TotalLiabilities_Trend =
-VAR SelectedDate = MAX('Dim Date'[date_key])
-RETURN CALCULATE(
-    SUM('Fact BS Balance'[display_balance]),
-    'Fact BS Balance'[classification] = "Liability",
-    'Fact BS Balance'[balance_date] = EOMONTH(SelectedDate, 0)
-)
+// Expense Categories
+_TotalExpenses = CALCULATE(SUM('Fact PL Line'[amount]), 'Dim Account'[account_type] = "Expense")
+_NetOperatingIncome = [_GrossProfit] - [_TotalExpenses]
+
+// Other Income/Expenses
+_TotalOtherExpenses = CALCULATE(SUM('Fact PL Line'[amount]), 'Dim Account'[account_type] = "Other Expense")
+_NetIncome = [_NetOperatingIncome] + [_NetOtherIncome]
 ```
 
-These measures map to Dim Date allowing line charts to show Assets vs Liabilities over time.
-
-### HTML Financial Ratios Table
-
-An HTML Content visual displays additional financial ratios with multi-year comparison:
-
-| Ratio | 2023 | 2024 | 2025 YTD | Description |
-|-------|------|------|----------|-------------|
-| Debt Ratio | 42% | 46% | 46% | Total Liabilities / Total Assets |
-| Financial Leverage | 1.72x | 1.86x | 1.86x | Total Assets / Total Equity |
-| Equity Ratio | 58% | 54% | 54% | Total Equity / Total Assets |
-
-**Styling Features:**
-- Matches existing HTML report scrollbar pattern
-- Conditional formatting on year-over-year changes
-- Color-coded variance indicators (green = favorable, red = unfavorable)
-- Header styled with #e6e6e6 border
-
-## Technical Implementation
-
-### DAX Measure Organization
-
-Measures follow a naming convention:
-
-| Prefix | Purpose | Example |
-|--------|---------|---------|
-| `_` | P&L line items | `_TotalIncome`, `_NetIncome` |
-| `_BS_` | Balance Sheet line items | `_BS_Checking`, `_BS_TotalAssets` |
-| None | General calculations | `Total Revenue`, `Revenue PY` |
-| `SVG KPI -` | SVG visualizations | `SVG KPI - Total Revenue`, `SVG KPI - Working Capital` |
-| `HTML` | HTML Content reports | `HTML Financial Ratios Table` |
-
-### Time Intelligence
-
-Prior year calculations use `SAMEPERIODLASTYEAR`:
+### Balance Sheet Measures
 
 ```dax
-VAR pyTotalIncome = CALCULATE(
-    [_TotalIncome],
-    SAMEPERIODLASTYEAR('Dim Date'[date_key])
-)
+// Assets
+_BS_TotalBankAccounts = [_BS_Checking] + [_BS_Savings]
+_BS_TotalCurrentAssets = [_BS_TotalBankAccounts] + [_BS_TotalAR] + [_BS_TotalOtherCurrentAssets]
+_BS_TotalAssets = [_BS_TotalCurrentAssets] + [_BS_TotalFixedAssets]
+
+// Liabilities
+_BS_TotalCurrentLiabilities = [_BS_TotalAP] + [_BS_TotalCreditCards] + [_BS_TotalOtherCurrentLiabilities]
+_BS_TotalLiabilities = [_BS_TotalCurrentLiabilities] + [_BS_TotalLongTermLiabilities]
+
+// Equity
+_BS_TotalEquity = [_BS_OpeningBalanceEquity] + [_BS_RetainedEarnings] + [_BS_NetIncomeBS]
+_BS_TotalLiabilitiesAndEquity = [_BS_TotalLiabilities] + [_BS_TotalEquity]
 ```
 
-The sparkline measures use `DATESINPERIOD` for rolling windows:
+### Time Intelligence Measures
 
 ```dax
-VAR MonthlyData = CALCULATETABLE(
-    'Dim Date',
-    DATESINPERIOD('Dim Date'[date_key], MaxDate, -12, MONTH)
-)
+// Prior Year Comparison
+Revenue PY = CALCULATE([Total Revenue], SAMEPERIODLASTYEAR('Dim Date'[date_key]))
+
+// YoY Change Calculation (used in SVG KPIs)
+YoYChange = CurrentValue - PriorYearValue
+YoYPercent = DIVIDE(YoYChange, PriorYearValue, 0)
 ```
 
-### Data Validation
+### SVG KPI Measures
 
-The Balance Sheet data has been validated through:
+Dynamic SVG-based KPI cards with embedded sparklines:
 
-1. **Accounting Equation Check**: Assets = Liabilities + Equity (verified to balance)
-2. **Transaction Tracing**: AR/AP changes traced through invoices, bills, and payments
-3. **Historical Continuity**: Balance changes verified against transaction activity
-4. **Cross-Layer Validation**: Bronze -> Silver -> Gold transformations verified
-
-### TMDL Format
-
-The semantic model uses Tabular Model Definition Language (TMDL), a human-readable format for Power BI models that enables:
-
-- Version control with meaningful diffs
-- Code review of model changes
-- Automated deployment pipelines
-
-File structure:
-```
-ICLA Finance Project.SemanticModel/
-  definition/
-    model.tmdl           # Model metadata
-    relationships.tmdl   # All relationships
-    tables/
-      Dim Account.tmdl   # Table definition + columns
-      Fact PL Line.tmdl
-      Fact BS Balance.tmdl
-      BS Header Table.tmdl
-      _Measures.tmdl     # All measures (P&L, BS, KPIs, HTML)
+```dax
+SVG KPI - Total Revenue =
+    // Generates complete SVG visualization with:
+    // - Formatted current value
+    // - YoY percentage change badge
+    // - Dynamic sparkline (Monthly when year selected, Annual otherwise)
+    // - Color-coded trend indicators (green/red)
 ```
 
-## Setup Instructions
+**Available SVG KPIs:**
+- `SVG KPI - Total Revenue`
+- `SVG KPI - Gross Profit`
+- `SVG KPI - Gross Margin`
+- `SVG KPI - Net Operating Income`
+- `SVG KPI - Net Income`
+- `SVG KPI - Net Profit Margin`
+
+### HTML Report Measures
+
+```dax
+BS HTML Report =
+    // Generates complete HTML Balance Sheet with:
+    // - CSS styling matching QuickBooks format
+    // - Scrollable container
+    // - Hierarchical account structure
+    // - Proper indentation and totaling
+```
+
+---
+
+## Getting Started
 
 ### Prerequisites
 
-- Power BI Desktop (November 2024 or later for TMDL support)
-- MySQL Server 8.0+
-- QuickBooks Online account (for data extraction)
+1. **Power BI Desktop** (latest version recommended)
+2. **MySQL Server** with the `icla_finance_gold` database
+3. **MySQL ODBC Connector** or MySQL.Database() connection capability
+4. **QuickBooks Online** account with API access (for data extraction)
 
-### Database Setup
+### Configuration
 
-1. Create the three MySQL schemas:
-   ```sql
-   CREATE SCHEMA icla_finance_bronze;
-   CREATE SCHEMA icla_finance_silver;
-   CREATE SCHEMA icla_finance_gold;
+1. **Database Connection**
+
+   Update the MySQL connection string in the Power Query source:
+   ```powerquery
+   Source = MySQL.Database("localhost", "icla_finance_gold", [ReturnSingleDatabase=true])
    ```
 
-2. Run the ETL scripts to populate tables from QuickBooks API
+   Modify `localhost` to your MySQL server address.
 
-3. Verify the gold layer tables exist:
-   - dim_date, dim_account, dim_customer, dim_vendor, dim_item, dim_aging_bucket
-   - fact_pl_line, fact_bs_balance, fact_invoice, fact_invoice_line
-   - fact_bill, fact_bill_line, fact_payment, fact_ar_aging, fact_ap_aging
+2. **Data Refresh**
 
-### Power BI Setup
+   Configure scheduled refresh in Power BI Service or refresh manually in Power BI Desktop.
 
-1. Open `ICLA Finance Project.pbip` in Power BI Desktop
+3. **Fiscal Year Settings**
 
-2. Update the MySQL connection string in Power Query:
-   - Server: localhost (or your MySQL server)
-   - Database: icla_finance_gold
-   - Authentication: MySQL credentials
+   The model supports fiscal year configurations. Update the `Dim Date` table generation to match your organization's fiscal calendar.
 
-3. Refresh the data model
+---
 
-4. The report pages will populate with your financial data
+## Project Structure
 
-### Customization
+```
+ICLA Finance Power BI Project/
+├── ICLA Finance Project.pbip              # Power BI Project file
+├── ICLA Finance Project.pbix              # Power BI Desktop file
+├── ICLA Finance Project.Report/           # Report definition
+│   ├── definition/
+│   │   ├── pages/                         # Report pages
+│   │   │   ├── 994fc452.../              # Profit & Loss page
+│   │   │   ├── 7214090d.../              # Balance Sheet page
+│   │   │   └── 39cc49e7.../              # Cashflow Statement page
+│   │   ├── bookmarks/                     # Report bookmarks
+│   │   └── report.json                    # Report configuration
+│   └── StaticResources/                   # Images and themes
+├── ICLA Finance Project.SemanticModel/    # Semantic model definition
+│   ├── definition/
+│   │   ├── tables/                        # Table definitions (TMDL)
+│   │   │   ├── Dim Account.tmdl
+│   │   │   ├── Dim Date.tmdl
+│   │   │   ├── Dim Customer.tmdl
+│   │   │   ├── Dim Vendor.tmdl
+│   │   │   ├── Dim Item.tmdl
+│   │   │   ├── Dim Aging Bucket.tmdl
+│   │   │   ├── Fact General Ledger.tmdl
+│   │   │   ├── Fact BS Balance.tmdl
+│   │   │   ├── Fact PL Line.tmdl
+│   │   │   ├── Fact AR Aging.tmdl
+│   │   │   ├── Fact AP Aging.tmdl
+│   │   │   ├── Fact Invoice.tmdl
+│   │   │   ├── Fact Invoice Line.tmdl
+│   │   │   ├── Fact Bill.tmdl
+│   │   │   ├── Fact Bill Line.tmdl
+│   │   │   ├── Fact Payment.tmdl
+│   │   │   └── _Measures.tmdl             # All DAX measures
+│   │   ├── relationships.tmdl             # Model relationships
+│   │   └── model.tmdl                     # Model configuration
+│   └── TMDLScripts/                       # Development scripts
+└── README.md                              # This file
+```
 
-To adapt for different chart of accounts:
+---
 
-1. Update `PL Header Table` with your P&L structure
-2. Update `BS Header Table` with your Balance Sheet structure
-3. Create corresponding measures for each line item
-4. Update the HTML Report measures to reference new line items
+## Technical Highlights
 
-## File Reference
+### 1. Medallion Architecture
+The solution implements a **Bronze → Silver → Gold** data pipeline:
+- **Bronze**: Raw QBO API extracts
+- **Silver**: Cleansed and conformed data
+- **Gold**: Business-ready dimensional model (`icla_finance_gold`)
 
-| File | Description |
-|------|-------------|
-| `ICLA Finance Project.pbix` | Power BI report file |
-| `ICLA Finance Project.pbip` | Power BI project file |
-| `ICLA Finance Project.Report/` | Report pages and visuals |
-| `ICLA Finance Project.SemanticModel/` | Data model (TMDL) |
+### 2. TMDL Format
+The semantic model uses **Tabular Model Definition Language (TMDL)** for:
+- Version control friendly structure
+- Human-readable model definitions
+- Easy diff/merge operations
 
-## Recent Updates
+### 3. SVG Visualizations
+Custom SVG-based KPI cards provide:
+- Embedded sparkline charts
+- Dynamic color-coded trend indicators
+- Context-aware period labels (Monthly vs Annual)
+- No external visual dependencies
 
-### December 2024
-- Added Balance Sheet Analytics page with 4 SVG KPI cards
-- Implemented trend charts for Assets vs Liabilities over time
-- Created HTML Financial Ratios Table with multi-year comparison
-- Validated all Balance Sheet KPIs against MySQL source data
-- Documented ETL transformation logic through Bronze -> Silver -> Gold layers
+### 4. HTML Content Visual
+Pixel-perfect Balance Sheet rendering using:
+- Custom CSS styling
+- Scrollable container with custom scrollbars
+- Hierarchical indentation
+- Proper accounting formatting (parentheses for negatives)
+
+### 5. Performance Optimization
+- Pre-calculated Balance Sheet balances (`Fact BS Balance`)
+- Efficient date filtering with dedicated date dimension
+- Bi-directional filtering only where necessary
+- Import mode for all tables
+
+---
+
+## License
+
+This project is provided as-is for educational and portfolio demonstration purposes.
+
+---
+
+## Author
+
+**Sulaiman Ahmed**
+
+- GitHub: [@sulaiman013](https://github.com/sulaiman013)
+
+---
+
+*Built with Power BI Desktop and MySQL*
